@@ -1,5 +1,15 @@
 {% extends 'posts/base.html' %}
 
-{% block title %}post {{ id }}{% endblock %}
+{% block title %}post {{ post.name }}{% endblock %}
 
-{% block content %}{{ id }}{% endblock %}
+{% block content %}
+    {% if post == None %}
+        <span>Noting here</span>
+    {% else %}
+
+        {% if post.type == 'embeded' %}
+            <iframe src="{{ post.content }}" frameborder="0"></iframe>
+        {% endif %}
+
+    {% endif %}
+{% endblock %}
