@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,11 +7,16 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'stylesheets/style.css' %}">
 </head>
 <body>
     <header>
-        <a href="{% url 'static:home' %}"><h1>Afinidata</h1></a>
+        <a href="{% url 'static:home' %}" class="logo">
+            <h1>Afinidata</h1>
+            <img src="{% static 'images/logo.png' %}" alt="">
+        </a>
     </header>
     {% block content %}{% endblock %}
 </body>
+    {% block scripts %}{% endblock %}
 </html>
