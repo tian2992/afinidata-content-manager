@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from posts.models import Post, Interaction
 from django.shortcuts import get_object_or_404, render
 from posts.forms import CreatePostFormModel, CreatePostForm
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 
 
 class HomeView(TemplateView):
@@ -43,5 +43,12 @@ def new_post(request):
             )
         ))
 
-    return render(request, 'posts/new.html', {'form': form})
+    try:
+        if request.GET['quest'] == 'afini':
 
+            return render(request, 'posts/new.html', {'form': form})
+
+        else:
+            raise Http404('Not found')
+    except:
+        raise Http404('Not found')
