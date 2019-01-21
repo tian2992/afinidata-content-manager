@@ -14,6 +14,18 @@ def new_user(request):
         if form.is_valid():
             user = form.save()
 
+            params = dict(request.POST)
+
+            del params['last_channel_id']
+            del params['backup_key']
+
+            for param in params:
+                UserData.objects.create(
+                    user=user,
+                    data_key=str(param),
+                    data_value=str(params[param][0])
+                )
+
             return JsonResponse(dict(
                 status='created',
                 data=dict(
