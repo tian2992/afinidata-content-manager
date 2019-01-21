@@ -1,6 +1,5 @@
 *.log
 local_settings.py
-db.sqlite3
 .idea/
 venv/
 *.DS_Store
@@ -11,5 +10,7 @@ include/
 lib/
 \.env
 staticfiles/
+**/migrations/
+
 
 *.sqlite3

@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'posts.apps.PostsConfig',
-    'static.apps.StaticConfig'
+    'static.apps.StaticConfig',
+    'messenger_users.apps.MessengerUsersConfig'
 ]
 
 MIDDLEWARE = [
@@ -97,7 +98,7 @@ DATABASES = {
     }
 }
 
-DATABASE_ROUTERS = ['posts.routers.PostsRouter']
+DATABASE_ROUTERS = ['posts.routers.PostsRouter', 'messenger_users.routers.MessengerUsersRouter']
 '''DATABASE_APPS_MAPPING = {'posts': 'posts_db',
                          'messenger_users': 'messenger_users_db'}'''
 
