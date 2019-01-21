@@ -25,7 +25,6 @@ def get_env_variable(var_name):
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -87,11 +86,21 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DEVELOPMENT_DATABASE_ENGINE'),
+    'default': {},
+    'posts_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_NAME')),
+    },
+    'messenger_users_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_USERS_NAME')),
     }
 }
+
+DATABASE_ROUTERS = ['posts.routers.PostsRouter']
+'''DATABASE_APPS_MAPPING = {'posts': 'posts_db',
+                         'messenger_users': 'messenger_users_db'}'''
+
 
 
 # Password validation

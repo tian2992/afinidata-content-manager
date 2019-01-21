@@ -12,6 +12,9 @@ class Post(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        app_label = 'posts'
+
 
 class Interaction(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
@@ -21,3 +24,6 @@ class Interaction(models.Model):
 
     def __str__(self):
         return self.messenger_id
+
+    class Meta:
+        app_label = 'posts'
