@@ -21,6 +21,11 @@ def post(request, id):
                     messenger_id=messenger_id,
                     type='opened'
             )
+            post_sesion = Interaction(post=post,
+                                      messenger_id=messenger_id,
+                                      type='sesion')
+            post_sesion.save()
+            print('post sesion', post_sesion.pk)
         except:
             pass
 
