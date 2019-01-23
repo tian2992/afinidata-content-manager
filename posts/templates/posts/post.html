@@ -3,7 +3,10 @@
 {% block title %}post {{ post.name }}{% endblock %}
 
 {% block content %}
-    <article id="post-article" data-id="{{ post.id }}" data-type="{{ post.type }}">
+    <article id="post-article"
+             data-id="{{ post.id }}"
+             data-type="{{ post.type }}"
+             data-session-id="{{ session_id }}">
     {% if post == None %}
         <span>Noting here</span>
     {% else %}
