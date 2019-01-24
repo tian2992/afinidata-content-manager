@@ -11,10 +11,10 @@ def validates_date(request):
             if request.GET['date']:
                 result = re.match("[\d]{1,2}/[\d]{1,2}/[\d]{4}", request.GET['date'])
                 if result:
-                    return HttpResponse('true')
+                    return JsonResponse(dict(isDateValid=True))
                 else:
-                    return HttpResponse('false')
+                    return JsonResponse(dict(isDateValid=False))
 
         except Exception as e:
-            return HttpResponse('false')
+            return JsonResponse(dict(isDateValid=False))
 
