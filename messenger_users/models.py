@@ -7,6 +7,7 @@ class User(models.Model):
     backup_key = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    bot_id = models.IntegerField(default=1)
 
     def __str__(self):
         return self.last_channel_id

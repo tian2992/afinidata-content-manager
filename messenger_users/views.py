@@ -18,6 +18,7 @@ def new_user(request):
 
             del params['last_channel_id']
             del params['backup_key']
+            del params['bot_id']
 
             for param in params:
                 UserData.objects.create(
@@ -42,3 +43,12 @@ def new_user(request):
             ))
     else:
         raise Http404('Not auth')
+
+
+@csrf_exempt
+def add_attribute(request):
+
+    if request.method == 'POST':
+        return JsonResponse(request.POST)
+    else:
+        return JsonResponse(dict(hello='world'))

@@ -6,7 +6,7 @@ class CreateUserFormModel(ModelForm):
 
     class Meta:
         model = User
-        fields = ['last_channel_id', 'backup_key']
+        fields = ['last_channel_id', 'backup_key', 'bot_id']
 
 
 class CreateUserDataFormModel(ModelForm):
