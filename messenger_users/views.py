@@ -46,9 +46,30 @@ def new_user(request):
 
 
 @csrf_exempt
-def add_attribute(request):
+def add_attribute(request, channel_id):
+
+    users = User.objects.filter(channel_id=channel_id)
+    user = None
+    if users:
+        user = users[0]
+    else:
+        users = User.objects.filter(last_channel_id=channel_id)
+        if users:
+            user = users[0]
 
     if request.method == 'POST':
-        return JsonResponse(request.POST)
+        if not user:
+            return JsonResponse(dict(status="error", error="User not exists with channel id: {}".format(channel_id)))
+        else:
+            results = []
+            for param in request.POST:
+                UserData.objects.create(
+                    user=user,
+                    data_key=str(param),
+                    data_value=str(request.POST[param])
+                )
+                results.append(dict(attribute=param, value=request.POST[param]))
+            print(request.POST)
+            return JsonResponse(dict(status="finished", data=dict(user_id=user.pk, added_attributes=results)))
     else:
         return JsonResponse(dict(hello='world'))
