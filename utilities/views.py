@@ -14,10 +14,31 @@ def validates_date(request):
                 result = re.match("[\d]{1,2}/[\d]{1,2}/[\d]{4}", request.GET['date'])
                 second_result = re.match("[\d]{1,2}%2F[\d]{1,2}%2F[\d]{4}", request.GET['date'])
                 if result or second_result:
-                    return JsonResponse(dict(isDateValid=True))
+                    return JsonResponse(
+                        dict(
+                            set_attributes=dict(
+                                isDateValid=True
+                            ),
+                            messages=[]
+                        )
+                    )
                 else:
-                    return JsonResponse(dict(isDateValid=False))
+                    return JsonResponse(
+                        dict(
+                            set_attributes=dict(
+                                isDateValid=False
+                            ),
+                            messages=[]
+                        )
+                    )
 
         except Exception as e:
-            return JsonResponse(dict(isDateValid=False))
+            return JsonResponse(
+                dict(
+                    set_attributes=dict(
+                        isDateValid=False
+                    ),
+                    messages=[]
+                )
+            )
 
