@@ -21,5 +21,6 @@ urlpatterns = [
     path('', include("static.urls", namespace="static")),
     path('posts/', include("posts.urls", namespace="posts")),
     path('messenger_users/', include("messenger_users.urls", namespace="users")),
-    path('utilities/', include("utilities.urls", namespace="utilities"))
+    path('utilities/', include("utilities.urls", namespace="utilities")),
+    path('dashboard/', include("dash.urls", namespace="dash"))
 ]

@@ -26,7 +26,7 @@ class Interaction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self
+        return self.channel_id
 
     class Meta:
         app_label = 'posts'

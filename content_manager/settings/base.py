@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'posts.apps.PostsConfig',
     'static.apps.StaticConfig',
     'messenger_users.apps.MessengerUsersConfig',
-    'utilities.apps.UtilitiesConfig'
+    'utilities.apps.UtilitiesConfig',
+    'dash.apps.DashConfig'
 ]
 
 MIDDLEWARE = [
