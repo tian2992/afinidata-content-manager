@@ -66,14 +66,14 @@
                             <td>{{ user.pk }}</td>
                             <td>
                                 {% for user_data in users_data %}
-                                    {% if user_data.user_id == user.id and user_data.data_key == 'name' %}
+                                    {% if user_data.user_id == user.id and user_data.data_key == 'channel_first_name' %}
                                         {{ user_data.data_value }}
                                     {% endif %}
                                 {% endfor %}
                             </td>
                             <td>
                                 {% for user_data in users_data %}
-                                    {% if user_data.user_id == user.id and user_data.data_key == 'last_name' %}
+                                    {% if user_data.user_id == user.id and user_data.data_key == 'channel_last_name' %}
                                         {{ user_data.data_value }}
                                     {% endif %}
                                 {% endfor %}
@@ -111,10 +111,10 @@
                            {% for user in users %}
                                {% if user.last_channel_id == interaction.channel_id %}
                                    {% for user_data in users_data %}
-                                       {% if user_data.user_id == user.pk and user_data.data_key == 'name' %}
+                                       {% if user_data.user_id == user.pk and user_data.data_key == 'channel_first_name' %}
                                            {{ user_data }}
                                        {% endif %}
-                                       {% if user_data.user_id == user.pk and user_data.data_key == 'last_name' %}
+                                       {% if user_data.user_id == user.pk and user_data.data_key == 'channel_last_name' %}
                                            {{ user_data }}
                                        {% endif %}
                                    {% endfor %}

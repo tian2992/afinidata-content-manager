@@ -9,38 +9,48 @@ from messenger_users.forms import CreateUserFormModel
 def new_user(request):
 
     if request.method == 'POST':
-        form = CreateUserFormModel(request.POST or None)
 
-        if form.is_valid():
-            user = form.save()
+        checked = None
+        try:
+            checked = User.objects.get(last_channel_id=request.POST['messenger user id'])
+        except:
+            pass
+        print(checked)
 
-            params = dict(request.POST)
-
-            del params['last_channel_id']
-            del params['backup_key']
-            del params['bot_id']
-
-            for param in params:
-                UserData.objects.create(
-                    user=user,
-                    data_key=str(param),
-                    data_value=str(params[param][0])
-                )
-
-            return JsonResponse(dict(
-                status='created',
-                data=dict(
-                    id=user.id,
-                    last_channel_id=user.last_channel_id,
-                    backup_key=user.backup_key
-                )
-            ))
+        if checked:
+            print('exist')
 
         else:
+            print('not exist')
+            user = dict(bot_id=None, last_channel_id=None, backup_key=None)
+            user['last_channel_id'] = request.POST['messenger user id']
+            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname'] + request.POST['DOB']
+            user['bot_id'] = request.POST['bot_id']
+            user_to_save = User(**user)
+            user_to_save.save()
+
+            user_to_update = User.objects.filter(last_channel_id=request.POST['messenger user id'])
+            user_to_update.update(username=request.POST['parentName'] + str(user_to_save.pk))
+
+            UserData.objects.create(user=user_to_save, data_key='parentName', data_value=request.POST['parentName'])
+            UserData.objects.create(user=user_to_save, data_key='parentLastname', data_value=request.POST['parentLastname'])
+            UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=request.POST['first name'])
+            UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=request.POST['last name'])
+
             return JsonResponse(dict(
-                status="error",
-                error="Invalid Params"
-            ))
+                            set_attributes=dict(
+                                username=request.POST['parentName'] + str(user_to_save.pk),
+                                backup_key=user['backup_key']
+                            ),
+                            messages=[]
+                        ))
+
+        return JsonResponse(dict(
+                            set_attributes=dict(
+                                hasLoggedIn=True
+                            ),
+                            messages=[]
+                        ))
     else:
         raise Http404('Not auth')
 
