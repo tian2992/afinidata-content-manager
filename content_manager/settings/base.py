@@ -91,26 +91,12 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 DATABASES = {
     'default': {},
     'posts_db': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'contentManager',
-        'USER': 'afinityMaster',
-        'PASSWORD': '1501AfiniMaster!#',
-        'HOST': 'contentmanagerinstance.cjmsrnutx39m.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
-        'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_NAME'))
     },
     'messenger_users_db': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'contentManagerUsers',
-        'USER': 'afinityMaster',
-        'PASSWORD': '1501AfiniMaster!#',
-        'HOST': 'contentmanagerinstance.cjmsrnutx39m.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
-        'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_USERS_NAME'))
     }
 }
 DATABASE_ROUTERS = ['posts.routers.PostsRouter', 'messenger_users.routers.MessengerUsersRouter']
