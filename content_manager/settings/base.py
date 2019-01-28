@@ -97,13 +97,17 @@ DATABASES = {
     'messenger_users_db': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_USERS_NAME'))
+    },
+    'web2py_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_WEBPY_NAME'))
     }
 }
-DATABASE_ROUTERS = ['posts.routers.PostsRouter', 'messenger_users.routers.MessengerUsersRouter']
-'''DATABASE_APPS_MAPPING = {'posts': 'posts_db',
-                         'messenger_users': 'messenger_users_db'}'''
-
-
+DATABASE_ROUTERS = [
+    'posts.routers.PostsRouter',
+    'messenger_users.routers.MessengerUsersRouter',
+    'utilities.routers.UtilitiesRouter'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
