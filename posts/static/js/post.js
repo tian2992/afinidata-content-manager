@@ -12,8 +12,12 @@
 
             if (SESSION_ID !== 'null') {
                 let minutes = 0
-                setInterval(() => {
+                let requestInterval = setInterval(() => {
                     let form = new FormData()
+                    console.log(minutes)
+                    if(minutes >= 20) {
+                        clearInterval(requestInterval)
+                    }
                     minutes = minutes + 1
                     form.append('minutes', minutes)
                     const URI = `${DOMAIN}/posts/interaction/${SESSION_ID}/edit/`
