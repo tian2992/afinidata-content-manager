@@ -23,7 +23,13 @@ def validates_date(request):
                     month = int(split_date[1])
                     year = int(split_date[2])
 
-                    if not day <= 31 or not month <= 12 or not year >= 1900 or not year <= datetime.now().year:
+                    if \
+                            not day <= 31 or \
+                            not day > 0 or \
+                            not month <= 12 or \
+                            not month > 0 or \
+                            not year >= 1900 or \
+                            not year <= datetime.now().year:
                         print('not valid')
                         return JsonResponse(
                             dict(
@@ -93,7 +99,13 @@ def validates_kids_date(request):
                     month = int(split_date[1])
                     year = int(split_date[2])
 
-                    if not day <= 31 or not month <= 12 or not year >= datetime.now().year - 7 or not year <= datetime.now().year:
+                    if \
+                            not day <= 31 or \
+                            not day > 0 or \
+                            not month <= 12 or \
+                            not month > 0 or \
+                            not year >= datetime.now().year - 7 or \
+                            not year <= datetime.now().year:
                         print('not valid')
                         return JsonResponse(
                             dict(
