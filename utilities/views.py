@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 import re
 from datetime import datetime
-
+from dateutil.parser import parse
 @csrf_exempt
 def validates_date(request):
 
@@ -54,7 +54,8 @@ def validates_date(request):
                     return JsonResponse(
                         dict(
                             set_attributes=dict(
-                                isDateValid=True
+                                isDateValid=True,
+                                parentDOB=parse(request.GET['date'])
                             ),
                             messages=[]
                         )
@@ -130,7 +131,8 @@ def validates_kids_date(request):
                     return JsonResponse(
                         dict(
                             set_attributes=dict(
-                                isDateValid=True
+                                isDateValid=True,
+                                childDOB=parse(request.GET['date'])
                             ),
                             messages=[]
                         )
