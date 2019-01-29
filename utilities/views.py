@@ -3,6 +3,36 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 import re
 from datetime import datetime
+from utilities.models import Web2pyData
+from dateutil.parser import parse
+
+@csrf_exempt
+def parse_date(request):
+    if request.method == 'GET':
+        parents = Web2pyData.objects.filter(field=2)
+        for parent in parents:
+            try:
+                parent_date = parse(parent.answer)
+                parent_getted = Web2pyData.objects.get(id=parent.pk)
+                if parent_date:
+                    print(parent_getted)
+                    parent_getted.answer = parent_date
+                    parent_getted.save()
+
+            except:
+                pass
+        children = Web2pyData.objects.filter(field=11)
+        for child in children:
+            try:
+                child_date = parse(child.answer)
+                child_getted = Web2pyData.objects.get(id=child.pk)
+                if child_date:
+                    print(child_getted)
+                    child_getted.answer = child_date
+                    child_getted.save()
+            except:
+                pass
+        return JsonResponse(dict(hello='world'))
 
 @csrf_exempt
 def validates_date(request):
