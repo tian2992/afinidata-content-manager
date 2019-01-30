@@ -1,0 +1,30 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Edit{% endblock %}
+
+{% block content %}
+    <h1>Edit</h1>
+
+    <form action="./edit" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ post.pk }}">
+        <div>
+            <label for="name">Name: </label>
+            <input type="text" name="name" value="{{ post.name }}">
+        </div>
+        <div>
+            <label for="content">Content: </label>
+            <textarea name="content" id="" cols="30" rows="10">{{ post.content }}</textarea>
+        </div>
+        <div>
+            <label for="type">Type:</label>
+            <select name="type" id="" value="{{ post.type }}">
+                <option value="embeded">Embeded</option>
+                <option value="youtube">Youtube Video</option>
+            </select>
+        </div>
+        <div>
+            <input type="submit" value="Update Post">
+        </div>
+    </form>
+{% endblock %}

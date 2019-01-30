@@ -1,5 +1,5 @@
 from django.urls import path
-from posts.views import HomeView, new_post, post, edit_interaction, feedback
+from posts.views import HomeView, new_post, post, edit_interaction, feedback, edit_post
 
 app_name = 'posts'
 
@@ -8,5 +8,6 @@ urlpatterns = [
     path('<int:id>/', post, name="post"),
     path('new/', new_post, name="new"),
     path('interaction/<int:id>/edit/', edit_interaction, name="interaction-edit"),
-    path('feedback/', feedback, name="feedback")
+    path('feedback/', feedback, name="feedback"),
+    path('<int:id>/edit', edit_post, name="edit-post")
 ]

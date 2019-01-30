@@ -154,3 +154,26 @@ def feedback(request):
 
     else:
         raise Http404('Not found')
+
+
+def edit_post(request, id):
+
+    if request.method == 'GET':
+
+        try:
+            post_to_edit = Post.objects.get(id=id)
+            return render(request, 'posts/edit.html', {'post': post_to_edit})
+        except:
+            raise Http404('Not found')
+
+    else:
+        try:
+            post_to_edit = Post.objects.get(id=request.POST['id'])
+            post_to_edit.name = request.POST['name'] if request.POST['name'] else None
+            post_to_edit.content = request.POST['content'] if request.POST['content'] else None
+            post_to_edit.type = request.POST['type'] if request.POST['type'] else None
+            post_to_edit.save()
+
+        except:
+            print('not found')
+        return JsonResponse(dict(hello='world'))
