@@ -30,3 +30,18 @@ class Interaction(models.Model):
 
     class Meta:
         app_label = 'posts'
+
+
+class Feedback(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    channel_id = models.CharField(default="", max_length=50)
+    bot_id = models.IntegerField(default=1)
+    value = models.IntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.channel_id
+
+    class Meta:
+        app_label = 'posts'

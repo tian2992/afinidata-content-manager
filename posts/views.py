@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from posts.models import Post, Interaction
+from posts.models import Post, Interaction, Feedback
 from django.shortcuts import get_object_or_404, render
 from posts.forms import CreatePostFormModel, CreatePostForm
 from django.http import JsonResponse, Http404
@@ -9,6 +9,7 @@ from datetime import datetime
 
 class HomeView(TemplateView):
     template_name = 'posts/index.html'
+
 
 def post(request, id):
 
@@ -82,3 +83,74 @@ def edit_interaction(request, id):
 
     else:
         return JsonResponse(dict(hello="world"))
+
+
+@csrf_exempt
+def feedback(request):
+    if request.method == 'POST':
+        try:
+            if request.POST \
+               and len(request.POST) >= 4 \
+               and request.POST['bot_id'] \
+               and request.POST['channel_id'] \
+               and request.POST['post_id'] \
+               and request.POST['value']:
+                print(request.POST)
+                active_feedback = Feedback.objects.filter(bot_id=request.POST['bot_id'],
+                                                          channel_id=request.POST['channel_id'],
+                                                          post_id=request.POST['post_id'])
+                if not active_feedback:
+                    if 1 <= int(request.POST['value']) <= 5:
+                        new_feedback = Feedback.objects.create(bot_id=request.POST['bot_id'],
+                                                               channel_id=request.POST['channel_id'],
+                                                               post_id=request.POST['post_id'],
+                                                               value=request.POST['value'])
+
+                        return JsonResponse(dict(status='created',
+                                                 data=dict(
+                                                     id=new_feedback.pk,
+                                                     post_id=new_feedback.post_id,
+                                                     channel_id=new_feedback.channel_id,
+                                                     bot_id=new_feedback.bot_id,
+                                                     value=new_feedback.value
+                                                 )))
+                    else:
+                        return JsonResponse(dict(status='error',
+                                                 error='value is not valid'))
+                else:
+                    change_feedback = Feedback.objects.get(bot_id=request.POST['bot_id'],
+                                                           channel_id=request.POST['channel_id'],
+                                                           post_id=request.POST['post_id'])
+
+                    if change_feedback.value != int(request.POST['value']) \
+                       and 1 <= int(request.POST['value']) <= 5:
+
+                        change_feedback.value = request.POST['value']
+                        change_feedback.save(update_fields=['value'])
+                        return JsonResponse(dict(status='updated',
+                                                 data=dict(
+                                                     id=change_feedback.pk,
+                                                     post_id=change_feedback.post_id,
+                                                     channel_id=change_feedback.channel_id,
+                                                     bot_id=change_feedback.bot_id,
+                                                     value=change_feedback.value
+                                                 )))
+                    else:
+                        return JsonResponse(dict(status='not-updated',
+                                                 data=dict(
+                                                     id=change_feedback.pk,
+                                                     post_id=change_feedback.post_id,
+                                                     channel_id=change_feedback.channel_id,
+                                                     bot_id=change_feedback.bot_id,
+                                                     value=change_feedback.value
+                                                 )))
+
+            else:
+                return JsonResponse(dict(status='error',
+                                         error='invalid params'))
+        except Exception as e:
+            return JsonResponse(dict(status='error',
+                                     error='invalid params'))
+
+    else:
+        raise Http404('Not found')
