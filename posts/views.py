@@ -67,6 +67,8 @@ def post(request, id):
             except:
 
                 return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
+        
+        return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
 
 
 def new_post(request):
