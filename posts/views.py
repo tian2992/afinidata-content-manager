@@ -52,6 +52,7 @@ def post(request, id):
                     .create(
                         post=post,
                         channel_id=user.last_channel_id,
+                        username=user.username,
                         bot_id=bot_id,
                         type='opened',
                         user_id=user.pk
@@ -59,6 +60,7 @@ def post(request, id):
                 post_session = Interaction(post=post,
                                            channel_id=user.last_channel_id,
                                            bot_id=bot_id,
+                                           username=user.username,
                                            type='session',
                                            user_id=user.pk)
                 post_session.save()
@@ -165,7 +167,8 @@ def feedback(request):
                                                                channel_id=user.last_channel_id,
                                                                post_id=request.POST['post_id'],
                                                                user_id=user.pk,
-                                                               value=request.POST['value'])
+                                                               value=request.POST['value'],
+                                                               username=user.username)
 
                         return JsonResponse(dict(status='created',
                                                  data=dict(
@@ -173,7 +176,8 @@ def feedback(request):
                                                      post_id=new_feedback.post_id,
                                                      user_id=new_feedback.user_id,
                                                      bot_id=new_feedback.bot_id,
-                                                     value=new_feedback.value
+                                                     value=new_feedback.value,
+                                                     username=user.username
                                                  )))
                     else:
                         return JsonResponse(dict(status='error',
@@ -194,7 +198,8 @@ def feedback(request):
                                                      post_id=change_feedback.post_id,
                                                      user_id=change_feedback.user_id,
                                                      bot_id=change_feedback.bot_id,
-                                                     value=change_feedback.value
+                                                     value=change_feedback.value,
+                                                     username=user.username
                                                  )))
                     else:
                         return JsonResponse(dict(status='not-updated',
@@ -203,7 +208,8 @@ def feedback(request):
                                                      post_id=change_feedback.post_id,
                                                      user_id=change_feedback.user_id,
                                                      bot_id=change_feedback.bot_id,
-                                                     value=change_feedback.value
+                                                     value=change_feedback.value,
+                                                     username=user.username
                                                  )))
 
             else:
