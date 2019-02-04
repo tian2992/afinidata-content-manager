@@ -1,5 +1,5 @@
 from django.db import models
-from messenger_users.models import User
+
 
 class Post(models.Model):
     name = models.CharField(max_length=255)
@@ -18,7 +18,7 @@ class Post(models.Model):
 
 class Interaction(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user_id = models.IntegerField(default=0)
     channel_id = models.CharField(default="", max_length=50)
     bot_id = models.IntegerField(default=1)
     type = models.CharField(max_length=255, default='open')
@@ -35,6 +35,7 @@ class Interaction(models.Model):
 
 class Feedback(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    user_id = models.IntegerField(default=0)
     channel_id = models.CharField(default="", max_length=50)
     bot_id = models.IntegerField(default=1)
     value = models.IntegerField(default=1)
