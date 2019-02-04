@@ -2,6 +2,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Arial;
+}
+
+.container {
+    width: 100%;
+    padding: 0 1em;
+    position: relative;
+    margin: 0 auto;
+    max-width: 1200px;
 }
 
 .embeded {
@@ -41,4 +50,89 @@ header h1 {
 .logo img {
     width: auto;
     max-width: 120px;
+}
+
+.post-form {
+    width: 100%;
+    height: auto;
+    min-height: calc(100vh - 60px);
+    background: #f9f9f9;
+}
+
+.post-form .form-content {
+    padding: 2em 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.post-form h1 {
+    color: #33658A;
+    font-size: 1.5em;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+.post-form form {
+    background: #fff;
+    padding: 2em;
+    width: 55%;
+    border-radius: 1em;
+    box-shadow: 1px 1px 3px rgba(0,0,0, .1);
+}
+
+.post-form form label {
+    display: block;
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: 1em;
+}
+
+.post-form form input[type="text"],
+.post-form form input[type="email"],
+.post-form form textarea,
+.post-form form select{
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0, .1);
+    border-right: 1px solid rgba(0,0,0, .1);
+    box-shadow: 2px 2px 6px rgba(0,0,0,.1);
+    margin-bottom: 1em;
+    padding: .8em .5em;
+    font-size: 1em;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+    background: none;
+    outline: none;
+    transition: all .2s;
+}
+
+.post-form form input[type="text"]:focus,
+.post-form form input[type="email"]:focus,
+.post-form form textarea:focus,
+.post-form form select:focus {
+    box-shadow: 2px 2px 6px rgba(51,101,138,.3);
+    border-bottom: 1px solid rgba(51,101,138,.2);
+    border-right: 1px solid rgba(51,101,138, .2);
+}
+
+.post-form form select {
+    background: url("../images/chevron-down.png");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 1em) center;
+    background-size: 14px auto;
+}
+
+.post-form form button,
+.post-form form input[type="submit"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    font-size: 1em;
+    background: rgba(51,101,138, .8);
+    color: #fff;
+    padding: .5em 1em;
+    cursor: pointer;
 }
