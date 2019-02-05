@@ -4,6 +4,8 @@ from django.http import JsonResponse, HttpResponse
 import re
 from datetime import datetime
 from dateutil.parser import parse
+
+
 @csrf_exempt
 def validates_date(request):
 
@@ -80,6 +82,7 @@ def validates_date(request):
                     messages=[]
                 )
             )
+
 
 @csrf_exempt
 def validates_kids_date(request):
