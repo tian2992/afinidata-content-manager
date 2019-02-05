@@ -27,6 +27,10 @@
                 return label
             }
 
+            async function process(event, tags, postTags) {
+
+            }
+
             async function setInputEvent(input, tags, postTags) {
                 let process = async event => {
                     if(event.keyCode === 13) {
@@ -34,8 +38,13 @@
                         if(!tag) {
                             let result = await createTag(event.target.value)
                             if(result.status === 'created') {
+                                let second_result = await setTagToPost(POST_ID, event.target.value)
+                                if(second_result.status !== 'error') {
+                                    postTags.push(result.data)
+                                }
                                 input.value = ""
                                 tags.push(result.data)
+                                await setPostTags(TAGS_CONTENT, postTags)
                                 await setTagsForDataList(TAGS_DATALIST, tags, postTags)
                                 input.removeEventListener(process)
                                 await setInputEvent(input, tags, postTags)
@@ -44,10 +53,18 @@
                             let postTag = postTags.find(item => item.name === event.target.value)
                             if(!postTag) {
                                 let result = await setTagToPost(POST_ID, event.target.value)
-                                console.log(result)
+                                if(result.status !== 'error') {
+                                    input.value = ""
+                                    postTags.push(result.data)
+                                    await setTagsForDataList(TAGS_DATALIST, tags, postTags)
+                                    await setPostTags(TAGS_CONTENT, postTags)
+                                    input.removeEventListener(process)
+                                    await setInputEvent(input, tags, postTags)
+                                }
+                            } else {
+                                console.log('post has tag')
                             }
                         }
-
                     }
                 }
                 input.addEventListener('keyup', process)
@@ -90,7 +107,7 @@
                 tagsArray.map(tag => !postTagsArray.includes(tag) && dataList.appendChild(createOption(tag.name)))
             }
 
-            let setPostTags = async (element, tags) => {
+            async function setPostTags(element, tags) {
                 element.innerHTML = ''
                 tags.map(tag => element.appendChild(createLabel(tag)))
             }
