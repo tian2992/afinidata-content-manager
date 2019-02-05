@@ -3,7 +3,7 @@
 {% block title %}Edit{% endblock %}
 
 {% block content %}
-    <section class="post-form">
+    <section class="post-form edit-post-form" data-post-id="{{ post.pk }}">
         <div class="container">
             <article class="form-content">
             <h1>Edit Post: {{ post.name }}</h1>
@@ -29,6 +29,13 @@
                         <input type="submit" value="Update Post">
                     </div>
                 </form>
+                <div class="tags">
+                    <label for="">Add tag: </label>
+                    <input type="text" id="tags-input" list="tags-datalist">
+                    <datalist id="tags-datalist"></datalist>
+
+                    <div class="tags-content"></div>
+                </div>
             </article>
         </div>
     </section>

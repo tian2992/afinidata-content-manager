@@ -63,6 +63,8 @@ header h1 {
     padding: 2em 0;
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .post-form h1 {
@@ -72,7 +74,8 @@ header h1 {
     width: 100%;
 }
 
-.post-form form {
+.post-form form,
+.post-form .tags{
     background: #fff;
     padding: 2em;
     width: 55%;
@@ -80,17 +83,21 @@ header h1 {
     box-shadow: 1px 1px 3px rgba(0,0,0, .1);
 }
 
-.post-form form label {
+.post-form .tags {
+    width: 40%;
+}
+
+.post-form label {
     display: block;
     width: 100%;
     font-size: 1em;
     margin-bottom: 1em;
 }
 
-.post-form form input[type="text"],
-.post-form form input[type="email"],
-.post-form form textarea,
-.post-form form select{
+.post-form input[type="text"],
+.post-form input[type="email"],
+.post-form textarea,
+.post-form select {
     width: 100%;
     border: none;
     border-bottom: 1px solid rgba(0,0,0, .1);
@@ -135,4 +142,20 @@ header h1 {
     color: #fff;
     padding: .5em 1em;
     cursor: pointer;
+}
+
+.tags-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.tag-item {
+    display: block;
+    margin-right: 5px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    color: #fff;
+    background: #00B3EC;
 }
