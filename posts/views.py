@@ -1,13 +1,12 @@
 from django.views.generic import TemplateView
 from posts.models import Post, Interaction, Feedback, Label
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from posts.forms import CreatePostFormModel, CreatePostForm
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from messenger_users.models import User
 from datetime import datetime
-
 
 class HomeView(TemplateView):
     template_name = 'posts/index.html'
@@ -76,19 +75,13 @@ def post(request, id):
 
 def new_post(request):
 
-    form = CreatePostFormModel(request.POST or None)
+    form = CreatePostForm(request.POST or None)
 
     if form.is_valid():
 
-        post = form.save()
+        saved_post = form.save()
 
-        return JsonResponse(dict(
-            status='created',
-            post=dict(
-                id=str(post.id),
-                name=str(post.name)
-            )
-        ))
+        return redirect('posts:post', id=saved_post.pk)
 
     try:
         if request.GET['quest'] == 'afini':
@@ -240,11 +233,13 @@ def edit_post(request, id):
             post_to_edit.name = request.POST['name'] if request.POST['name'] else None
             post_to_edit.content = request.POST['content'] if request.POST['content'] else None
             post_to_edit.type = request.POST['type'] if request.POST['type'] else None
+            post_to_edit.author = request.POST['author'] if request.POST['author'] else None
             post_to_edit.save()
 
         except:
             print('not found')
-        return JsonResponse(dict(hello='world'))
+            pass
+        return redirect('posts:edit-post', id=id)
 
 
 @csrf_exempt
@@ -348,3 +343,46 @@ def get_tags_for_post(request, id):
 
     else:
         raise Http404('Not found')
+
+@csrf_exempt
+def remove_tag_for_post(request, id):
+
+    if request.method != 'POST':
+        raise Http404('Not found')
+
+    try:
+        post = Post.objects.get(id=id)
+    except:
+        post = None
+
+    if not post:
+        return JsonResponse(dict(status='error', error='Post with id not founded'))
+
+    try:
+        tag = request.POST['name']
+    except:
+        tag = None
+
+    if not tag:
+        return JsonResponse(dict(status='error', error='Param name not set'))
+
+    try:
+        tag = Label.objects.get(name=tag)
+    except:
+        tag = None
+
+    if not tag:
+        return JsonResponse(dict(status='error', error='Tag with name not exist'))
+
+    try:
+        search_tag = post.label_set.get(id=tag.pk)
+        print(search_tag)
+    except:
+        search_tag = None
+
+    if not search_tag:
+        return JsonResponse(dict(status='error', error='Post has not tag with name'))
+
+    result = post.label_set.remove(tag)
+    print(result)
+    return JsonResponse(dict(status='removed', data=dict(id=tag.pk, name=tag.name)))

@@ -74,6 +74,11 @@ header h1 {
     width: 100%;
 }
 
+.post-form h1 small {
+    color: #1a1a1a;
+    font-size: .6em;
+}
+
 .post-form form,
 .post-form .tags{
     background: #fff;
@@ -152,11 +157,33 @@ header h1 {
 }
 
 .tag-item {
-    display: block;
+    display: flex;
     margin-right: 5px;
-    padding: 4px 8px;
-    border-radius: 2px;
+    padding: 4px 4px 4px 8px;
+    border-radius: 20px;
     color: #fff;
     background: #00B3EC;
     margin-bottom: 3px;
+    cursor: default;
+}
+
+.tag-item button {
+    width: 20px;
+    overflow: hidden;
+    height: 20px;
+    border: none;
+    background: #5b83a1;
+    color: #fff;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 4px;
+    transition: all .2s;
+    cursor: pointer;
+    outline: none;
+}
+
+.horizontal-center {
+    justify-content: center !important;
 }

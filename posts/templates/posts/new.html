@@ -3,11 +3,17 @@
 {% block title %}Create new post{% endblock %}
 
 {% block content %}
-    <form action="." method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div>
-            <input type="submit" value="Create Post">
+    <section class="post-form">
+        <div class="container">
+            <div class="form-content horizontal-center">
+                <form action="." method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div>
+                        <input type="submit" value="Create Post">
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </section>
 {% endblock %}

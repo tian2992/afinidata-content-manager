@@ -1,18 +1,28 @@
 {% extends 'posts/base.html' %}
 
-{% block title %}Edit{% endblock %}
+{% block title %}Edit post {% endblock %}
 
 {% block content %}
     <section class="post-form edit-post-form" data-post-id="{{ post.pk }}">
         <div class="container">
             <article class="form-content">
-            <h1>Edit Post: {{ post.name }}</h1>
+            <h1>
+                Edit Post: {{ post.name }}
+                <div>
+                    <small>Created: {{ post.created_at|date:"d M Y h:i" }}</small>
+                    <small>Last updated: {{ post.updated_at|date:"d M Y h:i" }}</small>
+                </div>
+            </h1>
                 <form action="./edit" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{ post.pk }}">
                     <div>
                         <label for="name">Name: </label>
                         <input type="text" name="name" value="{{ post.name }}">
+                    </div>
+                    <div>
+                        <label for="author">Author: </label>
+                        <input type="text" name="author" value="{{ post.author }}">
                     </div>
                     <div>
                         <label for="content">Content: </label>

@@ -12,6 +12,7 @@
             const CREATE_TAG_PATH = '/posts/tags/create'
             const POST_TAGS_PATH = (id) => `/posts/${id}/get_tags`
             const ADD_POST_TAG_PATH = (id) => `/posts/${id}/set_tag`
+            const REMOVE_POST_TAG_PATH = (id) => `/posts/${id}/remove_tag`
 
             function createOption(value) {
                 let option = document.createElement('option')
@@ -21,14 +22,16 @@
 
             function createLabel(item) {
                 let label = document.createElement('span')
+                let button = document.createElement('button')
+                let icon = document.createElement('i')
+                icon.classList.add('fa')
+                icon.classList.add('fa-times')
+                button.appendChild(icon)
                 label.innerText = item.name
                 label.dataset.tagId = item.id
                 label.classList.add('tag-item')
+                label.appendChild(button)
                 return label
-            }
-
-            async function process(event, tags, postTags) {
-
             }
 
             async function setInputEvent(input, tags, postTags) {
@@ -45,6 +48,7 @@
                                 input.value = ""
                                 tags.push(result.data)
                                 await setPostTags(TAGS_CONTENT, postTags)
+                                await setLabelEvent(TAGS_CONTENT, postTags)
                                 await setTagsForDataList(TAGS_DATALIST, tags, postTags)
                                 input.removeEventListener(process)
                                 await setInputEvent(input, tags, postTags)
@@ -58,6 +62,7 @@
                                     postTags.push(result.data)
                                     await setTagsForDataList(TAGS_DATALIST, tags, postTags)
                                     await setPostTags(TAGS_CONTENT, postTags)
+                                    await setLabelEvent(TAGS_CONTENT, postTags)
                                     input.removeEventListener(process)
                                     await setInputEvent(input, tags, postTags)
                                 }
@@ -112,14 +117,42 @@
                 tags.map(tag => element.appendChild(createLabel(tag)))
             }
 
+            async function labelEvent(event) {
+                let {target} = event
+                let body = new FormData()
+                let method = 'post'
+                let parent = target.parentElement
+                let {tagsElement, postTags} = target
+                let uri = `${DOMAIN}${REMOVE_POST_TAG_PATH(POST_ID)}`
+                body.append('name', parent.textContent)
+                let request = await fetch(uri, {method, body})
+                let response = await request.json()
+                if(response.status === 'removed') {
+                    postTags = postTags.filter(tag => tag.id !== response.data.id)
+                    await setPostTags(tagsElement, postTags)
+                    await setLabelEvent(tagsElement, postTags)
+                }
+            }
+
+            async function setLabelEvent(element, postTags) {
+                let buttons = document.querySelectorAll('.tag-item button')
+                buttons.forEach(button => button.removeEventListener('click', labelEvent))
+                buttons.forEach(button => {
+                    button.postTags = postTags
+                    button.tagsElement = element
+                    button.addEventListener('click', labelEvent)
+                })
+            }
+
             async function main() {
                 let tags = await getTags(DOMAIN, TAGS_PATH)
                 let postTags = await getTags(DOMAIN, POST_TAGS_PATH(POST_ID))
                 tags = tags.data
                 postTags = postTags.data
-                setPostTags(TAGS_CONTENT, postTags)
+                await setPostTags(TAGS_CONTENT, postTags)
                 await setTagsForDataList(TAGS_DATALIST, tags, postTags)
                 await setInputEvent(TAGS_INPUT, tags, postTags)
+                await setLabelEvent(TAGS_CONTENT, postTags)
             }
 
             main()
