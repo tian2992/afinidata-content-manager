@@ -54,7 +54,6 @@ class Feedback(models.Model):
 
 class Label(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    parent = models.ForeignKey('Label', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     posts = models.ManyToManyField(Post)
