@@ -143,3 +143,4 @@ USE_TZ = True
 
 STATIC_ROOT = 'staticfiles/'
 STATIC_URL = '/static/'
+DOMAIN_URL = 'http://localhost:8000'

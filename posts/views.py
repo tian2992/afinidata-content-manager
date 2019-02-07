@@ -4,9 +4,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from posts.forms import CreatePostFormModel, CreatePostForm
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from django.core import serializers
 from messenger_users.models import User
 from datetime import datetime
+
 
 class HomeView(TemplateView):
     template_name = 'posts/index.html'
@@ -71,6 +73,21 @@ def post(request, id):
                 return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
         
         return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
+
+
+class StatisticsView(TemplateView):
+    template_name = 'posts/statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        view_post = Post.objects.get(id=kwargs['id'])
+        clicks = view_post.interaction_set.filter(type='opened')
+        sessions = view_post.interaction_set.filter(type='session')
+        context['post'] = view_post
+        context['clicks'] = clicks
+        context['sessions'] = sessions
+        context['domain'] = settings.DOMAIN_URL
+        return context
 
 
 def new_post(request):

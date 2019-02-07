@@ -1,0 +1,37 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}post statistics{% endblock %}
+
+{% block content %}
+    <div>
+        <h1>Statistics for post {{ post.pk }}</h1>
+
+        <div>
+            <strong>Name: </strong>
+            <span>{{ post.name }}</span>
+            <br>
+            <strong>Created At: </strong>
+            <span>{{ post.created_at }}</span>
+            <br>
+            <strong>Last Update At: </strong>
+            <span>{{ post.updated_at }}</span>
+            <br>
+            <strong>Url: </strong>
+            <a href="{{ domain }}{% url 'posts:post' id=1 %}">{{ domain }}{% url 'posts:post' id=1 %}</a>
+            <br>
+            <strong>tags: </strong>
+            {% for tag in post.label_set.all %}
+                <span>{{ tag.name }}</span>
+            {% endfor %}
+            <br>
+            <strong>Total clicks: </strong>
+            <span>{{ clicks.count }}</span>
+        </div>
+
+    </div>
+
+
+    <h2>{{ clicks }}</h2>
+
+    <h2>{{ sessions }}</h2>
+{% endblock %}
