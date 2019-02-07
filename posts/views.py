@@ -96,7 +96,9 @@ def new_post(request):
 
     if form.is_valid():
 
-        saved_post = form.save()
+        data = form.cleaned_data
+
+        saved_post = Post.objects.create(**data)
 
         return redirect('posts:post', id=saved_post.pk)
 
