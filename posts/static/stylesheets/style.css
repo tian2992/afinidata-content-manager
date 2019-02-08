@@ -52,7 +52,8 @@ header h1 {
     max-width: 120px;
 }
 
-.post-form {
+.post-form,
+.post-statistics{
     width: 100%;
     height: auto;
     min-height: calc(100vh - 60px);
@@ -67,7 +68,8 @@ header h1 {
     justify-content: space-between;
 }
 
-.post-form h1 {
+.post-form h1,
+.post-statistics h1 {
     color: #33658A;
     font-size: 1.5em;
     margin-bottom: 1em;
@@ -186,4 +188,81 @@ header h1 {
 
 .horizontal-center {
     justify-content: center !important;
+}
+
+.post-statistics {
+    padding: 2em 0;
+}
+
+.panel {
+    background: #fff;
+    padding: 2em;
+    border-radius: 1em;
+    box-shadow: 1px 1px 3px rgba(0,0,0, .1);
+}
+
+.post-statistics strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: .2em;
+}
+
+.post-statistics span {
+    display: block;
+    margin-bottom: 1.5em;
+}
+
+.post-statistics .container {
+    justify-content: space-between;
+}
+
+.post-statistics .panel {
+    width: 60%;
+    margin-bottom: 1em;
+}
+
+.post-statistics .tag-item {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    vertical-align: top;
+    top: 0;
+    margin-bottom: 3px;
+}
+
+.post-statistics .small-panel {
+    width: 35%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.post-statistics .container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.post-statistics .target {
+    border: 1px solid rgba(0,0,0, .1);
+    border-radius: 4px;
+    margin: 0 5px 5px 0;
+    overflow: hidden;
+}
+
+.post-statistics .target * {
+    text-align: center;
+}
+
+.post-statistics .target strong {
+    color: #ffffff;
+    background: #00b3ec;
+    padding: 4px 8px;
+    font-size: .8em;
+}
+
+.post-statistics .target span {
+    font-weight: bold;
+    padding: 4px;
+    margin: 0;
+    font-size: 3em;
 }

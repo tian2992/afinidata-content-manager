@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core import serializers
 from messenger_users.models import User
 from datetime import datetime
+import math
 
 
 class HomeView(TemplateView):
@@ -79,14 +80,36 @@ class StatisticsView(TemplateView):
     template_name = 'posts/statistics.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        #context = super().get_context_data(**kwargs)
+        context = dict()
         view_post = Post.objects.get(id=kwargs['id'])
         clicks = view_post.interaction_set.filter(type='opened')
         sessions = view_post.interaction_set.filter(type='session')
+        feedbacks = view_post.feedback_set.all()
         context['post'] = view_post
         context['clicks'] = clicks
         context['sessions'] = sessions
         context['domain'] = settings.DOMAIN_URL
+
+        sessions_minutes = 0
+        for session in sessions:
+            if session.minutes != 0:
+                sessions_minutes = sessions_minutes + int(session.minutes)
+            else:
+                sessions_minutes = sessions_minutes + .3
+
+        sessions_minutes = math.floor(sessions_minutes)
+        context['session_minutes'] = sessions_minutes
+        context['session_average'] = sessions_minutes / int(sessions.count())
+
+        feedback_total = 0
+
+        for feedback in feedbacks:
+            feedback_total = feedback_total + int(feedback.value)
+
+        context['feedback_total'] = feedback_total
+        context['feedback_average'] = feedback_total / feedbacks.count()
+        context['feedback_ideal'] = feedbacks.count() * 5
         return context
 
 
