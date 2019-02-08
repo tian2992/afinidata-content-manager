@@ -1,0 +1,44 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}
+    Post list
+{% endblock %}
+
+{% block content %}
+    <section class="post-list">
+        <div class="container">
+            <h1>List</h1>
+            <ul>
+                {% for post in posts %}
+                    <li>
+                        <article class="panel">
+                            <h2>{{ post.pk }} {{ post.name }} <small>{{ post.created_at }}</small></h2>
+                            <div class="column">
+                                <strong>Users: </strong><span>{{ post.users }}</span><br>
+                                <strong>Clicks: </strong><span>{{ post.clicks }}</span><br>
+                                <strong>Minutes: </strong><span>{{ post.session_total }}</span><br>
+                                <strong>Av. Minutes: </strong><span>{{ post.session_average }}</span><br>
+                                <strong>Feedback: </strong><span>{{ post.feedback_total }}</span><br>
+                                <strong>Av. Feedback: </strong><span>{{ post.feedback_average }}</span><br>
+                            </div>
+                            <div class="column">
+                                <strong>Tags:</strong>
+                                {% for tag in post.label_set.all %}
+                                    <span class="tag-item">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="column">
+                                <strong>View Post: </strong>
+                                <a href="{{ domain }}{% url 'posts:post' id=post.pk %}">{{ domain }}{% url 'posts:post' id=post.pk %}</a>
+                            </div>
+                            <div class="column">
+                                <strong>View Statistics: </strong>
+                                <a href="{{ domain }}{% url 'posts:post-statistics' id=post.pk %}">{{ domain }}{% url 'posts:post-statistics' id=post.pk %}</a>
+                            </div>
+                        </article>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+{% endblock %}

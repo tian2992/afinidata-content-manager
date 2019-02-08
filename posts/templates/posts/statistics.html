@@ -21,7 +21,7 @@
                     <span>{{ post.author }}</span>
 
                     <strong>Url: </strong>
-                    <a href="{{ domain }}{% url 'posts:post' id=1 %}" target="_blank">{{ domain }}{% url 'posts:post' id=1 %}</a>
+                    <a href="{{ domain }}{% url 'posts:post' id=post.pk %}" target="_blank">{{ domain }}{% url 'posts:post' id=post.pk %}</a>
 
                 </div>
                 <div class="panel small-panel">

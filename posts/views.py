@@ -439,3 +439,40 @@ def remove_tag_for_post(request, id):
     result = post.label_set.remove(tag)
     print(result)
     return JsonResponse(dict(status='removed', data=dict(id=tag.pk, name=tag.name)))
+
+
+class PostsListView(TemplateView):
+
+    template_name = 'posts/list.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['domain'] = settings.DOMAIN_URL
+        posts = Post.objects.all()
+        for post in posts:
+            post.clicks = post.interaction_set.filter(type='opened').count()
+            session_total = 0
+            users = set()
+            sessions = post.interaction_set.filter(type='session')
+            for session in sessions:
+                users.add(session.user_id)
+                session_total = session_total + int(session.minutes)
+            post.session_total = session_total
+            if sessions.count() > 0:
+                post.session_average = round(session_total / sessions.count(), 2)
+            else:
+                post.session_average = 0
+            feedback_total = 0
+            feedback_list = post.feedback_set.all()
+            for feedback in feedback_list:
+                feedback_total = feedback_total + int(feedback.value)
+            post.feedback_total = feedback_total
+            if feedback_list.count() > 0:
+                post.feedback_average = feedback_total / feedback_list.count()
+            else:
+                post.feedback_average = 0
+            post.users = len(users)
+
+        context['posts'] = posts
+
+        return context

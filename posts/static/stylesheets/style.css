@@ -68,6 +68,18 @@ header h1 {
     justify-content: space-between;
 }
 
+@media (max-width: 925px) {
+    .post-form .form-content {
+        flex-direction: column;
+    }
+
+    .post-form .form-content form,
+    .post-form .form-content .tags {
+        width: 100%;
+        margin-bottom: 2em;
+    }
+}
+
 .post-form h1,
 .post-statistics h1 {
     color: #33658A;
@@ -216,6 +228,16 @@ header h1 {
     justify-content: space-between;
 }
 
+@media (max-width: 900px) {
+    .post-statistics .container {
+        flex-direction: column;
+    }
+
+    .post-statistics .container .panel {
+        width: 100%;
+    }
+}
+
 .post-statistics .panel {
     width: 60%;
     margin-bottom: 1em;
@@ -265,4 +287,82 @@ header h1 {
     padding: 4px;
     margin: 0;
     font-size: 3em;
+}
+
+.post-list {
+    background: #f9f9f9;
+    padding: 2em 0;
+    height: auto;
+    min-height: calc(100vh - 60px);
+}
+
+.post-list ul {
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+
+.post-list li {
+    width: 48%;
+    padding: 1em 0;
+}
+
+@media (max-width: 925px) {
+    .post-list ul {
+        flex-direction: column;
+    }
+
+    .post-list li {
+        width: 100%;
+    }
+}
+
+.post-list .panel h2 {
+    font-size: 1.5em;
+    padding-bottom: 1em;
+}
+
+.post-list .panel h2 small {
+    font-size: .6em;
+    color: #9a9a9a;
+}
+
+.post-list .panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.post-list .panel .column {
+    width: 49%;
+    padding-bottom: 1em;
+}
+
+.post-list .panel strong {
+    margin-bottom: .3em;
+    display: inline-block;
+    margin-right: .3em;
+}
+
+.post-list .panel a{
+    display: block;
+    padding-bottom: .5em;
+    color: rgba(0, 179, 236, .6);
+    text-decoration: none;
+}
+
+.post-list .panel a:hover {
+    text-decoration: underline;
+}
+
+.post-list .panel .tag-item {
+    display: inline-block;
+    vertical-align: top;
+    top: 0;
+    width: auto;
+    border-radius: 3px;
+    padding: 4px 8px;
+    background: rgba(0, 179, 236, .6);
 }
