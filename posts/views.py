@@ -86,6 +86,7 @@ class StatisticsView(TemplateView):
         clicks = view_post.interaction_set.filter(type='opened')
         sessions = view_post.interaction_set.filter(type='session')
         feedbacks = view_post.feedback_set.all()
+        users = set()
         context['post'] = view_post
         context['clicks'] = clicks
         context['sessions'] = sessions
@@ -93,15 +94,18 @@ class StatisticsView(TemplateView):
 
         sessions_minutes = 0
         for session in sessions:
+            users.add(session.user_id)
             if session.minutes != 0:
                 sessions_minutes = sessions_minutes + int(session.minutes)
             else:
                 sessions_minutes = sessions_minutes + .3
 
+        context['channel_users'] = len(users)
+
         sessions_minutes = math.floor(sessions_minutes)
         context['session_minutes'] = sessions_minutes
         if sessions.count() > 0:
-            context['session_average'] = sessions_minutes / int(sessions.count())
+            context['session_average'] = round(sessions_minutes / int(sessions.count()), 2)
         else:
             context['session_average'] = 0
 
@@ -112,10 +116,11 @@ class StatisticsView(TemplateView):
 
         context['feedback_total'] = feedback_total
         if feedbacks.count() > 0:
-            context['feedback_average'] = feedback_total / feedbacks.count()
+            context['feedback_average'] = round(feedback_total / feedbacks.count(), 2)
         else:
             context['feedback_average'] = 0
         context['feedback_ideal'] = feedbacks.count() * 5
+
         return context
 
 
