@@ -100,7 +100,10 @@ class StatisticsView(TemplateView):
 
         sessions_minutes = math.floor(sessions_minutes)
         context['session_minutes'] = sessions_minutes
-        context['session_average'] = sessions_minutes / int(sessions.count())
+        if sessions.count() > 0:
+            context['session_average'] = sessions_minutes / int(sessions.count())
+        else:
+            context['session_average'] = 0
 
         feedback_total = 0
 
@@ -108,7 +111,10 @@ class StatisticsView(TemplateView):
             feedback_total = feedback_total + int(feedback.value)
 
         context['feedback_total'] = feedback_total
-        context['feedback_average'] = feedback_total / feedbacks.count()
+        if feedbacks.count() > 0:
+            context['feedback_average'] = feedback_total / feedbacks.count()
+        else:
+            context['feedback_average'] = 0
         context['feedback_ideal'] = feedbacks.count() * 5
         return context
 
