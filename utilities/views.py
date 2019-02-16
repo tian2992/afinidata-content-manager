@@ -108,7 +108,7 @@ def validates_kids_date(request):
                             not day > 0 or \
                             not month <= 12 or \
                             not month > 0 or \
-                            not year >= datetime.now().year - 7 or \
+                            not year >= datetime.now().year - 15 or \
                             not year <= datetime.now().year:
                         print('not valid')
                         return JsonResponse(

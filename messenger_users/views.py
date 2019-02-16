@@ -24,7 +24,7 @@ def new_user(request):
             print('not exist')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
             user['last_channel_id'] = request.POST['messenger user id']
-            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname'] + request.POST['parentDOB']
+            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname']
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
             user_to_save.save()
