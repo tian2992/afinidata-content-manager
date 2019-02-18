@@ -3,6 +3,8 @@ from messenger_users.models import User, UserData
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from messenger_users.forms import CreateUserFormModel
+import random
+import string
 
 
 @csrf_exempt
@@ -24,7 +26,8 @@ def new_user(request):
             print('not exist')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
             user['last_channel_id'] = request.POST['messenger user id']
-            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname']
+            text = "".join([random.choice(string.ascii_letters) for i in list(range(10))])
+            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname'] + '.' + text
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
             user_to_save.save()
