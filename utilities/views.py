@@ -135,7 +135,7 @@ def validates_kids_date(request):
                         dict(
                             set_attributes=dict(
                                 isDateValid=True,
-                                childDOB=parse(request.GET['date'])
+                                childDOB=parse(request.GET['date'], dayfirst=True)
                             ),
                             messages=[]
                         )
