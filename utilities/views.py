@@ -7,6 +7,73 @@ from dateutil.parser import parse
 
 
 @csrf_exempt
+def check_valid_date(request):
+    if request.method == 'GET':
+        date = None
+
+        try:
+            date = request.GET['date']
+        except:
+            return JsonResponse(dict(status='error', error='param date not defined'))
+
+        new_date = parse(date)
+        print(new_date)
+        day = int(str(new_date)[8:10])
+        if day > 12:
+            UpdateChildDOB = 'no'
+        else:
+            UpdateChildDOB = 'si'
+
+        result = re.match("[\d]{1,2}/[\d]{1,2}/[\d]{1,4}", request.GET['date'])
+        second_result = re.match("[\d]{1,2}-[\d]{1,2}-[\d]{1,4}", request.GET['date'])
+        if result or second_result:
+            UpdateChildDOB = 'si'
+
+        if UpdateChildDOB == 'si':
+            update_date = parse(date, dayfirst=True)
+        else:
+            update_date = new_date
+
+        return JsonResponse(dict(
+            set_attributes=dict(
+                UpdateChildDOB=UpdateChildDOB,
+                UpdateChildDOBDate=update_date
+            ),
+            messages=[]
+        ))
+
+
+@csrf_exempt
+def change_kids_date(request):
+
+    if request.method == 'GET':
+
+        first_value = None
+        second_value = None
+        comparative = None
+
+        try:
+            first_value = request.GET['childDOB']
+            second_value = request.GET['UpdateChildDOBDate']
+            comparative = request.GET['UpdateChildDOB']
+        except:
+            return JsonResponse(dict(status='error', error='invalid parameters'))
+
+        if comparative == 'si':
+            return JsonResponse(dict(
+                set_attributes=dict(
+                    childDOB=second_value
+                ),
+                messages=[]
+            ))
+        else:
+            return JsonResponse(dict(
+                set_attributes=dict(),
+                messages=[]
+            ))
+
+
+@csrf_exempt
 def fix_date(request):
     if request.method == 'GET':
         date = None
