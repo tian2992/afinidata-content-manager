@@ -62,7 +62,8 @@ def change_kids_date(request):
         if comparative == 'si':
             return JsonResponse(dict(
                 set_attributes=dict(
-                    childDOB=second_value
+                    childDOB=second_value,
+                    DOBerroneo=first_value
                 ),
                 messages=[]
             ))
