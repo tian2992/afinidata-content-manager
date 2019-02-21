@@ -57,7 +57,7 @@ def validates_date(request):
                         dict(
                             set_attributes=dict(
                                 isDateValid=True,
-                                parentDOB=parse(request.GET['date'])
+                                parentDOB=parse(request.GET['date'], dayfirst=True)
                             ),
                             messages=[]
                         )
