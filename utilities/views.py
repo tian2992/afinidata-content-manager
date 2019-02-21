@@ -7,6 +7,31 @@ from dateutil.parser import parse
 
 
 @csrf_exempt
+def fix_date(request):
+    if request.method == 'GET':
+        date = None
+        attr = None
+
+        try:
+            date = request.GET['date']
+            attr = request.GET['attr']
+        except:
+            return JsonResponse(dict(status='error', error='not date or attr parameter'))
+
+        ref_date = str(date)[0:10]
+        new_date = ref_date[5:7] + '-' + ref_date[8:10] + '-' + ref_date[0:4]
+        print(date)
+        print(new_date)
+        return_date = parse(new_date, dayfirst=True)
+
+        return JsonResponse(dict(
+            set_attributes={
+                attr: return_date
+            },
+            messages=[]
+        ))
+
+@csrf_exempt
 def validates_date(request):
 
     print(request)
