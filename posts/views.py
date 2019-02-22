@@ -223,7 +223,16 @@ def set_user_send(request):
             user_id=user.pk
         )
 
-        return JsonResponse(dict(hello='world'))
+        return JsonResponse(dict(
+            status='created',
+            data=dict(
+                user_id=user.pk,
+                post_id=selected_post.pk,
+                type='sended'
+            )
+        ))
+    else:
+        raise Http404('Not found')
 
 
 @csrf_exempt
