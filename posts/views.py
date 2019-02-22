@@ -167,6 +167,66 @@ def edit_interaction(request, id):
 
 
 @csrf_exempt
+def set_user_send(request):
+    if request.method == 'POST':
+        user = None
+        post_id = None
+        bot_id = None
+        print(request.POST)
+        try:
+            username = request.POST['username']
+            user = User.objects.get(username=username)
+            print('user: ', user)
+        except:
+            print('not user with username')
+            pass
+
+        if not user:
+            try:
+                channel_id = request.POST['channel_id']
+                user = User.objects.get(last_channel_id=channel_id)
+                print(user)
+            except:
+                print('not user with last channel id')
+                pass
+
+        if not user:
+            try:
+                channel_id = request.POST['channel_id']
+                user = User.objects.get(channel_id=channel_id)
+                print(user)
+            except:
+                print('not user with channel id')
+                pass
+
+        if not user:
+            return JsonResponse(dict(status='error', error='not user defined'))
+
+        try:
+            post_id = request.POST['post_id']
+            selected_post = Post.objects.get(pk=post_id)
+            print(selected_post)
+        except:
+            return JsonResponse(dict(status='error', error='not post with id or id not defined'))
+
+        try:
+            bot_id = request.POST['bot_id']
+        except:
+            bot_id = 1
+
+        new_interaction = Interaction.objects.create(
+            post=selected_post,
+            channel_id=user.last_channel_id,
+            username=user.username,
+            bot_id=bot_id,
+            type='sended',
+            user_id=user.pk
+        )
+
+        return JsonResponse(dict(hello='world'))
+
+
+@csrf_exempt
 def feedback(request):
     if request.method == 'POST':
         user = None
@@ -468,9 +528,19 @@ class PostsListView(TemplateView):
                 feedback_total = feedback_total + int(feedback.value)
             post.feedback_total = feedback_total
             if feedback_list.count() > 0:
-                post.feedback_average = feedback_total / feedback_list.count()
+                post.feedback_average = round(feedback_total / feedback_list.count(), 2)
+                post.feedback_total_users = feedback_list.count()
             else:
                 post.feedback_average = 0
+                post.feedback_total_users = 0
+            posts_sended = post.interaction_set.filter(type='sended')
+            if posts_sended.count() > 0:
+                users_to_sended = set()
+                for interaction in posts_sended:
+                    users_to_sended.add(interaction.user_id)
+                post.total_sended_users = len(users_to_sended)
+            else:
+                post.total_sended_users = 0
             post.users = len(users)
 
         context['posts'] = posts

@@ -19,7 +19,9 @@
                                 <strong>Minutes: </strong><span>{{ post.session_total }}</span><br>
                                 <strong>Av. Minutes: </strong><span>{{ post.session_average }}</span><br>
                                 <strong>Feedback: </strong><span>{{ post.feedback_total }}</span><br>
+                                <strong>Usr. Feedback: </strong><span>{{ post.feedback_total_users }}</span><br>
                                 <strong>Av. Feedback: </strong><span>{{ post.feedback_average }}</span><br>
+                                <strong>Total Usr. to send</strong><span>{{ post.total_sended_users }}</span><br>
                             </div>
                             <div class="column">
                                 <strong>Tags:</strong>
@@ -27,11 +29,11 @@
                                     <span class="tag-item">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
-                            <div class="column">
+                            <div style="width: 100%;">
                                 <strong>View Post: </strong>
                                 <a href="{{ domain }}{% url 'posts:post' id=post.pk %}">{{ domain }}{% url 'posts:post' id=post.pk %}</a>
                             </div>
-                            <div class="column">
+                            <div style="width: 100%;">
                                 <strong>View Statistics: </strong>
                                 <a href="{{ domain }}{% url 'posts:post-statistics' id=post.pk %}">{{ domain }}{% url 'posts:post-statistics' id=post.pk %}</a>
                             </div>

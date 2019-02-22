@@ -2,7 +2,7 @@ from django.urls import path
 from posts.views import HomeView, new_post, post, \
      edit_interaction, feedback, edit_post, create_tag, \
      tags, set_tag_to_post, get_tags_for_post, remove_tag_for_post, \
-     StatisticsView, PostsListView
+     StatisticsView, PostsListView, set_user_send
 
 app_name = 'posts'
 
@@ -19,5 +19,6 @@ urlpatterns = [
     path('<int:id>/set_tag', set_tag_to_post, name="set-tag-to-post"),
     path('<int:id>/get_tags', get_tags_for_post, name="get-tags-for-post"),
     path('<int:id>/remove_tag', remove_tag_for_post, name='remove-tag-for-post'),
-    path('list/', PostsListView.as_view(), name="posts-list")
+    path('list/', PostsListView.as_view(), name="posts-list"),
+    path('set_user_send/', set_user_send, name='set-user-send')
 ]
