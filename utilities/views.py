@@ -254,3 +254,15 @@ def validates_kids_date(request):
                 )
             )
 
+
+@csrf_exempt
+def set_new_broadcast(request, broadcast_id, variable):
+
+    return JsonResponse(
+        dict(
+            set_attributes={
+                variable: int(broadcast_id) + 1
+            },
+            messages=[]
+        )
+    )

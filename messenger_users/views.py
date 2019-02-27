@@ -86,3 +86,22 @@ def add_attribute(request, channel_id):
             return JsonResponse(dict(status="finished", data=dict(user_id=user.pk, added_attributes=results)))
     else:
         return JsonResponse(dict(hello='world'))
+
+
+@csrf_exempt
+def by_username(request, username):
+    print(username)
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method'))
+    else:
+        try:
+            user = User.objects.get(username=username)
+        except Exception as e:
+            return JsonResponse(dict(status='error', error=str(e)))
+
+        return JsonResponse(dict(
+                                set_attributes=dict(
+                                    bot_user_id=user.pk
+                                ),
+                                messages=[]
+                            ))
