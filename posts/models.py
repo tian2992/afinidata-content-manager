@@ -10,6 +10,7 @@ class Post(models.Model):
     min_range = models.IntegerField(null=True, default=0)
     max_range = models.IntegerField(null=True, default=72)
     preview = models.TextField(null=True)
+    new = models.BooleanField(default=False, null=True)
     thumbnail = models.TextField(null=True)
     area_id = models.IntegerField(null=True, default=1)
     created_at = models.DateTimeField(auto_now_add=True)

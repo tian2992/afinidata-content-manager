@@ -351,6 +351,11 @@ def edit_post(request, id):
             raise Http404('Not found')
 
     else:
+        new = False
+        try:
+            new = True if request.POST['new'] else False
+        except:
+            pass
         try:
             post_to_edit = Post.objects.get(id=request.POST['id'])
             post_to_edit.name = request.POST['name'] if request.POST['name'] else None
@@ -362,11 +367,8 @@ def edit_post(request, id):
             post_to_edit.area_id = request.POST['area_id'] if request.POST['area_id'] else None
             post_to_edit.preview = request.POST['preview'] if request.POST['preview'] else None
             post_to_edit.thumbnail = request.POST['thumbnail'] if request.POST['thumbnail'] else None
-            print(post_to_edit)
-            print(request.POST)
+            post_to_edit.new = new
             result = post_to_edit.save()
-            print('result')
-            print(result)
         except:
             print('not found')
             pass
@@ -576,7 +578,8 @@ def post_by_limits(request):
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value, area_id=area_id)
+    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+    print(posts)
     if posts.count() <= 0:
         return JsonResponse(dict(status='error', error='Not posts founded with value'))
 
@@ -709,8 +712,9 @@ def get_thumbnail_by_post(request, id):
         ]
     ))
 
+
 @csrf_exempt
-def create_response_for_cuestion(request, id):
+def create_response_for_question(request, id):
     if request.method == 'GET':
         return JsonResponse(dict(status='error', error='Invalid method.'))
 

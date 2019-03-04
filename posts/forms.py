@@ -1,4 +1,4 @@
-from django.forms import ModelForm, Form, CharField, ChoiceField, RadioSelect, Select, IntegerField
+from django.forms import ModelForm, Form, CharField, ChoiceField, RadioSelect, Select, IntegerField, BooleanField
 from posts.models import Post, Question
 
 
@@ -15,6 +15,7 @@ class CreatePostForm(Form):
     area_id = IntegerField()
     preview = CharField()
     thumbnail = CharField(label='Thumbnail')
+    new = BooleanField(label='New?', required=False)
 
 
 class UpdatePostFormModel(ModelForm):

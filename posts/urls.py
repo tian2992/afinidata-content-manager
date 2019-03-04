@@ -5,7 +5,7 @@ from posts.views import HomeView, new_post, post, \
      StatisticsView, PostsListView, set_user_send, post_by_limits, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
      question_by_post, set_interaction_to_post, get_thumbnail_by_post, \
-     create_response_for_cuestion
+     create_response_for_question
 
 app_name = 'posts'
 
@@ -32,5 +32,5 @@ urlpatterns = [
     path('questions/new/', CreateQuestion.as_view(), name='new-question'),
     path('questions/<int:id>/edit/', EditQuestion.as_view(), name='edit-question'),
     path('<int:id>/questions/', question_by_post, name='question_by_post'),
-    path('questions/<int:id>/response/', create_response_for_cuestion, name='response_for_cuestion')
+    path('questions/<int:id>/response/', create_response_for_question, name='response_for_cuestion')
 ]

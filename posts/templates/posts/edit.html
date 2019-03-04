@@ -28,6 +28,17 @@
                         <label for="thumbnail">Thumbnail: </label>
                         <input type="text" name="thumbnail" value="{{ post.thumbnail }}">
                     </div>
+                    {% if post.new %}
+                        <div>
+                            <label for="new">Is new?: </label>
+                            <input type="checkbox" name="new" checked>
+                        </div>
+                    {% else %}
+                        <div>
+                            <label for="new">Is new?: </label>
+                            <input type="checkbox" name="new">
+                        </div>
+                    {% endif %}
                     <div>
                         <label for="min_range">Min range: </label>
                         <input type="number" name="min_range" value="{{ post.min_range }}">
