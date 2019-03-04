@@ -771,6 +771,7 @@ def get_replies_to_question(request, id):
     return JsonResponse(dict(
         messages=[
             {
+                "text": "holis!!!",
                 "quick_replies": quick_replies
             }
         ]
