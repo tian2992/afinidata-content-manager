@@ -584,7 +584,7 @@ def post_by_limits(request):
     return JsonResponse(dict(
         set_attributes=dict(
             post_id=service_post.pk,
-            post_uri=service_post.content,
+            post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
             post_preview=service_post.preview,
             post_title=service_post.name
         ),
