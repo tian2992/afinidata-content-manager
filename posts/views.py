@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, UpdateView, CreateView
-from posts.models import Post, Interaction, Feedback, Label, Question
+from posts.models import Post, Interaction, Feedback, Label, Question, Response
 from django.shortcuts import get_object_or_404, render, redirect
 from posts.forms import UpdatePostFormModel, CreatePostForm, QuestionForm
 from django.http import JsonResponse, Http404
@@ -707,4 +707,40 @@ def get_thumbnail_by_post(request, id):
                 )
             )
         ]
+    ))
+
+@csrf_exempt
+def create_response_for_cuestion(request, id):
+    if request.method == 'GET':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        username = request.POST['username']
+        user = User.objects.get(username=username)
+        question = Question.objects.get(id=id)
+        user_response = request.POST['response']
+    except Exception as e:
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    print(question)
+    print(user)
+    print(user_response)
+    response = Response.objects.create(
+        question=question,
+        user_id=user.pk,
+        username=username,
+        response=user_response
+    )
+
+    return JsonResponse(dict(
+        status='done',
+        data=dict(
+            response=dict(
+                id=response.pk,
+                user_id=response.user_id,
+                username=response.username,
+                response=response.response,
+                question=response.question.name
+            )
+        )
     ))
