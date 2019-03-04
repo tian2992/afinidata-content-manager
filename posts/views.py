@@ -571,10 +571,11 @@ def post_by_limits(request):
 
     try:
         value = int(request.GET['value'])
+        area_id = int(request.GET['area_id'])
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value)
+    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value, area_id=area_id)
     if posts.count() <= 0:
         return JsonResponse(dict(status='error', error='Not posts founded with value'))
 
