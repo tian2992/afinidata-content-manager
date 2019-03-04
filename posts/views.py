@@ -361,6 +361,7 @@ def edit_post(request, id):
             post_to_edit.max_range = request.POST['max_range'] if request.POST['max_range'] else None
             post_to_edit.area_id = request.POST['area_id'] if request.POST['area_id'] else None
             post_to_edit.preview = request.POST['preview'] if request.POST['preview'] else None
+            post_to_edit.thumbnail = request.POST['thumbnail'] if request.POST['thumbnail'] else None
             print(post_to_edit)
             print(request.POST)
             result = post_to_edit.save()
@@ -680,3 +681,30 @@ def set_interaction_to_post(request, id):
             id=post.pk
         )
     )))
+
+
+@csrf_exempt
+def get_thumbnail_by_post(request, id):
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid params'))
+
+    try:
+        post = Post.objects.get(pk=id)
+        print(post)
+        thumbnail = post.thumbnail
+    except Exception as e:
+        return JsonResponse(status='error', error='Invalid params')
+
+    return JsonResponse(dict(
+        set_attributes=dict(),
+        messages=[
+            dict(
+                attachment=dict(
+                    type='image',
+                    payload=dict(
+                        url=thumbnail
+                    )
+                )
+            )
+        ]
+    ))

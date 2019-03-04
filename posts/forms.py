@@ -14,6 +14,7 @@ class CreatePostForm(Form):
     max_range = IntegerField()
     area_id = IntegerField()
     preview = CharField()
+    thumbnail = CharField(label='Thumbnail')
 
 
 class UpdatePostFormModel(ModelForm):
