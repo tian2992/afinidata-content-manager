@@ -769,10 +769,9 @@ def get_replies_to_question(request, id):
 
     print(quick_replies)
     return JsonResponse(dict(
-        set_attributes=dict(),
         messages=[
-            dict(
-                quick_replies=quick_replies
-            )
+            {
+                "quick_replies": quick_replies
+            }
         ]
     ))
