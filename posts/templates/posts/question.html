@@ -1,0 +1,18 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Afinidata | Question{% endblock %}
+
+{% block content %}
+    <h1>Question</h1>
+
+    <div class="content">
+        <strong>{{ question.name }}</strong>
+    </div>
+
+    <div class="list">
+        For <a href="{% url 'posts:post' id=question.post.pk %}">{{ question.post.name }}</a>
+    </div>
+
+    <a href="{% url 'posts:edit-question' id=question.pk %}">Edit</a>
+
+{% endblock %}

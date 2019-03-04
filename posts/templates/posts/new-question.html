@@ -1,0 +1,15 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Afinidata | New Question{% endblock %}
+
+{% block content %}
+    <h1>New Question</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-submit">
+            <input type="submit" value="Create Question">
+        </div>
+    </form>
+
+{% endblock %}

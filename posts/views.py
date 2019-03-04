@@ -1,7 +1,7 @@
-from django.views.generic import TemplateView
-from posts.models import Post, Interaction, Feedback, Label
+from django.views.generic import TemplateView, UpdateView, CreateView
+from posts.models import Post, Interaction, Feedback, Label, Question
 from django.shortcuts import get_object_or_404, render, redirect
-from posts.forms import CreatePostFormModel, CreatePostForm
+from posts.forms import UpdatePostFormModel, CreatePostForm, QuestionForm
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.core import serializers
 from messenger_users.models import User
 from datetime import datetime
 import math
+import random
 
 
 class HomeView(TemplateView):
@@ -356,8 +357,15 @@ def edit_post(request, id):
             post_to_edit.content = request.POST['content'] if request.POST['content'] else None
             post_to_edit.type = request.POST['type'] if request.POST['type'] else None
             post_to_edit.author = request.POST['author'] if request.POST['author'] else None
-            post_to_edit.save()
-
+            post_to_edit.min_range = request.POST['min_range'] if request.POST['min_range'] else None
+            post_to_edit.max_range = request.POST['max_range'] if request.POST['max_range'] else None
+            post_to_edit.area_id = request.POST['area_id'] if request.POST['area_id'] else None
+            post_to_edit.preview = request.POST['preview'] if request.POST['preview'] else None
+            print(post_to_edit)
+            print(request.POST)
+            result = post_to_edit.save()
+            print('result')
+            print(result)
         except:
             print('not found')
             pass
@@ -555,3 +563,119 @@ class PostsListView(TemplateView):
         context['posts'] = posts
 
         return context
+
+
+def post_by_limits(request):
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        value = int(request.GET['value'])
+    except Exception as e:
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value)
+    if posts.count() <= 0:
+        return JsonResponse(dict(status='error', error='Not posts founded with value'))
+
+    rand_limit = random.randrange(0, posts.count())
+    service_post = posts[rand_limit]
+    return JsonResponse(dict(
+        set_attributes=dict(
+            post_id=service_post.pk,
+            post_uri=service_post.content,
+            post_preview=service_post.preview,
+            post_title=service_post.name
+        ),
+        messages=[]
+    ))
+
+
+class QuestionsView(TemplateView):
+    template_name = 'posts/questions.html'
+
+    def get_context_data(self, **kwargs):
+        questions = Question.objects.all()
+        return dict(questions=questions)
+
+
+class CreateQuestion(CreateView):
+    model = Question
+    template_name = 'posts/new-question.html'
+    fields = ('name', 'post')
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('posts:questions')
+
+
+class EditQuestion(UpdateView):
+    model = Question
+    template_name = 'posts/question-edit.html'
+    fields = ('name', 'post')
+    pk_url_kwarg = 'id'
+    context_object_name = 'question'
+
+    def form_valid(self, form):
+        question = form.save()
+        return redirect('posts:questions')
+
+
+class QuestionView(TemplateView):
+    template_name = 'posts/question.html'
+
+    def get_context_data(self, **kwargs):
+        question = get_object_or_404(Question, pk=kwargs['id'])
+        return dict(question=question)
+
+
+@csrf_exempt
+def question_by_post(request, id):
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    questions = Question.objects.filter(post_id=id)
+
+    if questions.count() <= 0:
+        return JsonResponse(dict(status='error', error='No questions for this post'))
+
+    random_limit = random.randrange(0, questions.count())
+    question = questions[random_limit]
+    print(question)
+    return JsonResponse(dict(
+        set_attributes=dict(
+            question_id=question.pk,
+            question_name=question.name
+        ),
+        messages=[]
+    ))
+
+
+@csrf_exempt
+def set_interaction_to_post(request, id):
+    if request.method == 'GET':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        username = request.POST['username']
+        user = User.objects.get(username=username)
+        post = Post.objects.get(id=id)
+    except Exception as e:
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    interaction = Interaction.objects.create(
+        post=post,
+        type=request.POST['interaction_type'],
+        channel_id=user.last_channel_id,
+        username=user.username,
+        user_id=user.pk,
+        bot_id=request.POST['bot_id']
+    )
+    return JsonResponse(dict(status='done', data=dict(
+        interaction=dict(
+            id=interaction.pk
+        ),
+        post=dict(
+            id=post.pk
+        )
+    )))

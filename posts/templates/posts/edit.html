@@ -25,8 +25,24 @@
                         <input type="text" name="author" value="{{ post.author }}">
                     </div>
                     <div>
+                        <label for="min_range">Min range: </label>
+                        <input type="number" name="min_range" value="{{ post.min_range }}">
+                    </div>
+                    <div>
+                        <label for="max_range">Max range: </label>
+                        <input type="number" name="max_range" value="{{ post.max_range }}">
+                    </div>
+                    <div>
+                        <label for="area_id">Area: </label>
+                        <input type="number" name="area_id" value="{{ post.area_id }}">
+                    </div>
+                    <div>
                         <label for="content">Content: </label>
                         <textarea name="content" id="" cols="30" rows="10">{{ post.content }}</textarea>
+                    </div>
+                    <div>
+                        <label for="preview">Preview: </label>
+                        <textarea name="preview" id="" cols="30" rows="10">{{ post.preview }}</textarea>
                     </div>
                     <div>
                         <label for="type">Type:</label>
