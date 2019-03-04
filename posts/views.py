@@ -607,7 +607,7 @@ class QuestionsView(TemplateView):
 class CreateQuestion(CreateView):
     model = Question
     template_name = 'posts/new-question.html'
-    fields = ('name', 'post')
+    fields = ('name', 'post', 'replies')
 
     def form_valid(self, form):
         form.save()
@@ -617,7 +617,7 @@ class CreateQuestion(CreateView):
 class EditQuestion(UpdateView):
     model = Question
     template_name = 'posts/question-edit.html'
-    fields = ('name', 'post')
+    fields = ('name', 'post', 'replies')
     pk_url_kwarg = 'id'
     context_object_name = 'question'
 
@@ -747,4 +747,32 @@ def create_response_for_question(request, id):
                 question=response.question.name
             )
         )
+    ))
+
+
+@csrf_exempt
+def get_replies_to_question(request, id):
+
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        question = Question.objects.get(pk=id)
+    except:
+        return JsonResponse(dict(status='error', error='Invalid params'))
+
+    split_replies = question.replies.split(', ')
+    quick_replies = []
+    for reply in split_replies:
+        new_reply = dict(title=reply, set_attributes=dict(response=reply))
+        quick_replies.append(new_reply)
+
+    print(quick_replies)
+    return JsonResponse(dict(
+        set_attributes=dict(),
+        messages=[
+            dict(
+                quick_replies=quick_replies
+            )
+        ]
     ))

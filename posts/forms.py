@@ -29,4 +29,4 @@ class QuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        fields = ('name', 'post')
+        fields = ('name', 'post', 'replies')

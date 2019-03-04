@@ -74,6 +74,7 @@ class Label(models.Model):
 class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    replies = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
