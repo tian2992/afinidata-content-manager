@@ -657,31 +657,32 @@ def question_by_post(request, id):
 
 
 @csrf_exempt
-def set_interaction_to_post(request, id):
+def set_interaction_to_post(request):
     if request.method == 'GET':
         return JsonResponse(dict(status='error', error='Invalid method.'))
 
     try:
         username = request.POST['username']
         user = User.objects.get(username=username)
-        post = Post.objects.get(id=id)
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
+    try:
+        post_id = request.POST['post_id']
+        post=Post.objects.get(id=post_id)
+    except:
+        post = None
 
     interaction = Interaction.objects.create(
-        post=post,
         type=request.POST['interaction_type'],
         channel_id=user.last_channel_id,
         username=user.username,
         user_id=user.pk,
-        bot_id=request.POST['bot_id']
+        bot_id=request.POST['bot_id'],
+        post=post
     )
     return JsonResponse(dict(status='done', data=dict(
         interaction=dict(
             id=interaction.pk
-        ),
-        post=dict(
-            id=post.pk
         )
     )))
 

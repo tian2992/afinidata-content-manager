@@ -24,7 +24,7 @@ class Post(models.Model):
 
 
 class Interaction(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     user_id = models.IntegerField(default=0)
     username = models.CharField(max_length=255, null=True)
     channel_id = models.CharField(default="", max_length=50)
