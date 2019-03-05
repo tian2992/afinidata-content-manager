@@ -765,7 +765,8 @@ def get_replies_to_question(request, id):
     split_replies = question.replies.split(', ')
     quick_replies = []
     for reply in split_replies:
-        new_reply = dict(title=reply, set_attributes=dict(response=reply), block_names=['Validador Feedback Ciclo 1-2'])
+        #new_reply = dict(title=reply, set_attributes=dict(response=reply), block_names=['Validador Feedback Ciclo 1-2'])
+        new_reply = dict(title=reply, block_names=['Validador Feedback Ciclo 1-2'])
         quick_replies.append(new_reply)
 
     print(quick_replies)
