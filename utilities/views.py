@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 import re
 from datetime import datetime
 from dateutil.parser import parse
+from messenger_users.models import User
 
 
 @csrf_exempt
@@ -266,3 +267,23 @@ def set_new_broadcast(request, broadcast_id, variable):
             messages=[]
         )
     )
+
+
+@csrf_exempt
+def get_user_id_by_username(request):
+
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        username = request.GET['username']
+        user = User.objects.get(username=username)
+    except Exception as e:
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    return JsonResponse(dict(
+        set_attributes=dict(
+            bot_user_id=user.pk
+        ),
+        messages=[]
+    ))
