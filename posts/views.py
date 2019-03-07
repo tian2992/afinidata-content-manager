@@ -562,7 +562,15 @@ class PostsListView(TemplateView):
             else:
                 post.total_sended_users = 0
             post.users = len(users)
-
+            posts_used = post.interaction_set.filter(type='used')
+            if posts_used.count() > 0:
+                users_to_used = set()
+                for interaction in posts_used:
+                    users_to_used.add(interaction.user_id)
+                post.total_used_users = len(users_to_used)
+                print(len(users_to_used))
+            else:
+                post.total_used_users = 0
         context['posts'] = posts
 
         return context
