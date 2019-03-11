@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core import serializers
 from messenger_users.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 import math
 import random
 
@@ -583,10 +583,24 @@ def post_by_limits(request):
     try:
         value = int(request.GET['value'])
         area_id = int(request.GET['area_id'])
+        username = request.GET['username']
+        user = User.objects.get(username=username)
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    posts = Post.objects.filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+    today = datetime.now()
+    days = timedelta(days=15)
+    date_to_use = today - days
+    print(date_to_use)
+    interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
+    excluded = set()
+    for interaction in interactions:
+        excluded.add(interaction.post_id)
+    print(excluded)
+
+    posts = Post.objects\
+        .exclude(id__in=excluded) \
+        .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
     print(posts)
     if posts.count() <= 0:
         return JsonResponse(dict(status='error', error='Not posts founded with value'))
