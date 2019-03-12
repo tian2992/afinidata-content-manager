@@ -632,8 +632,8 @@ class CreateQuestion(CreateView):
     fields = ('name', 'post', 'replies')
 
     def form_valid(self, form):
-        form.save()
-        return redirect('posts:questions')
+        new_question = form.save()
+        return redirect('posts:question', id=new_question.pk)
 
 
 class EditQuestion(UpdateView):
@@ -645,7 +645,7 @@ class EditQuestion(UpdateView):
 
     def form_valid(self, form):
         question = form.save()
-        return redirect('posts:questions')
+        return redirect('posts:question', id=question.pk)
 
 
 class QuestionView(TemplateView):

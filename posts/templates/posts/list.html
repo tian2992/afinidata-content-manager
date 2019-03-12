@@ -33,6 +33,20 @@
                                     <span class="tag-item">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
+                            {% if post.question_set.count > 0 %}
+                                <div style="width: 100%">
+                                    <strong>Questions:</strong><br>
+                                    <ol>
+                                        {% for question in post.question_set.all %}
+                                            <li>
+                                                <span>{{ question.name }}</span> - <a style="width: auto; display: inline-block" href="{% url 'posts:edit-question' id=question.pk %}">Edit</a><br>
+                                                <p>{{ question.replies }}</p>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                            {% endif %}
+
                             <div style="width: 100%;">
                                 <strong>View Post: </strong>
                                 <a href="{{ domain }}{% url 'posts:post' id=post.pk %}">{{ domain }}{% url 'posts:post' id=post.pk %}</a>

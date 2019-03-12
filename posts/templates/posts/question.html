@@ -14,9 +14,12 @@
     </div>
 
     <div class="list">
-        For <a href="{% url 'posts:post' id=question.post.pk %}">{{ question.post.name }}</a>
+        Post to question: <a href="{% url 'posts:post' id=question.post.pk %}">{{ question.post.name }}</a>
     </div>
+    <br>
 
-    <a href="{% url 'posts:edit-question' id=question.pk %}">Edit</a>
+    <a href="{% url 'posts:edit-question' id=question.pk %}">Edit question</a> -
+    <a href="{% url 'posts:edit-post' id=question.post.pk %}">Back to edit post</a> -
+    <a href="{% url 'posts:posts-list' %}">Back to post lists</a>
 
 {% endblock %}
