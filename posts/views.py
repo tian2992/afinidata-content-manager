@@ -135,7 +135,7 @@ def new_post(request):
 
         saved_post = Post.objects.create(**data)
 
-        return redirect('posts:post', id=saved_post.pk)
+        return redirect('posts:edit-post', id=saved_post.pk)
 
     try:
         if request.GET['quest'] == 'afini':
