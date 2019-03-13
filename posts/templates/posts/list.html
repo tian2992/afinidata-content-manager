@@ -8,6 +8,7 @@
     <section class="post-list">
         <div class="container">
             <h1>List</h1>
+            <a href="{% url 'posts:new' %}?quest=afini">Create new</a>
             <ul>
                 {% for post in posts %}
                     <li>

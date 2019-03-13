@@ -270,6 +270,26 @@ def set_new_broadcast(request, broadcast_id, variable):
 
 
 @csrf_exempt
+def set_chatfuel_variable(request):
+
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    try:
+        variable = request.GET['variable']
+        value = request.GET['value']
+    except Exception as e:
+        return JsonResponse(dict(status='error', error=str(e)))
+
+    return JsonResponse(dict(
+        set_attributes={
+            variable: value
+        },
+        messages=[]
+    ))
+
+
+@csrf_exempt
 def get_user_id_by_username(request):
 
     if request.method == 'POST':
