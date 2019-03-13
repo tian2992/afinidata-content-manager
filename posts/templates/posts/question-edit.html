@@ -3,13 +3,22 @@
 {% block title %}Afinidata | Edit Question{% endblock %}
 
 {% block content %}
-    <h1>Edit Question</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="form-submit">
-            <input type="submit" value="Edit Question">
+
+    <section class="post-form">
+        <div class="container">
+            <div class="form-content horizontal-center">
+                <form method="post">
+                    <h1>Edit Question</h1>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="form-submit">
+                        <input type="submit" value="Edit Question">
+                        <a href="{% url 'posts:question' id=object.pk %}">Back to question</a> -
+                        <a href="{% url 'posts:questions' %}">Back to questions</a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </section>
 
 {% endblock %}

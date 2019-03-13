@@ -135,7 +135,7 @@ def new_post(request):
 
         saved_post = Post.objects.create(**data)
 
-        return redirect('posts:edit-post', id=saved_post.pk)
+        return redirect('posts:review', id=saved_post.pk)
 
     try:
         if request.GET['quest'] == 'afini':
@@ -799,3 +799,12 @@ def get_replies_to_question(request, id):
             }
         ]
     ))
+
+
+class ReviewPostView(TemplateView):
+    template_name = 'posts/review.html'
+
+    def get_context_data(self, **kwargs):
+
+        review_post = get_object_or_404(Post, id=kwargs['id'])
+        return dict(post=review_post)

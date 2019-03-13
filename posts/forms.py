@@ -1,4 +1,4 @@
-from django.forms import ModelForm, Form, CharField, ChoiceField, RadioSelect, Select, IntegerField, BooleanField
+from django.forms import ModelForm, Form, CharField, ChoiceField, RadioSelect, Select, IntegerField, BooleanField, Textarea
 from posts.models import Post, Question
 
 
@@ -6,16 +6,16 @@ class CreatePostForm(Form):
 
     TYPE_CHOICES = (('embeded', 'Embeded'), ('youtube', 'Youtube'))
 
-    name = CharField(label='Name to post')
-    content = CharField(label='Content')
-    type = ChoiceField(widget=Select, choices=TYPE_CHOICES)
+    name = CharField(label='Name')
     author = CharField(label='Author')
+    thumbnail = CharField(label='Thumbnail')
+    new = BooleanField(label='New?', required=False)
+    type = ChoiceField(widget=Select, choices=TYPE_CHOICES)
     min_range = IntegerField()
     max_range = IntegerField()
     area_id = IntegerField()
-    preview = CharField()
-    thumbnail = CharField(label='Thumbnail')
-    new = BooleanField(label='New?', required=False)
+    content = CharField(label='Content')
+    preview = CharField(widget=Textarea)
 
 
 class UpdatePostFormModel(ModelForm):

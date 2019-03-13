@@ -3,16 +3,22 @@
 {% block title %}Afinidata | Questions{% endblock %}
 
 {% block content %}
-    <h1>Questions</h1>
+    <div class="post-list">
+        <div class="container">
+            <div class="panel" style="max-width: 800px; left: 0; right: 0; margin: 0 auto;">
+            <h2>Questions</h2>
 
-    <ul>
-        {% for question in questions %}
-            <li>{{ question.name }} -
-                <a href="{% url 'posts:question' id=question.pk %}">View</a> -
-                <a href="{% url 'posts:edit-question' id=question.pk %}">Edit</a>
-            </li>
-        {% endfor %}
-    </ul>
+            <ul style="width: 100%;">
+                {% for question in questions %}
+                    <li>{{ question.name }} -
+                        <a style="display: inline;" href="{% url 'posts:question' id=question.pk %}">View</a> -
+                        <a style="display: inline;" href="{% url 'posts:edit-question' id=question.pk %}">Edit</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            </div>
+        </div>
+    </div>
 
     <a href="{% url 'posts:new-question' %}">New Question</a>
 {% endblock %}

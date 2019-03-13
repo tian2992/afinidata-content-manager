@@ -107,8 +107,7 @@ header h1 {
 }
 
 .post-form label {
-    display: block;
-    width: 100%;
+    display: inline-block;
     font-size: 1em;
     margin-bottom: 1em;
 }
@@ -366,4 +365,29 @@ header h1 {
     border-radius: 3px;
     padding: 4px 8px;
     background: rgba(0, 179, 236, .6);
+}
+
+.post-list .panel ul {
+    flex-direction: column;
+    list-style-type: disc;
+    padding-top: .5em;
+    padding-bottom: 1em;
+}
+
+.post-list .panel li {
+    width: 100%;
+    padding: .2em 0 .1em;
+}
+
+.btn {
+    color: #fff;
+    text-decoration: none;
+    background: rgba(0, 179, 236, .8);
+    padding: .4em 1em;
+    border-radius: .3em;
+    transition: all .2s;
+}
+
+.btn:hover {
+    background: rgba(0, 179, 236, 1);
 }

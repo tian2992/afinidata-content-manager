@@ -5,7 +5,7 @@ from posts.views import HomeView, new_post, post, \
      StatisticsView, PostsListView, set_user_send, post_by_limits, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
      question_by_post, set_interaction_to_post, get_thumbnail_by_post, \
-     create_response_for_question, get_replies_to_question
+     create_response_for_question, get_replies_to_question, ReviewPostView
 
 app_name = 'posts'
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('new/', new_post, name="new"),
     path('set_interaction/', set_interaction_to_post, name='set_interaction'),
     path('<int:id>/thumbnail/', get_thumbnail_by_post, name='get_thumbnail'),
+    path('<int:id>/review/', ReviewPostView.as_view(), name='review'),
     path('interaction/<int:id>/edit/', edit_interaction, name="interaction-edit"),
     path('feedback/', feedback, name="feedback"),
     path('<int:id>/edit', edit_post, name="edit-post"),
