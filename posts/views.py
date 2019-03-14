@@ -601,7 +601,7 @@ def post_by_limits(request):
     posts = Post.objects\
         .exclude(id__in=excluded) \
         .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
-    print(posts)
+    
     if posts.count() <= 0:
         return JsonResponse(dict(status='error', error='Not posts founded with value'))
 
