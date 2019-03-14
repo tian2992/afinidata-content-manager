@@ -595,13 +595,14 @@ def post_by_limits(request):
     interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
     excluded = set()
     for interaction in interactions:
-        excluded.add(interaction.post_id)
+        if interaction.post_id:
+            excluded.add(interaction.post_id)
     print(excluded)
 
     posts = Post.objects\
         .exclude(id__in=excluded) \
         .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
-    
+
     if posts.count() <= 0:
         return JsonResponse(dict(status='error', error='Not posts founded with value'))
 
