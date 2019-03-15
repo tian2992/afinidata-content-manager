@@ -11,6 +11,7 @@
                     <h1>Edit Question</h1>
                     {% csrf_token %}
                     {{ form.as_p }}
+                    <p style="margin-bottom: 1em;">Please write a coma (,) to separate different replies.</p>
                     <div class="form-submit">
                         <input type="submit" value="Edit Question">
                         <a href="{% url 'posts:question' id=object.pk %}">Back to question</a> -
