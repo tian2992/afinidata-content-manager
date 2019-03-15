@@ -5,13 +5,14 @@ from posts.views import HomeView, new_post, post, \
      StatisticsView, PostsListView, set_user_send, post_by_limits, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
      question_by_post, set_interaction_to_post, get_thumbnail_by_post, \
-     create_response_for_question, get_replies_to_question, ReviewPostView
+     create_response_for_question, get_replies_to_question, ReviewPostView, DeletePostView
 
 app_name = 'posts'
 
 urlpatterns = [
     path('', HomeView.as_view(), name="home"),
     path('<int:id>/', post, name="post"),
+    path('<int:id>/delete/', DeletePostView.as_view(), name='delete'),
     path('new/', new_post, name="new"),
     path('set_interaction/', set_interaction_to_post, name='set_interaction'),
     path('<int:id>/thumbnail/', get_thumbnail_by_post, name='get_thumbnail'),

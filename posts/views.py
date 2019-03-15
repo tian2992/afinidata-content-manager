@@ -1,8 +1,9 @@
-from django.views.generic import TemplateView, UpdateView, CreateView
+from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
 from posts.models import Post, Interaction, Feedback, Label, Question, Response
 from django.shortcuts import get_object_or_404, render, redirect
 from posts.forms import UpdatePostFormModel, CreatePostForm, QuestionForm
 from django.http import JsonResponse, Http404
+from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core import serializers
@@ -372,7 +373,16 @@ def edit_post(request, id):
         except:
             print('not found')
             pass
-        return redirect('posts:review', id=id)
+        return redirect('posts:edit-post', id=id)
+
+
+class DeletePostView(DeleteView):
+    model = Post
+    template_name = 'posts/delete.html'
+    pk_url_kwarg = 'id'
+    context_object_name = 'post'
+
+    success_url = reverse_lazy('posts:posts-list', kwargs={'quest': 'afini'})
 
 
 @csrf_exempt
@@ -525,10 +535,16 @@ class PostsListView(TemplateView):
 
     template_name = 'posts/list.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = dict()
         context['domain'] = settings.DOMAIN_URL
         posts = Post.objects.all()
+        try:
+            quest = self.request.GET['quest']
+        except Exception as e:
+            raise Http404('Not found')
+        if quest != 'afini':
+            raise Http404('Not found')
         for post in posts:
             post.clicks = post.interaction_set.filter(type='opened').count()
             session_total = 0
@@ -634,7 +650,7 @@ class CreateQuestion(CreateView):
 
     def form_valid(self, form):
         new_question = form.save()
-        return redirect('posts:question', id=new_question.pk)
+        return redirect('posts:review', id=new_question.post.pk)
 
 
 class EditQuestion(UpdateView):
@@ -646,7 +662,7 @@ class EditQuestion(UpdateView):
 
     def form_valid(self, form):
         question = form.save()
-        return redirect('posts:question', id=question.pk)
+        return redirect('posts:review', id=question.post.pk)
 
 
 class QuestionView(TemplateView):

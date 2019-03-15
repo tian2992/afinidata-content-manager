@@ -70,14 +70,28 @@
                         <input type="submit" value="Update Post">
                     </div>
 
-                    <a href="{% url 'posts:new-question' %}">Add post question</a>
+
                 </form>
                 <div class="tags">
-                    <label for="">Add tag: </label>
+                    <h3>Add tag: </h3>
                     <input type="text" id="tags-input" list="tags-datalist">
                     <datalist id="tags-datalist"></datalist>
 
                     <div class="tags-content"></div>
+
+                    <h3>Questions:</h3>
+
+                    {% if post.question_set.count > 0 %}
+                        <ul class="list">
+                            {% for question in post.question_set.all %}
+                                <li><span>{{ question.name }}</span> - <a href="{% url 'posts:question' id=question.pk %}" class="link">View</a> - <a href="{% url 'posts:edit-question' id=question.pk %}" class="link">Edit</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>No questions for this post.</span><br>
+                    {% endif %}
+
+                    <a href="{% url 'posts:new-question' %}" class="link">Add post question</a>
                 </div>
             </article>
         </div>

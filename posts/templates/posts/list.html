@@ -14,6 +14,7 @@
                         <article class="panel">
                             <h2>{{ post.pk }} {{ post.name }} <small>{{ post.created_at }}</small></h2>
                             <a href="{% url 'posts:edit-post' id=post.pk %}" target="_blank">Edit</a>
+                            <a href="{% url 'posts:delete' id=post.pk %}" target="_blank">Delete</a>
                             <div style="width: 100%;">
                                 <h3>Stats:</h3>
                                 <ul>
