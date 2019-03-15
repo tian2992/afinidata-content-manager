@@ -1,9 +1,10 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
+from django.utils.functional import lazy
 from posts.models import Post, Interaction, Feedback, Label, Question, Response
 from django.shortcuts import get_object_or_404, render, redirect
 from posts.forms import UpdatePostFormModel, CreatePostForm, QuestionForm
 from django.http import JsonResponse, Http404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core import serializers
@@ -382,7 +383,7 @@ class DeletePostView(DeleteView):
     pk_url_kwarg = 'id'
     context_object_name = 'post'
 
-    success_url = reverse_lazy('posts:posts-list', kwargs={'quest': 'afini'})
+    success_url = '/posts/list/?quest=afini'
 
 
 @csrf_exempt

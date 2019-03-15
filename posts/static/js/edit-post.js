@@ -13,6 +13,8 @@
             const POST_TAGS_PATH = (id) => `/posts/${id}/get_tags`
             const ADD_POST_TAG_PATH = (id) => `/posts/${id}/set_tag`
             const REMOVE_POST_TAG_PATH = (id) => `/posts/${id}/remove_tag`
+            let tags = []
+            let postTags = []
 
             function createOption(value) {
                 let option = document.createElement('option')
@@ -34,10 +36,11 @@
                 return label
             }
 
-            async function setInputEvent(input, tags, postTags) {
+            async function setInputEvent(input) {
                 let process = async event => {
                     if(event.keyCode === 13) {
                         let tag = tags.find(item => item.name === event.target.value)
+                        console.log('post tags: ', postTags)
                         if(!tag) {
                             let result = await createTag(event.target.value)
                             if(result.status === 'created') {
@@ -48,10 +51,8 @@
                                 input.value = ""
                                 tags.push(result.data)
                                 await setPostTags(TAGS_CONTENT, postTags)
-                                await setLabelEvent(TAGS_CONTENT, postTags)
                                 await setTagsForDataList(TAGS_DATALIST, tags, postTags)
-                                input.removeEventListener(process)
-                                await setInputEvent(input, tags, postTags)
+                                await setLabelEvent(TAGS_CONTENT)
                             }
                         } else {
                             let postTag = postTags.find(item => item.name === event.target.value)
@@ -60,11 +61,9 @@
                                 if(result.status !== 'error') {
                                     input.value = ""
                                     postTags.push(result.data)
-                                    await setTagsForDataList(TAGS_DATALIST, tags, postTags)
                                     await setPostTags(TAGS_CONTENT, postTags)
-                                    await setLabelEvent(TAGS_CONTENT, postTags)
-                                    input.removeEventListener(process)
-                                    await setInputEvent(input, tags, postTags)
+                                    await setTagsForDataList(TAGS_DATALIST, tags, postTags)
+                                    await setLabelEvent(TAGS_CONTENT)
                                 }
                             } else {
                                 console.log('post has tag')
@@ -106,9 +105,7 @@
 
             async function setTagsForDataList(dataList, tagsArray, postTagsArray) {
                 dataList.innerHTML = ""
-                console.log(tagsArray)
-                console.log(postTagsArray)
-                tagsArray.map(tag => console.log(postTagsArray.includes(tag)))
+                //tagsArray.map(tag => console.log(postTagsArray.includes(tag)))
                 tagsArray.map(tag => !postTagsArray.includes(tag) && dataList.appendChild(createOption(tag.name)))
             }
 
@@ -118,11 +115,13 @@
             }
 
             async function labelEvent(event) {
+                console.log('remove here')
+                console.log(postTags)
                 let {target} = event
                 let body = new FormData()
                 let method = 'post'
                 let parent = target.parentElement
-                let {tagsElement, postTags} = target
+                let {tagsElement} = target
                 let uri = `${DOMAIN}${REMOVE_POST_TAG_PATH(POST_ID)}`
                 body.append('name', parent.textContent)
                 let request = await fetch(uri, {method, body})
@@ -134,9 +133,10 @@
                 }
             }
 
-            async function setLabelEvent(element, postTags) {
+            async function setLabelEvent(element) {
                 let buttons = document.querySelectorAll('.tag-item button')
                 buttons.forEach(button => button.removeEventListener('click', labelEvent))
+                //console.log(postTags)
                 buttons.forEach(button => {
                     button.postTags = postTags
                     button.tagsElement = element
@@ -145,14 +145,14 @@
             }
 
             async function main() {
-                let tags = await getTags(DOMAIN, TAGS_PATH)
-                let postTags = await getTags(DOMAIN, POST_TAGS_PATH(POST_ID))
-                tags = tags.data
-                postTags = postTags.data
+                let requestTags = await getTags(DOMAIN, TAGS_PATH)
+                let requestPostTags = await getTags(DOMAIN, POST_TAGS_PATH(POST_ID))
+                tags = requestTags.data
+                postTags = requestPostTags.data
                 await setPostTags(TAGS_CONTENT, postTags)
                 await setTagsForDataList(TAGS_DATALIST, tags, postTags)
-                await setInputEvent(TAGS_INPUT, tags, postTags)
-                await setLabelEvent(TAGS_CONTENT, postTags)
+                await setInputEvent(TAGS_INPUT)
+                await setLabelEvent(TAGS_CONTENT)
             }
 
             main()

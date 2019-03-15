@@ -15,6 +15,7 @@
                     {% csrf_token %}
                     <p style="margin-bottom: 1em;">Are you sure to delete? {{ post.name }}</p>
                     <input type="submit" value="Delete">
+                    <a href="{% url 'posts:edit-post' id=post.pk %}" class="link">Back to post</a>
                 </form>
             </article>
         </div>
