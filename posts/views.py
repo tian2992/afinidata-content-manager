@@ -68,7 +68,8 @@ def post(request, id):
                                            bot_id=bot_id,
                                            username=user.username,
                                            type='session',
-                                           user_id=user.pk)
+                                           user_id=user.pk,
+                                           value=-1)
                 post_session.save()
                 return render(request, 'posts/post.html',
                               {'post': post, 'session_id': post_session.pk})
@@ -98,8 +99,8 @@ class StatisticsView(TemplateView):
         sessions_minutes = 0
         for session in sessions:
             users.add(session.user_id)
-            if session.minutes != 0:
-                sessions_minutes = sessions_minutes + int(session.minutes)
+            if session.value != 0:
+                sessions_minutes = sessions_minutes + int(session.value)
             else:
                 sessions_minutes = sessions_minutes + .3
 
@@ -157,7 +158,7 @@ def edit_interaction(request, id):
         print(request.POST)
 
         try:
-            interaction = Interaction.objects.filter(pk=id).update(minutes=request.POST['minutes'])
+            interaction = Interaction.objects.filter(pk=id).update(value=request.POST['minutes'])
             return JsonResponse(dict(
                 status='updated',
                 interaction=interaction
@@ -553,7 +554,7 @@ class PostsListView(TemplateView):
             sessions = post.interaction_set.filter(type='session')
             for session in sessions:
                 users.add(session.user_id)
-                session_total = session_total + int(session.minutes)
+                session_total = session_total + int(session.value)
             post.session_total = session_total
             if sessions.count() > 0:
                 post.session_average = round(session_total / sessions.count(), 2)
@@ -700,6 +701,7 @@ def question_by_post(request, id):
 def set_interaction_to_post(request):
     if request.method == 'GET':
         return JsonResponse(dict(status='error', error='Invalid method.'))
+    value = 0
 
     try:
         username = request.POST['username']
@@ -711,6 +713,10 @@ def set_interaction_to_post(request):
         post=Post.objects.get(id=post_id)
     except:
         post = None
+    try:
+        value = request.POST['value']
+    except:
+        pass
 
     interaction = Interaction.objects.create(
         type=request.POST['interaction_type'],
@@ -718,7 +724,8 @@ def set_interaction_to_post(request):
         username=user.username,
         user_id=user.pk,
         bot_id=request.POST['bot_id'],
-        post=post
+        post=post,
+        value=value
     )
     return JsonResponse(dict(status='done', data=dict(
         interaction=dict(

@@ -12,6 +12,18 @@
 
             if (SESSION_ID !== 'null') {
                 let minutes = 0
+
+                setTimeout(() => {
+                    let form = new FormData()
+                    form.append('minutes', 0)
+                    const URI = `${DOMAIN}/posts/interaction/${SESSION_ID}/edit/`
+                    fetch(URI, {
+                        method: 'post',
+                        body: form
+                    })
+                        .then(response => response.json())
+                        .then(response => console.log(response))
+                }, 5000)
                 let requestInterval = setInterval(() => {
                     let form = new FormData()
                     console.log(minutes)
