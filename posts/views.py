@@ -627,12 +627,46 @@ def post_by_limits(request):
 
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
+    if service_post.content_activity:
+        activity = service_post.content_activity.split('|')
+        print(activity)
     return JsonResponse(dict(
         set_attributes=dict(
             post_id=service_post.pk,
             post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
             post_preview=service_post.preview,
             post_title=service_post.name
+        ),
+        messages=[]
+    ))
+
+
+def post_activity(request, id):
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    try:
+        search_post = Post.objects.get(id=id)
+        post_count = int(request.GET['post_count'])
+    except Exception as e:
+        return JsonResponse(dict(status='error', error=str(e)))
+
+    if not search_post.content_activity:
+        return JsonResponse(dict(status='error', error='Post has not activity'))
+
+    activity_array = search_post.content_activity.split('|')
+    print(len(activity_array))
+    if post_count > len(activity_array) - 1:
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+    if post_count < len(activity_array) - 1:
+        post_has_finished = False
+    else:
+        post_has_finished = True
+    return JsonResponse(dict(
+        set_attributes=dict(
+            activity_content=activity_array[post_count].strip(),
+            post_count=post_count + 1,
+            post_has_finished=post_has_finished
         ),
         messages=[]
     ))

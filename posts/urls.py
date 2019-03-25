@@ -5,7 +5,8 @@ from posts.views import HomeView, new_post, post, \
      StatisticsView, PostsListView, set_user_send, post_by_limits, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
      question_by_post, set_interaction_to_post, get_thumbnail_by_post, \
-     create_response_for_question, get_replies_to_question, ReviewPostView, DeletePostView
+     create_response_for_question, get_replies_to_question, ReviewPostView, DeletePostView, \
+     post_activity
 
 app_name = 'posts'
 
@@ -21,6 +22,7 @@ urlpatterns = [
     path('feedback/', feedback, name="feedback"),
     path('<int:id>/edit', edit_post, name="edit-post"),
     path('<int:id>/statistics/', StatisticsView.as_view(), name='post-statistics'),
+    path('<int:id>/activity/', post_activity, name='post-activity'),
     path('tags/create', create_tag, name="create-tag"),
     path('tags/', tags, name='tags'),
     path('<int:id>/set_tag', set_tag_to_post, name="set-tag-to-post"),
