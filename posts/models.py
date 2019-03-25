@@ -6,6 +6,7 @@ class Post(models.Model):
     pretty_name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     content = models.TextField(null=True)
+    content_activity = models.TextField(null=True)
     author = models.CharField(null=True, default="", max_length=255)
     min_range = models.IntegerField(null=True, default=0)
     max_range = models.IntegerField(null=True, default=72)

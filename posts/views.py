@@ -370,6 +370,7 @@ def edit_post(request, id):
             post_to_edit.area_id = request.POST['area_id'] if request.POST['area_id'] else None
             post_to_edit.preview = request.POST['preview'] if request.POST['preview'] else None
             post_to_edit.thumbnail = request.POST['thumbnail'] if request.POST['thumbnail'] else None
+            post_to_edit.content_activity = request.POST['content_activity'] if request.POST['content_activity'] else None
             post_to_edit.new = new
             result = post_to_edit.save()
         except:

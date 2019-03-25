@@ -15,6 +15,7 @@ class CreatePostForm(Form):
     max_range = IntegerField()
     area_id = IntegerField()
     content = CharField(label='Content')
+    content_activity = CharField(label='Activity for FB. (Divide sections with | )')
     preview = CharField(widget=Textarea)
 
 
