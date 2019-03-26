@@ -26,6 +26,11 @@
                                     <li><strong>Users to give Feedback: </strong><span>{{ post.feedback_total_users }}</span></li>
                                     <li><strong>Users to use post (activity):</strong><span>{{ post.total_used_users }}</span></li>
                                     <li><strong>Ranges: </strong><span>{{ post.min_range }} - {{ post.max_range }}</span></li>
+                                    {% if post.content_activity %}
+                                        <li><strong>Has activity?: </strong><span>Yes</span></li>
+                                    {% else %}
+                                        <li><strong>Has activity?: </strong><span>No</span></li>
+                                    {% endif %}
 
                                 </ul>
                                 <h3>Configuration:</h3>
