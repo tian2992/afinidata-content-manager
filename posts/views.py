@@ -1,13 +1,11 @@
-from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView
-from django.utils.functional import lazy
+from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView
 from posts.models import Post, Interaction, Feedback, Label, Question, Response
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
-from posts.forms import UpdatePostFormModel, CreatePostForm, QuestionForm
+from posts.forms import CreatePostForm
 from django.http import JsonResponse, Http404
-from django.urls import reverse_lazy, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from django.core import serializers
 from messenger_users.models import User
 from datetime import datetime, timedelta
 import math
@@ -126,6 +124,34 @@ class StatisticsView(TemplateView):
         context['feedback_ideal'] = feedbacks.count() * 5
 
         return context
+
+
+class NewPostView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+              'content_activity', 'preview')
+    template_name = 'posts/new.html'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+
+    def form_valid(self, form):
+        post = form.save()
+        return redirect('posts:edit-post', id=post.pk)
+
+
+class EditPostView(LoginRequiredMixin, UpdateView):
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+    model = Post
+    pk_url_kwarg = 'id'
+    context_object_name = 'post'
+    fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+              'content_activity', 'preview')
+    template_name = 'posts/sedit.html'
+
+    def form_valid(self, form):
+        post = form.save()
+        return redirect('posts:edit', id=post.pk)
 
 
 def new_post(request):

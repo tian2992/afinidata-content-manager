@@ -6,12 +6,15 @@ from posts.views import HomeView, new_post, post, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
      question_by_post, set_interaction_to_post, get_thumbnail_by_post, \
      create_response_for_question, get_replies_to_question, ReviewPostView, DeletePostView, \
-     post_activity
+     post_activity, NewPostView, EditPostView
 
 app_name = 'posts'
 
 urlpatterns = [
     path('', HomeView.as_view(), name="home"),
+    path('snew/', NewPostView.as_view(), name='snew'),
+    path('<int:id>/sedit/', EditPostView.as_view(), name="edit"),
+    path('<int:id>/edit', edit_post, name="edit-post"),
     path('<int:id>/', post, name="post"),
     path('<int:id>/delete/', DeletePostView.as_view(), name='delete'),
     path('new/', new_post, name="new"),
@@ -20,7 +23,6 @@ urlpatterns = [
     path('<int:id>/review/', ReviewPostView.as_view(), name='review'),
     path('interaction/<int:id>/edit/', edit_interaction, name="interaction-edit"),
     path('feedback/', feedback, name="feedback"),
-    path('<int:id>/edit', edit_post, name="edit-post"),
     path('<int:id>/statistics/', StatisticsView.as_view(), name='post-statistics'),
     path('<int:id>/activity/', post_activity, name='post-activity'),
     path('tags/create', create_tag, name="create-tag"),

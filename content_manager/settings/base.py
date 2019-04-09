@@ -89,7 +89,10 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {},
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_DEFAULT_NAME'))
+    },
     'posts_db': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_NAME'))
