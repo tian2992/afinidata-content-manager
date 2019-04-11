@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from messenger_users.models import User
 from datetime import datetime, timedelta
+from django.urls import reverse_lazy
 import math
 import random
 
@@ -405,7 +406,9 @@ def edit_post(request, id):
         return redirect('posts:edit-post', id=id)
 
 
-class DeletePostView(DeleteView):
+class DeletePostView(LoginRequiredMixin, DeleteView):
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
     model = Post
     template_name = 'posts/delete.html'
     pk_url_kwarg = 'id'
@@ -560,20 +563,16 @@ def remove_tag_for_post(request, id):
     return JsonResponse(dict(status='removed', data=dict(id=tag.pk, name=tag.name)))
 
 
-class PostsListView(TemplateView):
+class PostsListView(LoginRequiredMixin, TemplateView):
 
     template_name = 'posts/list.html'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, *args, **kwargs):
         context = dict()
         context['domain'] = settings.DOMAIN_URL
         posts = Post.objects.all()
-        try:
-            quest = self.request.GET['quest']
-        except Exception as e:
-            raise Http404('Not found')
-        if quest != 'afini':
-            raise Http404('Not found')
         for post in posts:
             post.clicks = post.interaction_set.filter(type='opened').count()
             session_total = 0
@@ -698,42 +697,60 @@ def post_activity(request, id):
     ))
 
 
-class QuestionsView(TemplateView):
+class QuestionsView(LoginRequiredMixin, TemplateView):
     template_name = 'posts/questions.html'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         questions = Question.objects.all()
         return dict(questions=questions)
 
 
-class CreateQuestion(CreateView):
+class CreateQuestion(LoginRequiredMixin, CreateView):
     model = Question
     template_name = 'posts/new-question.html'
     fields = ('name', 'post', 'replies')
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
         new_question = form.save()
         return redirect('posts:review', id=new_question.post.pk)
 
 
-class EditQuestion(UpdateView):
+class EditQuestion(LoginRequiredMixin, UpdateView):
     model = Question
     template_name = 'posts/question-edit.html'
     fields = ('name', 'post', 'replies')
     pk_url_kwarg = 'id'
     context_object_name = 'question'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
         question = form.save()
         return redirect('posts:review', id=question.post.pk)
 
 
-class QuestionView(TemplateView):
+class QuestionView(LoginRequiredMixin, TemplateView):
     template_name = 'posts/question.html'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         question = get_object_or_404(Question, pk=kwargs['id'])
         return dict(question=question)
+
+
+class DeleteQuestionView(LoginRequiredMixin, DeleteView):
+    template_name = 'posts/question-delete.html'
+    model = Question
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+    pk_url_kwarg = 'id'
+    context_object_name = 'question'
+    success_url = reverse_lazy('posts:questions')
 
 
 @csrf_exempt
@@ -887,10 +904,9 @@ def get_replies_to_question(request, id):
     ))
 
 
-class ReviewPostView(TemplateView):
+class ReviewPostView(LoginRequiredMixin, DetailView):
     template_name = 'posts/review.html'
-
-    def get_context_data(self, **kwargs):
-
-        review_post = get_object_or_404(Post, id=kwargs['id'])
-        return dict(post=review_post)
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+    model = Post
+    pk_url_kwarg = 'id'

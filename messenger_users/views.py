@@ -43,7 +43,8 @@ def new_user(request):
             return JsonResponse(dict(
                             set_attributes=dict(
                                 username=request.POST['parentName'] + str(user_to_save.pk),
-                                backup_key=user['backup_key']
+                                backup_key=user['backup_key'],
+                                user_id=user_to_save.pk
                             ),
                             messages=[]
                         ))
@@ -101,7 +102,7 @@ def by_username(request, username):
 
         return JsonResponse(dict(
                                 set_attributes=dict(
-                                    bot_user_id=user.pk
+                                    user_id=user.pk
                                 ),
                                 messages=[]
                             ))

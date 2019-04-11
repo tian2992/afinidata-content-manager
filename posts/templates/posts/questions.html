@@ -12,7 +12,8 @@
                 {% for question in questions %}
                     <li>{{ question.name }} -
                         <a style="display: inline;" href="{% url 'posts:question' id=question.pk %}">View</a> -
-                        <a style="display: inline;" href="{% url 'posts:edit-question' id=question.pk %}">Edit</a>
+                        <a style="display: inline;" href="{% url 'posts:edit-question' id=question.pk %}">Edit</a> -
+                        <a style="display: inline;" href="{% url 'posts:delete-question' id=question.pk %}">Delete</a>
                     </li>
                 {% endfor %}
             </ul>

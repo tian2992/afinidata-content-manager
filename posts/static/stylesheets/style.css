@@ -409,3 +409,18 @@ ul.list {
 ul.list li {
     margin-bottom: .5em;
 }
+
+.main-footer {
+    background: #305876;
+    color: #fff;
+    padding: 1em;
+}
+
+.main-footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.main-footer a:hover {
+    text-decoration: underline;
+}

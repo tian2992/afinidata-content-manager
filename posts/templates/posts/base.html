@@ -29,6 +29,11 @@
         </a>
     </header>
     {% block content %}{% endblock %}
+    {% if user.is_authenticated %}
+        <footer class="main-footer">
+                <a href="{% url 'logout' %}">Logout</a>
+        </footer>
+    {% endif %}
 </body>
     {% block scripts %}{% endblock %}
     <script src="{% static 'js/post.js' %}"></script>

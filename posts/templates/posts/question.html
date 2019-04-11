@@ -22,6 +22,7 @@
                 <br>
 
                 <a style="display: inline-block" href="{% url 'posts:edit-question' id=question.pk %}">Edit question</a> -
+                <a style="display: inline-block" href="{% url 'posts:delete-question' id=question.pk %}">Delete question</a> -
                 <a style="display: inline-block" href="{% url 'posts:edit-post' id=question.post.pk %}">Back to edit post</a> -
                 <a style="display: inline-block" href="{% url 'posts:posts-list' %}">Back to post lists</a>
             </div>
