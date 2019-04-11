@@ -12,12 +12,12 @@ app_name = 'posts'
 
 urlpatterns = [
     path('', HomeView.as_view(), name="home"),
-    path('snew/', NewPostView.as_view(), name='snew'),
-    path('<int:id>/sedit/', EditPostView.as_view(), name="edit"),
-    path('<int:id>/edit', edit_post, name="edit-post"),
+    path('new/', NewPostView.as_view(), name='new'),
+    path('<int:id>/edit/', EditPostView.as_view(), name="edit-post"),
+    #path('<int:id>/edit', edit_post, name="edit-post"),
     path('<int:id>/', post, name="post"),
     path('<int:id>/delete/', DeletePostView.as_view(), name='delete'),
-    path('new/', new_post, name="new"),
+    #path('new/', new_post, name="new"),
     path('set_interaction/', set_interaction_to_post, name='set_interaction'),
     path('<int:id>/thumbnail/', get_thumbnail_by_post, name='get_thumbnail'),
     path('<int:id>/review/', ReviewPostView.as_view(), name='review'),
