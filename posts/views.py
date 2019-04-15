@@ -6,11 +6,13 @@ from posts.forms import CreatePostForm
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.utils import timezone
 from messenger_users.models import User
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.urls import reverse_lazy
 import math
 import random
+import pytz
 import requests
 
 
@@ -657,7 +659,7 @@ def post_by_limits(request):
         print('not here!')
     else:
         today = datetime.now()
-        days = timedelta(days=15)
+        days = timedelta(days=35)
         date_to_use = today - days
         print(date_to_use)
         interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
@@ -667,9 +669,17 @@ def post_by_limits(request):
                 excluded.add(interaction.post_id)
         print(excluded)
 
-        posts = Post.objects\
-            .exclude(id__in=excluded) \
-            .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+        utc = pytz.UTC
+        new_user_limit = utc.localize(datetime(2019, 3, 20, 0, 0, 0))
+        print(new_user_limit)
+        if user.created_at > new_user_limit:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id)
+        else:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
 
         if posts.count() <= 0:
             return JsonResponse(dict(status='error', error='Not posts founded with value'))
