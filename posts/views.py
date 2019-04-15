@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from django.urls import reverse_lazy
 import math
 import random
+import requests
 
 
 class HomeView(TemplateView):
@@ -632,26 +633,47 @@ def post_by_limits(request):
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    today = datetime.now()
-    days = timedelta(days=15)
-    date_to_use = today - days
-    print(date_to_use)
-    interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
-    excluded = set()
-    for interaction in interactions:
-        if interaction.post_id:
-            excluded.add(interaction.post_id)
-    print(excluded)
+    group = 'random'
 
-    posts = Post.objects\
-        .exclude(id__in=excluded) \
-        .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+    try:
+        group_register = user.userdata_set.get(data_key='posts_group')
+        group = group_register.data_value
+    except Exception as e:
+        print(str(e))
+        pass
 
-    if posts.count() <= 0:
-        return JsonResponse(dict(status='error', error='Not posts founded with value'))
+    print(group)
 
-    rand_limit = random.randrange(0, posts.count())
-    service_post = posts[rand_limit]
+    if group == 'feedback':
+        uri = "https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=1&method=deterministic" % (user.pk,
+                                                                                                         value)
+        r = requests.get(uri)
+        response = r.json()
+        feedback_post_id = response['recommendation'][0]
+        #feedback_post_id = 1
+        service_post = Post.objects.get(id=feedback_post_id)
+
+    else:
+        today = datetime.now()
+        days = timedelta(days=15)
+        date_to_use = today - days
+        print(date_to_use)
+        interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
+        excluded = set()
+        for interaction in interactions:
+            if interaction.post_id:
+                excluded.add(interaction.post_id)
+        print(excluded)
+
+        posts = Post.objects\
+            .exclude(id__in=excluded) \
+            .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+
+        if posts.count() <= 0:
+            return JsonResponse(dict(status='error', error='Not posts founded with value'))
+
+        rand_limit = random.randrange(0, posts.count())
+        service_post = posts[rand_limit]
     if service_post.content_activity:
         activity = service_post.content_activity.split('|')
         print(activity)
