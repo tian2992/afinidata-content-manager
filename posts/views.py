@@ -644,15 +644,17 @@ def post_by_limits(request):
 
     print(group)
 
-    if group == 'feedback':
+    '''if group == 'feedback':
         uri = "https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=1&method=deterministic" % (user.pk,
                                                                                                          value)
         r = requests.get(uri)
         response = r.json()
         feedback_post_id = response['recommendation'][0]
         #feedback_post_id = 1
-        service_post = Post.objects.get(id=feedback_post_id)
+        service_post = Post.objects.get(id=feedback_post_id)'''
 
+    if False:
+        print('not here!')
     else:
         today = datetime.now()
         days = timedelta(days=15)
