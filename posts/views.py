@@ -153,7 +153,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         post = form.save()
-        return redirect('posts:edit', id=post.pk)
+        return redirect('posts:edit-post', id=post.pk)
 
 
 def new_post(request):
