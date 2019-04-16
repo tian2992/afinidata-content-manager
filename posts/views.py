@@ -635,10 +635,10 @@ def post_by_limits(request):
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    group = 'random'
+    group = 'C'
 
     try:
-        group_register = user.userdata_set.get(data_key='posts_group')
+        group_register = user.userdata_set.get(data_key='AB_group')
         group = group_register.data_value
     except Exception as e:
         print(str(e))
@@ -646,17 +646,24 @@ def post_by_limits(request):
 
     print(group)
 
-    '''if group == 'feedback':
-        uri = "https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=1&method=deterministic" % (user.pk,
-                                                                                                         value)
+    if group == 'A':
+        uri = 'https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=1&criterion=read_rate&' \
+              'method=deterministic&upto=2019-04-15' % (user.pk, value)
+    elif group == 'B':
+        uri = 'https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=1&criterion=feedback' \
+              '&method=deterministic&upto=2019-04-15' % (user.pk, value)
+    else:
+        uri = False
+
+    if uri:
+
         r = requests.get(uri)
         response = r.json()
-        feedback_post_id = response['recommendation'][0]
-        #feedback_post_id = 1
-        service_post = Post.objects.get(id=feedback_post_id)'''
+        feedback_post_id = int(response['recommendation'][0])
+        print('id: ', feedback_post_id)
+        feedback_post_id = 1
+        service_post = Post.objects.get(id=feedback_post_id)
 
-    if False:
-        print('not here!')
     else:
         today = datetime.now()
         days = timedelta(days=35)
