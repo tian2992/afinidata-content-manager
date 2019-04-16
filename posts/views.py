@@ -661,7 +661,7 @@ def post_by_limits(request):
         response = r.json()
         feedback_post_id = int(response['recommendation'][0])
         print('id: ', feedback_post_id)
-        feedback_post_id = 1
+        #feedback_post_id = 1
         service_post = Post.objects.get(id=feedback_post_id)
 
     else:
