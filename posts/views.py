@@ -666,15 +666,15 @@ def post_by_limits(request):
         service_post_list = [int(x) for x in response['recommendation']]
         print('service give posts with id')
         print(service_post_list)
-        user_openend_post_list = [x.post_id for x in Interaction.objects.filter(type__in=['sended', 'opened'],
+        user_opened_post_list = [x.post_id for x in Interaction.objects.filter(type__in=['sended', 'opened'],
                                                                                 user_id=user.pk,
                                                                                 created_at__gt=date_to_use)]
         print('local excluded')
-        print(user_openend_post_list)
-        #user_openend_post_list = [131, 128, 88, 47]
+        print(user_opened_post_list)
+        #user_opened_post_list = [131, 128, 88, 47]
         print('fake excluded (for dev only)')
-        print(user_openend_post_list)
-        recommendations = [x for x in service_post_list if x not in user_openend_post_list]
+        print(user_opened_post_list)
+        recommendations = [x for x in service_post_list if x not in user_opened_post_list]
         print(recommendations)
         feedback_post_id = int(recommendations[0])
         print('id: ', feedback_post_id)
