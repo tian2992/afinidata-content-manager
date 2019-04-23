@@ -666,7 +666,8 @@ def post_by_limits(request):
         service_post_list = [int(x) for x in response['recommendation']]
         print('service give posts with id')
         print(service_post_list)
-        user_openend_post_list = [x.post_id for x in Interaction.objects.filter(type='opened', user_id=user.pk,
+        user_openend_post_list = [x.post_id for x in Interaction.objects.filter(type__in=['sended', 'opened'],
+                                                                                user_id=user.pk,
                                                                                 created_at__gt=date_to_use)]
         print('local excluded')
         print(user_openend_post_list)
