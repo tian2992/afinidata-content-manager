@@ -670,14 +670,14 @@ def post_by_limits(request):
                                                                                 created_at__gt=date_to_use)]
         print('local excluded')
         print(user_openend_post_list)
-        user_openend_post_list = [131, 128, 88, 47]
+        #user_openend_post_list = [131, 128, 88, 47]
         print('fake excluded (for dev only)')
         print(user_openend_post_list)
         recommendations = [x for x in service_post_list if x not in user_openend_post_list]
         print(recommendations)
         feedback_post_id = int(recommendations[0])
         print('id: ', feedback_post_id)
-        feedback_post_id = 1
+        #feedback_post_id = 1
         service_post = Post.objects.get(id=feedback_post_id)
 
     else:
