@@ -28,6 +28,13 @@
             <img src="{% static 'images/logo.png' %}" alt="">
         </a>
     </header>
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
     {% block content %}{% endblock %}
     {% if user.is_authenticated %}
         <footer class="main-footer">

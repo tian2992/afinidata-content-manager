@@ -1,8 +1,23 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+STATUS_CHOICES = (
+    ('draft', 'draft'),
+    ('review', 'review'),
+    ('private', 'private'),
+    ('published', 'published')
+)
+
+REVIEW_STATUS_CHOICES = (
+    ('pending', 'Pending'),
+    ('completed', 'Completed')
+)
 
 
 class Post(models.Model):
     name = models.CharField(max_length=255)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=255, default='review')
     pretty_name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     content = models.TextField(null=True)
@@ -93,6 +108,36 @@ class Response(models.Model):
     response = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.pk)
+
+    class Meta:
+        app_label = 'posts'
+
+
+class Review(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    status = models.CharField(choices=REVIEW_STATUS_CHOICES, default='pending', max_length=20)
+    comment = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    users = models.ManyToManyField(User, through='UserReviewRole')
+
+    def __str__(self):
+        return "%s__%s__%s" % (self.pk, self.status, self.post.pk)
+
+    class Meta:
+        app_label = 'posts'
+
+
+REVIEW_ROLE_CHOICES = (('author', 'author'), ('reviewer', 'reviewer'))
+
+
+class UserReviewRole(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(choices=REVIEW_ROLE_CHOICES, default='author', max_length=20)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.pk)

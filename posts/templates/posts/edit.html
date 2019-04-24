@@ -7,7 +7,7 @@
         <div class="container">
             <article class="form-content">
             <h1>
-                Edit Post: {{ post.name }}
+                Edit Post: {{ post.name }} <small>status: {{ post.status }}</small>
                 <a href="{% url 'posts:posts-list' %}?quest=afini" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
                 <div>
                     <small>Created: {{ post.created_at|date:"d M Y h:i" }}</small>

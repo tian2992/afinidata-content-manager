@@ -8,9 +8,10 @@
             <article class="form-content">
             <h1>
                 Edit Post: {{ post.name }}
-                <a href="{% url 'posts:posts-list' %}?quest=afini" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
+                <a href="{% url 'posts:posts-list' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
                 <div>
-                    <small>Created: {{ post.created_at|date:"d M Y h:i" }}</small>
+                    <small>Status: {{ post.status }},</small>
+                    <small>Created: {{ post.created_at|date:"d M Y h:i" }},</small>
                     <small>Last updated: {{ post.updated_at|date:"d M Y h:i" }}</small>
                 </div>
             </h1>

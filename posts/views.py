@@ -1,13 +1,16 @@
-from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView
-from posts.models import Post, Interaction, Feedback, Label, Question, Response
+from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
+from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
+from django import forms
 from posts.forms import CreatePostForm
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils import timezone
 from messenger_users.models import User
+from django.contrib.auth.models import User as DjangoUser
+from django.contrib import messages
 from datetime import datetime, timedelta, date
 from django.urls import reverse_lazy
 import math
@@ -133,16 +136,45 @@ class StatisticsView(TemplateView):
 class NewPostView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
-              'content_activity', 'preview')
+              'content_activity', 'preview', 'status')
     template_name = 'posts/new.html'
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         context = super(NewPostView, self).get_context_data(**kwargs)
-        print(context)
-        self.fields = ('name', 'author')
+
+        if not self.request.user.is_superuser:
+            form_class = super(NewPostView, self).get_form_class()
+            form = super(NewPostView, self).get_form(form_class)
+            STATUS_CHOICES = (('draft', 'draft'), ('review', 'review'))
+            status_field = forms.ChoiceField(choices=STATUS_CHOICES)
+            print(status_field)
+            form.fields['status'] = status_field
+            context['form'] = form
+
         return context
+
+    def post(self, request, *args, **kwargs):
+
+        if not self.request.user.is_superuser:
+            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+                           'content_activity', 'preview')
+            form_class = super(NewPostView, self).get_form_class()
+            form = super(NewPostView, self).get_form(form_class)
+        else:
+            form_class = super(NewPostView, self).get_form_class()
+            form = super(NewPostView, self).get_form(form_class)
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        print(form)
+        post = form.save()
+        return redirect('posts:edit-post', id=post.pk)
 
 
 class EditPostView(LoginRequiredMixin, UpdateView):
@@ -151,13 +183,40 @@ class EditPostView(LoginRequiredMixin, UpdateView):
     model = Post
     pk_url_kwarg = 'id'
     context_object_name = 'post'
-    fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+    fields = ('name', 'status', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
               'content_activity', 'preview')
     template_name = 'posts/sedit.html'
 
     def form_valid(self, form):
         post = form.save()
         return redirect('posts:edit-post', id=post.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super(EditPostView, self).get_context_data(**kwargs)
+
+        if not self.request.user.is_superuser:
+            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+                           'content_activity', 'preview')
+            form_class = super(EditPostView, self).get_form_class()
+            form = super(EditPostView, self).get_form(form_class)
+            context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+
+        if not self.request.user.is_superuser:
+            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+                           'content_activity', 'preview')
+            form_class = super(EditPostView, self).get_form_class()
+            form = super(EditPostView, self).get_form(form_class)
+        else:
+            form_class = super(EditPostView, self).get_form_class()
+            form = super(EditPostView, self).get_form(form_class)
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 @csrf_exempt
@@ -912,3 +971,53 @@ class ReviewPostView(LoginRequiredMixin, DetailView):
     redirect_field_name = 'redirect_to'
     model = Post
     pk_url_kwarg = 'id'
+
+
+class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
+
+    model = Review
+    fields = ('comment', )
+    context_object_name = 'review'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+    template_name = 'posts/new-review.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ChangePostStatusToReviewView, self).get_context_data(**kwargs)
+        context['post'] = get_object_or_404(Post, id=self.kwargs['id'])
+        return context
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, id=self.kwargs['id'])
+        last_post_review = None
+        try:
+            last_post_review = Review.objects.filter(post=post).order_by('-id')[:1]
+            last_post_review = last_post_review.first()
+        except Exception as e:
+            pass
+
+        if last_post_review and last_post_review.status == 'pending':
+            messages.error(self.request, 'Post is actually in review, wait for approbation')
+            return redirect('posts:edit-post', id=post.pk)
+
+        if post.status == 'published':
+            messages.error(self.request, 'Post is actually published')
+            return redirect('posts:edit-post', id=post.pk)
+
+        last_review = Review.objects.all().exclude(post=post)[:1]
+        print(last_review)
+        reviewer_list = DjangoUser.objects.filter(groups__name='reviewer')
+        post_reviewer = reviewer_list.first()
+
+        if not post_reviewer:
+            messages.error(self.request, 'User with role reviewer not exist')
+            return redirect('posts:new-review', id=self.kwargs['id'])
+
+        post_user = self.request.user
+
+        if post_user and post and post_reviewer:
+            new_review = form.save(commit=False)
+            new_review.post = post
+            new_review.save()
+            messages.success(self.request, 'Your request for approbation has been created')
+            return redirect('posts:edit-post', id=post.pk)
