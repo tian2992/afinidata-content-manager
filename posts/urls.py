@@ -1,6 +1,6 @@
 from django.urls import path
-from posts.views import HomeView, new_post, post, \
-     edit_interaction, feedback, edit_post, create_tag, \
+from posts.views import HomeView, post, \
+     edit_interaction, feedback, create_tag, \
      tags, set_tag_to_post, get_tags_for_post, remove_tag_for_post, \
      StatisticsView, PostsListView, set_user_send, post_by_limits, \
      QuestionsView, CreateQuestion, EditQuestion, QuestionView, \
@@ -14,10 +14,8 @@ urlpatterns = [
     path('', HomeView.as_view(), name="home"),
     path('new/', NewPostView.as_view(), name='new'),
     path('<int:id>/edit/', EditPostView.as_view(), name="edit-post"),
-    #path('<int:id>/edit', edit_post, name="edit-post"),
     path('<int:id>/', post, name="post"),
     path('<int:id>/delete/', DeletePostView.as_view(), name='delete'),
-    #path('new/', new_post, name="new"),
     path('set_interaction/', set_interaction_to_post, name='set_interaction'),
     path('<int:id>/thumbnail/', get_thumbnail_by_post, name='get_thumbnail'),
     path('<int:id>/review/', ReviewPostView.as_view(), name='review'),

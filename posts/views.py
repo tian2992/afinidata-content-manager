@@ -138,9 +138,11 @@ class NewPostView(LoginRequiredMixin, CreateView):
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
 
-    def form_valid(self, form):
-        post = form.save()
-        return redirect('posts:edit-post', id=post.pk)
+    def get_context_data(self, **kwargs):
+        context = super(NewPostView, self).get_context_data(**kwargs)
+        print(context)
+        self.fields = ('name', 'author')
+        return context
 
 
 class EditPostView(LoginRequiredMixin, UpdateView):
@@ -157,28 +159,6 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         post = form.save()
         return redirect('posts:edit-post', id=post.pk)
 
-
-def new_post(request):
-
-    form = CreatePostForm(request.POST or None)
-
-    if form.is_valid():
-
-        data = form.cleaned_data
-
-        saved_post = Post.objects.create(**data)
-
-        return redirect('posts:edit-post', id=saved_post.pk)
-
-    try:
-        if request.GET['quest'] == 'afini':
-
-            return render(request, 'posts/new.html', {'form': form})
-
-        else:
-            raise Http404('Not found')
-    except:
-        raise Http404('Not found')
 
 @csrf_exempt
 def edit_interaction(request, id):
@@ -371,42 +351,6 @@ def feedback(request):
 
     else:
         raise Http404('Not found')
-
-
-def edit_post(request, id):
-
-    if request.method == 'GET':
-
-        try:
-            post_to_edit = Post.objects.get(id=id)
-            return render(request, 'posts/edit.html', {'post': post_to_edit})
-        except:
-            raise Http404('Not found')
-
-    else:
-        new = False
-        try:
-            new = True if request.POST['new'] else False
-        except:
-            pass
-        try:
-            post_to_edit = Post.objects.get(id=request.POST['id'])
-            post_to_edit.name = request.POST['name'] if request.POST['name'] else None
-            post_to_edit.content = request.POST['content'] if request.POST['content'] else None
-            post_to_edit.type = request.POST['type'] if request.POST['type'] else None
-            post_to_edit.author = request.POST['author'] if request.POST['author'] else None
-            post_to_edit.min_range = request.POST['min_range'] if request.POST['min_range'] else None
-            post_to_edit.max_range = request.POST['max_range'] if request.POST['max_range'] else None
-            post_to_edit.area_id = request.POST['area_id'] if request.POST['area_id'] else None
-            post_to_edit.preview = request.POST['preview'] if request.POST['preview'] else None
-            post_to_edit.thumbnail = request.POST['thumbnail'] if request.POST['thumbnail'] else None
-            post_to_edit.content_activity = request.POST['content_activity'] if request.POST['content_activity'] else None
-            post_to_edit.new = new
-            result = post_to_edit.save()
-        except:
-            print('not found')
-            pass
-        return redirect('posts:edit-post', id=id)
 
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
@@ -671,14 +615,14 @@ def post_by_limits(request):
                                                                                 created_at__gt=date_to_use)]
         print('local excluded')
         print(user_opened_post_list)
-        #user_opened_post_list = [131, 128, 88, 47]
+        user_opened_post_list = [131, 128, 88, 47]
         print('fake excluded (for dev only)')
         print(user_opened_post_list)
         recommendations = [x for x in service_post_list if x not in user_opened_post_list]
         print(recommendations)
         feedback_post_id = int(recommendations[0])
         print('id: ', feedback_post_id)
-        #feedback_post_id = 1
+        feedback_post_id = 1
         service_post = Post.objects.get(id=feedback_post_id)
 
     else:
