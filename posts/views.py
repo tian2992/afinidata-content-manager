@@ -1006,18 +1006,22 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 
         last_review = Review.objects.all().exclude(post=post)[:1]
         print(last_review)
-        reviewer_list = DjangoUser.objects.filter(groups__name='reviewer')
-        post_reviewer = reviewer_list.first()
+        reviser_list = DjangoUser.objects.filter(groups__name='reviser')
+        post_reviser = reviser_list.first()
 
-        if not post_reviewer:
-            messages.error(self.request, 'User with role reviewer not exist')
+        if not post_reviser:
+            messages.error(self.request, 'User with role reviser not exist')
             return redirect('posts:new-review', id=self.kwargs['id'])
 
         post_user = self.request.user
 
-        if post_user and post and post_reviewer:
+        if post_user and post and post_reviser:
             new_review = form.save(commit=False)
             new_review.post = post
             new_review.save()
+            author_role = UserReviewRole.objects.create(user=post_user, review=new_review)
+            print(author_role)
+            reviser_role = UserReviewRole.objects.create(user=post_reviser, review=new_review, role='reviser')
+            print(reviser_role)
             messages.success(self.request, 'Your request for approbation has been created')
             return redirect('posts:edit-post', id=post.pk)

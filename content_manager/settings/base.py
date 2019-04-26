@@ -91,10 +91,6 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_DEFAULT_NAME'))
-    },
-    'posts_db': {
-        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_NAME'))
     },
     'messenger_users_db': {
@@ -102,10 +98,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_USERS_NAME'))
     }
 }
-DATABASE_ROUTERS = ['posts.routers.PostsRouter', 'messenger_users.routers.MessengerUsersRouter']
-'''DATABASE_APPS_MAPPING = {'posts': 'posts_db',
-                         'messenger_users': 'messenger_users_db'}'''
-
+DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
 
 
 # Password validation

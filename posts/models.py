@@ -35,9 +35,6 @@ class Post(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
-        app_label = 'posts'
-
 
 class Interaction(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
@@ -53,9 +50,6 @@ class Interaction(models.Model):
     def __str__(self):
         return self.channel_id
 
-    class Meta:
-        app_label = 'posts'
-
 
 class Feedback(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
@@ -70,9 +64,6 @@ class Feedback(models.Model):
     def __str__(self):
         return self.channel_id
 
-    class Meta:
-        app_label = 'posts'
-
 
 class Label(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -82,9 +73,6 @@ class Label(models.Model):
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        app_label = 'posts'
 
 
 class Question(models.Model):
@@ -96,9 +84,6 @@ class Question(models.Model):
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        app_label = 'posts'
 
 
 class Response(models.Model):
@@ -112,9 +97,6 @@ class Response(models.Model):
     def __str__(self):
         return str(self.pk)
 
-    class Meta:
-        app_label = 'posts'
-
 
 class Review(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -127,11 +109,8 @@ class Review(models.Model):
     def __str__(self):
         return "%s__%s__%s" % (self.pk, self.status, self.post.pk)
 
-    class Meta:
-        app_label = 'posts'
 
-
-REVIEW_ROLE_CHOICES = (('author', 'author'), ('reviewer', 'reviewer'))
+REVIEW_ROLE_CHOICES = (('author', 'author'), ('reviser', 'reviser'))
 
 
 class UserReviewRole(models.Model):
@@ -141,6 +120,3 @@ class UserReviewRole(models.Model):
 
     def __str__(self):
         return str(self.pk)
-
-    class Meta:
-        app_label = 'posts'
