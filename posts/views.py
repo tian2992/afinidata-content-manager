@@ -530,6 +530,7 @@ def remove_tag_for_post(request, id):
 
     try:
         post = Post.objects.get(id=id)
+        print(post)
     except:
         post = None
 
