@@ -25,10 +25,7 @@
             function createLabel(item) {
                 let label = document.createElement('span')
                 let button = document.createElement('button')
-                let icon = document.createElement('i')
-                icon.classList.add('fa')
-                icon.classList.add('fa-times')
-                button.appendChild(icon)
+                button.innerText = 'x'
                 label.innerText = item.name
                 label.dataset.tagId = item.id
                 label.classList.add('tag-item')
@@ -43,6 +40,8 @@
                         console.log('post tags: ', postTags)
                         if(!tag) {
                             let result = await createTag(event.target.value)
+                            console.log('tag not exist')
+                            console.log('result here: ', result)
                             if(result.status === 'created') {
                                 let second_result = await setTagToPost(POST_ID, event.target.value)
                                 if(second_result.status !== 'error') {
@@ -50,8 +49,8 @@
                                 }
                                 input.value = ""
                                 tags.push(result.data)
-                                await setPostTags(TAGS_CONTENT, postTags)
-                                await setTagsForDataList(TAGS_DATALIST, tags, postTags)
+                                await setPostTags(TAGS_CONTENT)
+                                await setTagsForDataList(TAGS_DATALIST)
                                 await setLabelEvent(TAGS_CONTENT)
                             }
                         } else {
@@ -61,8 +60,8 @@
                                 if(result.status !== 'error') {
                                     input.value = ""
                                     postTags.push(result.data)
-                                    await setPostTags(TAGS_CONTENT, postTags)
-                                    await setTagsForDataList(TAGS_DATALIST, tags, postTags)
+                                    await setPostTags(TAGS_CONTENT)
+                                    await setTagsForDataList(TAGS_DATALIST)
                                     await setLabelEvent(TAGS_CONTENT)
                                 }
                             } else {
@@ -103,33 +102,43 @@
                 return tags
             }
 
-            async function setTagsForDataList(dataList, tagsArray, postTagsArray) {
+            async function setTagsForDataList(dataList) {
                 dataList.innerHTML = ""
-                //tagsArray.map(tag => console.log(postTagsArray.includes(tag)))
-                tagsArray.map(tag => !postTagsArray.includes(tag) && dataList.appendChild(createOption(tag.name)))
+                let dataListTags = []
+                tags.map(tag => {
+                    let result = postTags.find(postTag => postTag.id == tag.id)
+                    if (!result) {
+                        dataListTags.push(tag)
+                    }
+                })
+                dataListTags.map(tag => dataList.appendChild(createOption(tag.name)))
             }
 
-            async function setPostTags(element, tags) {
+            async function setPostTags(element) {
                 element.innerHTML = ''
-                tags.map(tag => element.appendChild(createLabel(tag)))
+                postTags.map(tag => element.appendChild(createLabel(tag)))
             }
 
             async function labelEvent(event) {
-                console.log('remove here')
-                console.log(postTags)
                 let {target} = event
                 let body = new FormData()
                 let method = 'post'
                 let parent = target.parentElement
+                console.log(target)
+                console.log(parent)
                 let {tagsElement} = target
                 let uri = `${DOMAIN}${REMOVE_POST_TAG_PATH(POST_ID)}`
-                body.append('name', parent.textContent)
+                let tagToDelete = String(parent.textContent)
+                tagToDelete = tagToDelete.slice(0, tagToDelete.length - 1)
+                body.append('name', tagToDelete)
                 let request = await fetch(uri, {method, body})
                 let response = await request.json()
                 if(response.status === 'removed') {
                     postTags = postTags.filter(tag => tag.id !== response.data.id)
-                    await setPostTags(tagsElement, postTags)
-                    await setLabelEvent(tagsElement, postTags)
+                    await setPostTags(tagsElement)
+                    await setLabelEvent(tagsElement)
+                } else {
+                    console.log(response)
                 }
             }
 
@@ -149,8 +158,8 @@
                 let requestPostTags = await getTags(DOMAIN, POST_TAGS_PATH(POST_ID))
                 tags = requestTags.data
                 postTags = requestPostTags.data
-                await setPostTags(TAGS_CONTENT, postTags)
-                await setTagsForDataList(TAGS_DATALIST, tags, postTags)
+                await setPostTags(TAGS_CONTENT)
+                await setTagsForDataList(TAGS_DATALIST)
                 await setInputEvent(TAGS_INPUT)
                 await setLabelEvent(TAGS_CONTENT)
             }
