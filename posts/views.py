@@ -525,6 +525,7 @@ def remove_tag_for_post(request, id):
 
     try:
         post = Post.objects.get(id=id)
+        print(post)
     except:
         post = None
 
@@ -1169,3 +1170,4 @@ class RejectionView(LoginRequiredMixin, CreateView):
         print(rejection)
         messages.success(self.request, 'Post with id: %s has been rejected, and need edit' % post.pk)
         return redirect('posts:posts-list')
+
