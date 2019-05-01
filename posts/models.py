@@ -23,7 +23,7 @@ POST_TYPE_CHOICES = (
 class Post(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, default='review')
-    pretty_name = models.CharField(max_length=255)
+    pretty_name = models.CharField(max_length=255, null=True)
     type = models.CharField(max_length=255, default='embeded', choices=POST_TYPE_CHOICES)
     content = models.TextField(null=True)
     content_activity = models.TextField(null=True)
