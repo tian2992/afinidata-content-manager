@@ -22,7 +22,9 @@
                     <div>
                         <input type="submit" value="Update Post">
                         <a href="{% url 'posts:delete' id=post.pk %}" style="display: inline" class="link">Delete Post</a>
-                        <a href="{% url 'posts:send_to_review' id=post.pk %}" style="display: inline" class="link">Send to Review</a>
+                        {% if post.status == 'draft' %}
+                            <a href="{% url 'posts:send_to_review' id=post.pk %}" style="display: inline" class="link">Send to Review</a>
+                        {% endif %}
                     </div>
 
 
