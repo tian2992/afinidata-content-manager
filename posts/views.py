@@ -192,7 +192,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
     model = Post
     pk_url_kwarg = 'id'
     context_object_name = 'post'
-    fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+    fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'area_id', 'content',
               'content_activity', 'preview')
     template_name = 'posts/edit.html'
 
