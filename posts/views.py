@@ -20,8 +20,14 @@ import pytz
 import requests
 
 
-class HomeView(TemplateView):
+class HomeView(LoginRequiredMixin, ListView):
     template_name = 'posts/index.html'
+    model = Post
+    context_object_name = 'posts'
+    paginate_by = 10
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+
 
 
 def post(request, id):

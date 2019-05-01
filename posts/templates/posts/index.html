@@ -3,5 +3,41 @@
 {% block title %}Afinidata{% endblock %}
 
 {% block content %}
-    <h1>Posts here!</h1>
+    <section class="post-list">
+        <div class="container">
+            <div>
+                <ol style="display: flex; justify-content: space-between; flex-wrap: wrap">
+                    {% for post in posts %}
+                        <li>
+                            <article class="panel">
+                                {{ post.name }}
+                            </article>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+
+            {% if is_paginated %}
+              <ul class="pagination">
+                {% if page_obj.has_previous %}
+                  <li><a href="?page={{ page_obj.previous_page_number }}&{{ parameters }}">&laquo;</a></li>
+                {% else %}
+                  <li class="disabled"><span>&laquo;</span></li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                  {% if page_obj.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                  {% else %}
+                    <li><a href="?page={{ i }}&{{ parameters }}">{{ i }}</a></li>
+                  {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                  <li><a href="?page={{ page_obj.next_page_number }}&{{ parameters }}">&raquo;</a></li>
+                {% else %}
+                  <li class="disabled"><span>&raquo;</span></li>
+                {% endif %}
+              </ul>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}
