@@ -1,0 +1,27 @@
+{% extends 'posts/base.html' %}
+
+{% block  title%}
+    Afinidata | Reviews
+{% endblock %}
+
+{% block content %}
+    <div class="post-list">
+        <div class="container">
+            <div class="panel" style="max-width: 800px; left: 0; right: 0; margin: 0 auto;">
+            <h2>Reviews ({{ role }})</h2>
+
+            <ul style="width: 100%;">
+                {% for review in reviews %}
+                    <li>
+                        <strong>Post: </strong><span>{{ review.post.name }} (#{{ review.post.pk }})</span><br>
+                        <strong>Review status: </strong><span>{{ review.status }}</span>|
+                        <a style="display: inline;"
+                           href="{% url 'posts:post-review' id=review.post.pk review_id=review.pk %}">View</a> -
+                    </li>
+                {% endfor %}
+            </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

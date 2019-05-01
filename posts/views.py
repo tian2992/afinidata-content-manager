@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
-from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole
+from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
+    Rejection
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from django import forms
@@ -135,7 +136,7 @@ class StatisticsView(TemplateView):
 
 class NewPostView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+    fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'content',
               'content_activity', 'preview', 'status')
     template_name = 'posts/new.html'
     login_url = '/admin/login/'
@@ -147,7 +148,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
         if not self.request.user.is_superuser:
             form_class = super(NewPostView, self).get_form_class()
             form = super(NewPostView, self).get_form(form_class)
-            STATUS_CHOICES = (('draft', 'draft'), ('review', 'review'))
+            STATUS_CHOICES = (('draft', 'draft'),)
             status_field = forms.ChoiceField(choices=STATUS_CHOICES)
             print(status_field)
             form.fields['status'] = status_field
@@ -158,10 +159,14 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
 
         if not self.request.user.is_superuser:
-            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
-                           'content_activity', 'preview')
+            self.fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'content',
+                           'content_activity', 'preview', 'status')
             form_class = super(NewPostView, self).get_form_class()
             form = super(NewPostView, self).get_form(form_class)
+            STATUS_CHOICES = (('draft', 'draft'),)
+            status_field = forms.ChoiceField(choices=STATUS_CHOICES)
+            form.fields['status'] = status_field
+
         else:
             form_class = super(NewPostView, self).get_form_class()
             form = super(NewPostView, self).get_form(form_class)
@@ -173,7 +178,11 @@ class NewPostView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         print(form)
-        post = form.save()
+        user = self.request.user
+        post = form.save(commit=False)
+        post.user = user
+        post.save()
+        messages.success(self.request, 'The post with id %s has been created' % post.pk)
         return redirect('posts:edit-post', id=post.pk)
 
 
@@ -183,40 +192,23 @@ class EditPostView(LoginRequiredMixin, UpdateView):
     model = Post
     pk_url_kwarg = 'id'
     context_object_name = 'post'
-    fields = ('name', 'status', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
+    fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
               'content_activity', 'preview')
-    template_name = 'posts/sedit.html'
+    template_name = 'posts/edit.html'
 
     def form_valid(self, form):
         post = form.save()
         return redirect('posts:edit-post', id=post.pk)
 
     def get_context_data(self, **kwargs):
-        context = super(EditPostView, self).get_context_data(**kwargs)
-
-        if not self.request.user.is_superuser:
-            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
-                           'content_activity', 'preview')
-            form_class = super(EditPostView, self).get_form_class()
-            form = super(EditPostView, self).get_form(form_class)
-            context['form'] = form
+        context = super().get_context_data()
+        user = self.request.user
+        if user.is_superuser:
+            context['role'] = 'superuser'
+        else:
+            post = get_object_or_404(Post, id=self.kwargs['id'], user=user)
+            context['role'] = 'owner'
         return context
-
-    def post(self, request, *args, **kwargs):
-
-        if not self.request.user.is_superuser:
-            self.fields = ('name', 'author', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'area_id', 'content',
-                           'content_activity', 'preview')
-            form_class = super(EditPostView, self).get_form_class()
-            form = super(EditPostView, self).get_form(form_class)
-        else:
-            form_class = super(EditPostView, self).get_form_class()
-            form = super(EditPostView, self).get_form(form_class)
-
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 @csrf_exempt
@@ -702,11 +694,11 @@ def post_by_limits(request):
         if user.created_at > new_user_limit:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
-                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id)
+                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True, status='published')
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
-                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True)
+                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True, status='published')
 
         if posts.count() <= 0:
             return JsonResponse(dict(status='error', error='Not posts founded with value'))
@@ -1004,14 +996,36 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             messages.error(self.request, 'Post is actually published')
             return redirect('posts:edit-post', id=post.pk)
 
-        last_review = Review.objects.all().exclude(post=post)[:1]
-        print(last_review)
+        last_reviews = Review.objects.all().exclude(post=post).order_by('-id')[:1]
         reviser_list = DjangoUser.objects.filter(groups__name='reviser')
         post_reviser = reviser_list.first()
+        print('first: ', post_reviser)
 
         if not post_reviser:
             messages.error(self.request, 'User with role reviser not exist')
             return redirect('posts:new-review', id=self.kwargs['id'])
+
+        if reviser_list.count() > 1:
+            print('more revisers')
+            if last_reviews.count() > 0:
+                last_review = last_reviews.first()
+                print(last_review)
+                reviser_index = 0
+                user = UserReviewRole.objects.filter(review=last_review, role='reviser').first().user
+                for counter, reviser_user in enumerate(reviser_list):
+                    if user == reviser_user:
+                        print('equals', counter)
+                        reviser_index = counter
+                        print(reviser_user)
+                        print(user)
+                        print(reviser_index)
+
+                print('count', reviser_list.count())
+                if reviser_index < (reviser_list.count() - 1):
+                    print(reviser_index, reviser_list.count() - 1)
+                    post_reviser = reviser_list[reviser_index + 1]
+
+        print(post_reviser)
 
         post_user = self.request.user
 
@@ -1020,8 +1034,138 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             new_review.post = post
             new_review.save()
             author_role = UserReviewRole.objects.create(user=post_user, review=new_review)
-            print(author_role)
             reviser_role = UserReviewRole.objects.create(user=post_reviser, review=new_review, role='reviser')
-            print(reviser_role)
+            post.status = 'review'
+            post.save()
             messages.success(self.request, 'Your request for approbation has been created')
             return redirect('posts:edit-post', id=post.pk)
+
+
+class Reviews(LoginRequiredMixin, ListView):
+    template_name = 'posts/reviser-reviews.html'
+    model = Review
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+    context_object_name = 'reviews'
+
+    def get_queryset(self):
+        user = self.request.user
+        superuser = user.is_superuser
+        status = ['pending', 'completed']
+        try:
+            status = self.request.GET['status']
+        except Exception as e:
+            print(e)
+            pass
+        print(status)
+        if superuser:
+            queryset = Review.objects.all().order_by('-pk')
+        else:
+            queryset = Review.objects.filter(users__in=[user.pk]).order_by('-pk')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['role'] = 'author'
+        if self.request.user.is_superuser:
+            context['role'] = 'superuser'
+        else:
+            is_reviser = True if self.request.user.groups.filter(name='reviser').count() > 0 else False
+
+            if is_reviser:
+                context['role'] = 'reviser'
+        return context
+
+
+class ReviewView(LoginRequiredMixin, DetailView):
+    template_name = 'posts/review-detail.html'
+    model = Review
+    pk_url_kwarg = 'review_id'
+    context_object_name = 'review'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+
+    def get_object(self, queryset=None):
+        post = get_object_or_404(Post, id=self.kwargs['id'])
+        object = get_object_or_404(Review.objects.filter(post=post), id=self.kwargs['review_id'])
+        if not self.request.user.is_superuser:
+            user = get_object_or_404(object.users.all(), id=self.request.user.pk)
+        return object
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['post'] = get_object_or_404(Post, id=self.kwargs['id'])
+        if not self.request.user.is_superuser:
+            role = get_object_or_404(UserReviewRole, user=self.request.user, review=context['object'])
+            context['role'] = role
+        return context
+
+
+class AcceptReviewView(LoginRequiredMixin, View):
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        review = get_object_or_404(Review, id=kwargs['review_id'])
+        user = self.request.user
+        post_user = False
+
+        if review.post.status == 'published':
+            messages.error(self.request, 'Post is actually published, no need to review')
+            return redirect('posts:edit-post', id=review.post.pk)
+
+        if not user.is_superuser:
+            post_user = True if review.userreviewrole_set.filter(user=user, role='reviser').count() > 0 else False
+
+        if not (post_user or user.is_superuser):
+            messages.error(self.request, 'User not authorize to approve the post')
+            return redirect('posts:edit-post', id=review.post.pk)
+
+        review.post.status = 'published'
+        published = review.post.save()
+        print(published)
+
+        review.status = 'completed'
+        completed = review.save()
+        print(completed)
+
+        approbation = Approbation.objects.create(user=user, review=review)
+        print(approbation)
+
+        messages.success(self.request, "Post with id: %s has been approved for %s." % (review.post.pk, user.username))
+        return redirect('posts:edit-post', id=review.post.pk)
+
+
+class RejectionView(LoginRequiredMixin, CreateView):
+
+    model = Rejection
+    template_name = 'posts/new-rejection.html'
+    fields = ('comment',)
+    context_object_name = 'rejection'
+    login_url = '/admin/login/'
+    redirect_field_name = 'redirect_to'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
+        context['post'] = review.post
+        if not self.request.user.is_superuser:
+            role = get_object_or_404(UserReviewRole, user=self.request.user, review=review)
+            context['role'] = role
+        return context
+
+    def form_valid(self, form):
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
+        post = review.post
+        review.status = 'completed'
+        review.save()
+        post.status = 'draft'
+        post.save()
+        rejection = form.save(commit=False)
+        rejection.user = self.request.user
+        rejection.review = review
+        rejection.save()
+        print(rejection)
+        messages.success(self.request, 'Post with id: %s has been rejected, and need edit' % post.pk)
+        return redirect('posts:posts-list')

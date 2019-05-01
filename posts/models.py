@@ -14,15 +14,20 @@ REVIEW_STATUS_CHOICES = (
     ('completed', 'Completed')
 )
 
+POST_TYPE_CHOICES = (
+    ('embeded', 'embeded'),
+    ('youtube', 'youtube')
+)
+
 
 class Post(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, default='review')
     pretty_name = models.CharField(max_length=255)
-    type = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, default='embeded', choices=POST_TYPE_CHOICES)
     content = models.TextField(null=True)
     content_activity = models.TextField(null=True)
-    author = models.CharField(null=True, default="", max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     min_range = models.IntegerField(null=True, default=0)
     max_range = models.IntegerField(null=True, default=72)
     preview = models.TextField(null=True)
@@ -120,3 +125,20 @@ class UserReviewRole(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+
+class Approbation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s__%s__%s" % (self.pk, self.user.first_name, self.review.pk)
+
+
+class Rejection(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    comment = models.TextField(null=True)
+
+    def __str__(self):
+        return "%s__%s__%s" % (self.pk, self.user.first_name, self.review.pk)
