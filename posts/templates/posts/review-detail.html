@@ -11,6 +11,13 @@
                 <div>
                     <h2>Review ({{ review.status }})</h2>
                     <h3>Post Details: </h3>
+                    {% if review.status == 'pending' or request.user.is_superuser %}
+                        <a href="{% url 'posts:edit-post' id=post.pk %}" style="display: inline;">Edit post</a>
+                    {% else %}
+                        {% if request.user == post.user and post.status != 'published' %}
+                            <a href="{% url 'posts:edit-post' id=post.pk %}" style="display: inline;">Edit post</a>
+                        {% endif %}
+                    {% endif %}
                     <ul>
                         <li><strong>ID: </strong><span>{{post.pk}}</span></li>
                         <li>
@@ -49,9 +56,10 @@
                     <br>
                     <p>{{ review.comment }}</p>
                     <br>
+                    <a href="{% url 'posts:reviews' %}" style="display: inline;">Back to Reviews</a>
                     {% if review.status == 'pending' %}
                         {% if request.user.is_superuser or role.role == 'reviser' %}
-                            <a href="{% url 'posts:accept-review' review_id=review.pk %}"
+                            - <a href="{% url 'posts:accept-review' review_id=review.pk %}"
                                style="display: inline">Publish Post</a> -
                             <a href="{% url 'posts:reject-review' review_id=review.pk %}"
                                style="display: inline">Reject Post</a>

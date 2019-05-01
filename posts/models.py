@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 STATUS_CHOICES = (
     ('draft', 'draft'),
     ('review', 'review'),
-    ('private', 'private'),
+    ('rejected', 'rejected'),
     ('published', 'published')
 )
 

@@ -136,7 +136,7 @@ class StatisticsView(TemplateView):
 
 class NewPostView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'content',
+    fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'content',
               'content_activity', 'preview', 'status')
     template_name = 'posts/new.html'
     login_url = '/admin/login/'
@@ -192,7 +192,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
     model = Post
     pk_url_kwarg = 'id'
     context_object_name = 'post'
-    fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'area_id', 'content',
+    fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'content',
               'content_activity', 'preview')
     template_name = 'posts/edit.html'
 
@@ -203,11 +203,20 @@ class EditPostView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         user = self.request.user
+        post = get_object_or_404(Post, id=self.kwargs['id'])
         if user.is_superuser:
             context['role'] = 'superuser'
-        else:
-            post = get_object_or_404(Post, id=self.kwargs['id'], user=user)
+        elif post.user == user:
             context['role'] = 'owner'
+        else:
+            last_reviews = Review.objects.filter(post=post, status='pending').order_by('-id')[:1]
+            if not last_reviews.count() > 0:
+                post = get_object_or_404(Post, id=self.kwargs['id'], user=user)
+
+            last_review = last_reviews.first()
+            review = get_object_or_404(UserReviewRole, review=last_review, user=user)
+            context['role'] = 'reviser'
+
         return context
 
 
@@ -1048,27 +1057,31 @@ class Reviews(LoginRequiredMixin, ListView):
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
     context_object_name = 'reviews'
+    paginate_by = 10
 
     def get_queryset(self):
         user = self.request.user
         superuser = user.is_superuser
         status = ['pending', 'completed']
         try:
-            status = self.request.GET['status']
+            status = [self.request.GET['status']]
         except Exception as e:
             print(e)
             pass
         print(status)
         if superuser:
-            queryset = Review.objects.all().order_by('-pk')
+            queryset = Review.objects.filter(status__in=status).order_by('-pk')
         else:
-            queryset = Review.objects.filter(users__in=[user.pk]).order_by('-pk')
+            queryset = Review.objects.filter(status__in=status, users__in=[user.pk]).order_by('-pk')
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['role'] = 'author'
+        get_copy = self.request.GET.copy()
+        parameters = get_copy.pop('page', True) and get_copy.urlencode()
+        context['parameters'] = parameters
         if self.request.user.is_superuser:
             context['role'] = 'superuser'
         else:
@@ -1161,7 +1174,7 @@ class RejectionView(LoginRequiredMixin, CreateView):
         post = review.post
         review.status = 'completed'
         review.save()
-        post.status = 'draft'
+        post.status = 'rejected'
         post.save()
         rejection = form.save(commit=False)
         rejection.user = self.request.user
