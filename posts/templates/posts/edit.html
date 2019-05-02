@@ -8,72 +8,24 @@
             <article class="form-content">
             <h1>
                 Edit Post: {{ post.name }}
-                <a href="{% url 'posts:posts-list' %}?quest=afini" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
+                <a href="{% url 'posts:posts-list' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
+                <a href="{% url 'posts:reviews' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to Reviews</a>
                 <div>
-                    <small>Created: {{ post.created_at|date:"d M Y h:i" }}</small>
-                    <small>Last updated: {{ post.updated_at|date:"d M Y h:i" }}</small>
+                    <small>Status: {{ post.status }},</small>
+                    <small>Created: {{ post.created_at|date:"d M Y h:i" }},</small>
+                    <small>Last updated: {{ post.updated_at|date:"d M Y h:i" }},</small>
+                    <small>Author: {{ post.user.username }}</small>
                 </div>
             </h1>
-                <form action="./edit" method="post">
+                <form method="post">
                     {% csrf_token %}
-                    <input type="hidden" name="id" value="{{ post.pk }}">
-                    <div>
-                        <label for="name">Name: </label>
-                        <input type="text" name="name" value="{{ post.name }}">
-                    </div>
-                    <div>
-                        <label for="author">Author: </label>
-                        <input type="text" name="author" value="{{ post.author }}">
-                    </div>
-                    <div>
-                        <label for="thumbnail">Thumbnail: </label>
-                        <input type="text" name="thumbnail" value="{{ post.thumbnail }}">
-                    </div>
-                    {% if post.new %}
-                        <div>
-                            <label for="new">Is new?: </label>
-                            <input type="checkbox" name="new" checked>
-                        </div>
-                    {% else %}
-                        <div>
-                            <label for="new">Is new?: </label>
-                            <input type="checkbox" name="new">
-                        </div>
-                    {% endif %}
-                    <div>
-                        <label for="min_range">Min range: </label>
-                        <input type="number" name="min_range" value="{{ post.min_range }}">
-                    </div>
-                    <div>
-                        <label for="max_range">Max range: </label>
-                        <input type="number" name="max_range" value="{{ post.max_range }}">
-                    </div>
-                    <div>
-                        <label for="area_id">Area: </label>
-                        <input type="number" name="area_id" value="{{ post.area_id }}">
-                    </div>
-                    <div>
-                        <label for="content">Content: </label>
-                        <textarea name="content" id="" cols="30" rows="10">{{ post.content }}</textarea>
-                    </div>
-                <div>
-                        <label for="content_activity">Content Activity: (Divide sections with |)</label>
-                        <textarea name="content_activity" id="" cols="30" rows="10">{{ post.content_activity }}</textarea>
-                    </div>
-                    <div>
-                        <label for="preview">Preview: </label>
-                        <textarea name="preview" id="" cols="30" rows="10">{{ post.preview }}</textarea>
-                    </div>
-                    <div>
-                        <label for="type">Type:</label>
-                        <select name="type" id="" value="{{ post.type }}">
-                            <option value="embeded">Embeded</option>
-                            <option value="youtube">Youtube Video</option>
-                        </select>
-                    </div>
+                    {{ form.as_p }}
                     <div>
                         <input type="submit" value="Update Post">
                         <a href="{% url 'posts:delete' id=post.pk %}" style="display: inline" class="link">Delete Post</a>
+                        {% if post.status == 'draft' or post.status == 'rejected' %}
+                            <a href="{% url 'posts:send_to_review' id=post.pk %}" style="display: inline" class="link">Send to Review</a>
+                        {% endif %}
                     </div>
 
 
@@ -99,6 +51,7 @@
 
                     <a href="{% url 'posts:new-question' %}" class="link">Add post question</a>
                 </div>
+
             </article>
         </div>
     </section>

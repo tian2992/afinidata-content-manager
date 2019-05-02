@@ -62,7 +62,7 @@
                     <br>
                 </div>
                 <div>
-                    <a href="{% url 'posts:posts-list' %}?quest=afini" style="display: inline-block">View all posts</a> -
+                    <a href="{% url 'posts:posts-list' %}" style="display: inline-block">View all posts</a> -
                     <a href="{% url 'posts:post' id=post.pk %}" style="display: inline-block">View Post</a> -
                     <a href="{% url 'posts:edit-post' id=post.pk %}" style="display: inline-block">Edit Post</a> -
                     {% if post.question_set.count <= 0 %}

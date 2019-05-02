@@ -5,8 +5,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 DATABASES = {
-    'default': {},
-    'posts': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': get_env_variable('DATABASE_NAME'),
         'USER': get_env_variable('DATABASE_USER'),

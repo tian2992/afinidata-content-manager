@@ -7,7 +7,6 @@ class CreatePostForm(Form):
     TYPE_CHOICES = (('embeded', 'Embeded'), ('youtube', 'Youtube'))
 
     name = CharField(label='Name')
-    author = CharField(label='Author')
     thumbnail = CharField(label='Thumbnail')
     new = BooleanField(label='New?', required=False)
     type = ChoiceField(widget=Select, choices=TYPE_CHOICES)
@@ -23,7 +22,7 @@ class UpdatePostFormModel(ModelForm):
 
     class Meta:
         model = Post
-        fields = ['name', 'content', 'type', 'author', 'min_range', 'max_range', 'area_id', 'preview']
+        fields = ['name', 'content', 'type', 'min_range', 'max_range', 'area_id', 'preview']
 
 
 class QuestionForm(ModelForm):

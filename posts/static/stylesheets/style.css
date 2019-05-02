@@ -402,6 +402,10 @@ header h1 {
     text-decoration: none;
 }
 
+.link:hover {
+    text-decoration: underline;
+}
+
 ul.list {
     margin-bottom: 1em;
 }
@@ -423,4 +427,27 @@ ul.list li {
 
 .main-footer a:hover {
     text-decoration: underline;
+}
+
+.pagination {
+    list-style-type: none !important;
+    display: flex !important;
+    width: 100%;
+    flex-direction: row !important;
+    justify-content: center !important;
+}
+
+.pagination li {
+    width: auto !important;
+}
+
+.pagination li a,
+.pagination li span {
+    padding: 2px 5px !important;
+    border: 1px solid rgba(0,0,0, .1);
+    display: block;
+}
+
+.pagination li a {
+    cursor: pointer !important;
 }
