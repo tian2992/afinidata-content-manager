@@ -1003,7 +1003,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 
         print(post_reviser)
 
-        post_user = self.request.user
+        post_user = post.user
 
         if post_user and post and post_reviser:
             new_review = form.save(commit=False)
