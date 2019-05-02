@@ -28,6 +28,52 @@ class HomeView(LoginRequiredMixin, ListView):
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        for post in context['posts']:
+            post.clicks = post.interaction_set.filter(type='opened').count()
+            session_total = 0
+            users = set()
+            sessions = post.interaction_set.filter(type='session')
+            for session in sessions:
+                users.add(session.user_id)
+                session_total = session_total + int(session.value)
+            post.session_total = session_total
+            if sessions.count() > 0:
+                post.session_average = round(session_total / sessions.count(), 2)
+            else:
+                post.session_average = 0
+            feedback_total = 0
+            feedback_list = post.feedback_set.all()
+            for feedback in feedback_list:
+                feedback_total = feedback_total + int(feedback.value)
+            post.feedback_total = feedback_total
+            if feedback_list.count() > 0:
+                post.feedback_average = round(feedback_total / feedback_list.count(), 2)
+                post.feedback_total_users = feedback_list.count()
+            else:
+                post.feedback_average = 0
+                post.feedback_total_users = 0
+            posts_sended = post.interaction_set.filter(type='sended')
+            if posts_sended.count() > 0:
+                users_to_sended = set()
+                for interaction in posts_sended:
+                    users_to_sended.add(interaction.user_id)
+                post.total_sended_users = len(users_to_sended)
+            else:
+                post.total_sended_users = 0
+            post.users = len(users)
+            posts_used = post.interaction_set.filter(type='used')
+            if posts_used.count() > 0:
+                users_to_used = set()
+                for interaction in posts_used:
+                    users_to_used.add(interaction.user_id)
+                post.total_used_users = len(users_to_used)
+                print(len(users_to_used))
+            else:
+                post.total_used_users = 0
+        return context
+
 
 
 def post(request, id):
