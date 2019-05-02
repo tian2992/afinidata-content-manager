@@ -143,44 +143,10 @@ class StatisticsView(TemplateView):
 class NewPostView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'content',
-              'content_activity', 'preview', 'status')
+              'content_activity', 'preview')
     template_name = 'posts/new.html'
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
-
-    def get_context_data(self, **kwargs):
-        context = super(NewPostView, self).get_context_data(**kwargs)
-
-        if not self.request.user.is_superuser:
-            form_class = super(NewPostView, self).get_form_class()
-            form = super(NewPostView, self).get_form(form_class)
-            STATUS_CHOICES = (('draft', 'draft'),)
-            status_field = forms.ChoiceField(choices=STATUS_CHOICES)
-            print(status_field)
-            form.fields['status'] = status_field
-            context['form'] = form
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-
-        if not self.request.user.is_superuser:
-            self.fields = ('name', 'thumbnail', 'new', 'type', 'min_range', 'max_range', 'content',
-                           'content_activity', 'preview', 'status')
-            form_class = super(NewPostView, self).get_form_class()
-            form = super(NewPostView, self).get_form(form_class)
-            STATUS_CHOICES = (('draft', 'draft'),)
-            status_field = forms.ChoiceField(choices=STATUS_CHOICES)
-            form.fields['status'] = status_field
-
-        else:
-            form_class = super(NewPostView, self).get_form_class()
-            form = super(NewPostView, self).get_form(form_class)
-
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
     def form_valid(self, form):
         print(form)
@@ -682,14 +648,14 @@ def post_by_limits(request):
                                                                                 created_at__gt=date_to_use)]
         print('local excluded')
         print(user_opened_post_list)
-        user_opened_post_list = [131, 128, 88, 47]
+        #user_opened_post_list = [131, 128, 88, 47]
         print('fake excluded (for dev only)')
         print(user_opened_post_list)
         recommendations = [x for x in service_post_list if x not in user_opened_post_list]
         print(recommendations)
         feedback_post_id = int(recommendations[0])
         print('id: ', feedback_post_id)
-        feedback_post_id = 1
+        #feedback_post_id = 1
         service_post = Post.objects.get(id=feedback_post_id)
 
     else:
@@ -1043,7 +1009,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 
         print(post_reviser)
 
-        post_user = self.request.user
+        post_user = post.user
 
         if post_user and post and post_reviser:
             new_review = form.save(commit=False)
