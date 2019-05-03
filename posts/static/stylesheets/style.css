@@ -446,8 +446,34 @@ ul.list li {
     padding: 2px 5px !important;
     border: 1px solid rgba(0,0,0, .1);
     display: block;
+    background: #fff;
+    text-decoration: none;
 }
 
 .pagination li a {
     cursor: pointer !important;
+    color: rgba(0, 179, 236, .6);
+}
+
+.inline-form-content input[type='text'],
+.inline-form-content select,
+.inline-form-content input[type='number'],
+.inline-form-content input[type='email']{
+    border: 1px solid rgba(0,0,0, .1);
+    background: #fff;
+    padding: 8px 10px;
+    border-radius: 4px;
+}
+
+.inline-form-content input[type="submit"] {
+    padding: 8px 10px;
+    border: 1px solid rgba(0,0,0, .1);
+    cursor: pointer;
+    background: rgba(0, 179, 236, .6);
+    color: #fff;
+    border-radius: 5px;
+}
+
+.inline-form-content input[type="submit"]:hover {
+    background: #305876;
 }

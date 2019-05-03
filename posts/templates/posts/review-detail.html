@@ -27,6 +27,7 @@
                             {% endif %}
                         </li>
                         <li><strong>Content: </strong><a href="{{ post.content }}">{{ post.content }}</a></li>
+                        <li><strong>Author: </strong><span>{{ post.user.first_name }} {{ post.user.last_name }} ({{ post.user.username }})</span></li>
                         <li><strong>Preview: </strong><span>{{ post.preview }}</span></li>
                         <li><strong>Content Activity: </strong><p>{{ post.content_activity }}</p></li>
                         <li><strong>Ranges: </strong><span>{{ post.min_range }} - {{ post.max_range }}</span></li>

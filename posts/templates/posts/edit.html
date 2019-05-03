@@ -8,7 +8,7 @@
             <article class="form-content">
             <h1>
                 Edit Post: {{ post.name }}
-                <a href="{% url 'posts:posts-list' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
+                <a href="{% url 'posts:home' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to list</a>
                 <a href="{% url 'posts:reviews' %}" class="link" style="font-size: .7em; font-weight: normal; text-decoration: underline;">Back to Reviews</a>
                 <div>
                     <small>Status: {{ post.status }},</small>

@@ -14,6 +14,7 @@ from django.contrib.auth.models import User as DjangoUser
 from django.contrib import messages
 from datetime import datetime, timedelta, date
 from django.urls import reverse_lazy
+from django.contrib.auth.models import Group
 import math
 import random
 import pytz
@@ -28,8 +29,51 @@ class HomeView(LoginRequiredMixin, ListView):
     login_url = '/admin/login/'
     redirect_field_name = 'redirect_to'
 
+    def get_queryset(self):
+        try:
+            params = dict()
+            if self.request.GET['name']:
+                params['name__contains'] = self.request.GET['name']
+            if self.request.GET['user_id']:
+                params['user_id'] = self.request.GET['user_id']
+            if self.request.GET['status']:
+                params['status'] = self.request.GET['status']
+            posts = Post.objects.filter(**params)
+            return posts
+        except Exception as e:
+            return Post.objects.all()
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
+
+        get_copy = self.request.GET.copy()
+        parameters = get_copy.pop('page', True) and get_copy.urlencode()
+        context['parameters'] = parameters
+        context['status_list'] = ['draft', 'review', 'rejected', 'published']
+
+        try:
+            params = dict()
+            if self.request.GET['name']:
+                params['name__contains'] = self.request.GET['name']
+                context['name'] = self.request.GET['name']
+            if self.request.GET['user_id']:
+                params['user_id'] = self.request.GET['user_id']
+                context['user_id'] = int(self.request.GET['user_id'])
+            if self.request.GET['status']:
+                params['status'] = self.request.GET['status']
+                context['status'] = self.request.GET['status']
+            posts = Post.objects.filter(**params)
+            context['total'] = posts.count()
+        except Exception as e:
+            context['total'] = Post.objects.all().count()
+            pass
+        try:
+            group = Group.objects.get(name='author')
+            users = group.user_set.all()
+            context['users'] = users
+        except Exception as e:
+            pass
+
         for post in context['posts']:
             post.clicks = post.interaction_set.filter(type='opened').count()
             session_total = 0
@@ -69,11 +113,9 @@ class HomeView(LoginRequiredMixin, ListView):
                 for interaction in posts_used:
                     users_to_used.add(interaction.user_id)
                 post.total_used_users = len(users_to_used)
-                print(len(users_to_used))
             else:
                 post.total_used_users = 0
         return context
-
 
 
 def post(request, id):
@@ -1200,5 +1242,5 @@ class RejectionView(LoginRequiredMixin, CreateView):
         rejection.save()
         print(rejection)
         messages.success(self.request, 'Post with id: %s has been rejected, and need edit' % post.pk)
-        return redirect('posts:posts-list')
+        return redirect('posts:home')
 

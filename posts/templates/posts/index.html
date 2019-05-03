@@ -6,6 +6,40 @@
     <section class="post-list">
         <div class="container">
             <div>
+                <div class="panel">
+                    <div class="inline-form-content">
+                        <form action="." method="get">
+                            <input type="text" name="name" placeholder="name" value="{{ name }}">
+                            <select name="status" id="status" value="{{ status }}">
+                                <option value="">All Status</option>
+                                {% for option in status_list %}
+                                    {% if status == option %}
+                                        <option value="{{ option }}" selected="selected">{{ option }}</option>
+                                    {% else %}
+                                        <option value="{{ option }}">{{ option }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% if users.count > 0 %}
+                                <select name="user_id" id="user_id">
+                                    <option value="">All Authors</option>
+                                    {% for author in users %}
+                                        {% if user_id == author.pk %}
+                                            <option value="{{ author.pk }}" selected="selected">{{ author.username }}</option>
+                                        {% else %}
+                                            <option value="{{ author.pk }}">{{ author.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </select>
+                            {% endif %}
+                            <input type="submit" value="Filter">
+                        </form>
+                    </div>
+                    <div>
+                        <strong>Total: {{ total }}</strong>
+                    </div>
+                </div>
                 <ol style="display: flex; justify-content: space-between; flex-wrap: wrap">
                     {% for post in posts %}
                         <li>
