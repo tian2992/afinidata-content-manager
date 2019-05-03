@@ -23,6 +23,10 @@
                             <input type="hidden" name="redirect_to" value="{{ request.GET.redirect_to }}" />
                         {% endif %}
                     </div>
+                    <div>
+                        <strong>Don't you have an account? </strong>
+                        <a href="{% url 'static:signup' %}" class="link">Create account</a>
+                    </div>
                 </form>
             </div>
         </div>
