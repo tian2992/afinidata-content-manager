@@ -28,6 +28,15 @@
             <img src="{% static 'images/logo.png' %}" alt="">
         </a>
     </header>
+    {% if request.user.is_authenticated %}
+        <nav class="header-nav">
+            <ul>
+                <li><a href="{% url 'posts:home' %}">Posts</a></li>
+                <li><a href="{% url 'posts:reviews' %}">Reviews</a></li>
+                <li><a href="{% url 'static:logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    {% endif %}
         {% if messages %}
           <ul class="messages">
             {% for message in messages %}

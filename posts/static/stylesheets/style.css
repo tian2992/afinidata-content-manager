@@ -479,3 +479,27 @@ ul.list li {
 .inline-form-content input[type="submit"]:hover {
     background: #305876;
 }
+
+.header-nav {
+    background: #305876;
+    display: flex;
+    justify-content: center;
+}
+
+.header-nav ul {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+}
+
+.header-nav a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    transition: all .2s;
+}
+
+.header-nav a:hover {
+    background: rgba(0,0,0,.2);
+}
