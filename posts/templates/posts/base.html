@@ -39,7 +39,8 @@
     {% if user.is_authenticated %}
         <footer class="main-footer">
             <strong>User: </strong><span>{{ request.user.username }}</span>
-                <a href="{% url 'static:logout' %}">Logout</a>
+                <a href="{% url 'static:logout' %}">Logout</a>,
+                <a href="{% url 'static:change_password' %}">Change password</a>
         </footer>
     {% endif %}
 </body>

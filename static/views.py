@@ -1,8 +1,8 @@
 from django.views.generic import TemplateView, View
 from django.http.response import JsonResponse
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm, PasswordResetForm
 from django.contrib.auth.models import Group
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.shortcuts import redirect
 from django.contrib import messages
 
@@ -79,3 +79,31 @@ class LogoutView(View):
         logout(request)
         messages.success(request, 'Logout successfully')
         return redirect('static:home')
+
+
+class ChangePasswordView(TemplateView):
+    template_name = 'static/change_password.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['form'] = PasswordChangeForm(self.request.user)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if not self.request.user.username:
+            return redirect('posts:home')
+
+        return super().get(self, request)
+
+    def post(self, request):
+        form = PasswordChangeForm(request.user, request.POST)
+
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password has been changed.')
+            return redirect('static:change_password')
+        else:
+            messages.error(request, 'Errors in form.')
+            return redirect('static:change_password')
+
