@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.http.response import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import Group
@@ -71,3 +71,11 @@ class SignUpView(TemplateView):
 
         messages.error(request, 'Invalid params.')
         return redirect('static:signup')
+
+
+class LogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'Logout successfully')
+        return redirect('static:home')
