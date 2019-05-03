@@ -115,6 +115,7 @@ header h1 {
 .post-form input[type="text"],
 .post-form input[type="number"],
 .post-form input[type="email"],
+.post-form input[type="password"],
 .post-form textarea,
 .post-form select {
     width: 100%;
@@ -137,6 +138,7 @@ header h1 {
 .post-form form input[type="text"]:focus,
 .post-form form input[type="email"]:focus,
 .post-form form textarea:focus,
+.post-form input[type="password"]:focus,
 .post-form form select:focus {
     box-shadow: 2px 2px 6px rgba(51,101,138,.3);
     border-bottom: 1px solid rgba(51,101,138,.2);

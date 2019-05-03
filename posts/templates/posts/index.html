@@ -46,8 +46,8 @@
                             <article class="panel">
                                 <h2>{{ post.name }} <small>{{ post.created_at }}</small></h2>
                                 {% if request.user.is_superuser or request.user == post.user%}
-                                    <a href="{% url 'posts:edit-post' id=post.pk %}" target="_blank">Edit</a>
-                                    <a href="{% url 'posts:delete' id=post.pk %}" target="_blank">Delete</a>
+                                    <a href="{% url 'posts:edit-post' id=post.pk %}">Edit</a>
+                                    <a href="{% url 'posts:delete' id=post.pk %}">Delete</a>
                                 {% endif %}
                                 <div style="width: 100%;">
                                     <h3>Stats:</h3>

@@ -26,7 +26,7 @@ class HomeView(LoginRequiredMixin, ListView):
     model = Post
     context_object_name = 'posts'
     paginate_by = 10
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_queryset(self):
@@ -233,7 +233,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
     fields = ('name', 'thumbnail', 'new', 'min_range', 'max_range', 'content',
               'content_activity', 'preview')
     template_name = 'posts/new.html'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
@@ -247,7 +247,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
 
 
 class EditPostView(LoginRequiredMixin, UpdateView):
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     model = Post
     pk_url_kwarg = 'id'
@@ -474,7 +474,7 @@ def feedback(request):
 
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     model = Post
     template_name = 'posts/delete.html'
@@ -634,7 +634,7 @@ def remove_tag_for_post(request, id):
 class PostsListView(LoginRequiredMixin, TemplateView):
 
     template_name = 'posts/list.html'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, *args, **kwargs):
@@ -822,7 +822,7 @@ def post_activity(request, id):
 
 class QuestionsView(LoginRequiredMixin, TemplateView):
     template_name = 'posts/questions.html'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
@@ -834,7 +834,7 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
     model = Question
     template_name = 'posts/new-question.html'
     fields = ('name', 'post', 'replies')
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
@@ -848,7 +848,7 @@ class EditQuestion(LoginRequiredMixin, UpdateView):
     fields = ('name', 'post', 'replies')
     pk_url_kwarg = 'id'
     context_object_name = 'question'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
@@ -858,7 +858,7 @@ class EditQuestion(LoginRequiredMixin, UpdateView):
 
 class QuestionView(LoginRequiredMixin, TemplateView):
     template_name = 'posts/question.html'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
@@ -869,7 +869,7 @@ class QuestionView(LoginRequiredMixin, TemplateView):
 class DeleteQuestionView(LoginRequiredMixin, DeleteView):
     template_name = 'posts/question-delete.html'
     model = Question
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     pk_url_kwarg = 'id'
     context_object_name = 'question'
@@ -1029,7 +1029,7 @@ def get_replies_to_question(request, id):
 
 class ReviewPostView(LoginRequiredMixin, DetailView):
     template_name = 'posts/review.html'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     model = Post
     pk_url_kwarg = 'id'
@@ -1040,7 +1040,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
     model = Review
     fields = ('comment', )
     context_object_name = 'review'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     template_name = 'posts/new-review.html'
 
@@ -1114,7 +1114,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 class Reviews(LoginRequiredMixin, ListView):
     template_name = 'posts/reviser-reviews.html'
     model = Review
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
     context_object_name = 'reviews'
     paginate_by = 10
@@ -1157,7 +1157,7 @@ class ReviewView(LoginRequiredMixin, DetailView):
     model = Review
     pk_url_kwarg = 'review_id'
     context_object_name = 'review'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_object(self, queryset=None):
@@ -1177,7 +1177,7 @@ class ReviewView(LoginRequiredMixin, DetailView):
 
 
 class AcceptReviewView(LoginRequiredMixin, View):
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get(self, request, *args, **kwargs):
@@ -1217,7 +1217,7 @@ class RejectionView(LoginRequiredMixin, CreateView):
     template_name = 'posts/new-rejection.html'
     fields = ('comment',)
     context_object_name = 'rejection'
-    login_url = '/admin/login/'
+    login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
