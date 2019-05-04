@@ -6,7 +6,7 @@
     <section class="post-list">
         <div class="container">
             <div>
-                <div class="panel">
+                <div class="panel" style="margin-bottom: 1em;">
                     <div class="inline-form-content">
                         <form action="." method="get">
                             <input type="text" name="name" placeholder="name" value="{{ name }}">
@@ -40,6 +40,9 @@
                         <strong>Total: {{ total }}</strong>
                     </div>
                 </div>
+
+                <a href="{% url 'posts:new' %}" class="btn">New Post</a>
+
                 <ol style="display: flex; justify-content: space-between; flex-wrap: wrap">
                     {% for post in posts %}
                         <li>
