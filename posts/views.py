@@ -1,24 +1,23 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection
+    Rejection, ReviewComment
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
-from django import forms
-from posts.forms import CreatePostForm
+from posts import forms
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from django.utils import timezone
 from messenger_users.models import User
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib import messages
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from django.urls import reverse_lazy
 from django.contrib.auth.models import Group
 import math
 import random
 import pytz
 import requests
+from posts.models import STATUS_CHOICES
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -39,6 +38,12 @@ class HomeView(LoginRequiredMixin, ListView):
             if self.request.GET['status']:
                 params['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
+            if self.request.GET['tags']:
+                tagsList = self.request.GET.getlist('tags')
+                tag_posts = Post.objects.filter(label__name__in=tagsList)
+                posts = tag_posts.filter(**params)
+                print(posts)
+
             return posts
         except Exception as e:
             return Post.objects.all()
@@ -49,7 +54,13 @@ class HomeView(LoginRequiredMixin, ListView):
         get_copy = self.request.GET.copy()
         parameters = get_copy.pop('page', True) and get_copy.urlencode()
         context['parameters'] = parameters
-        context['status_list'] = ['draft', 'review', 'rejected', 'published']
+        context['status_list'] = [item[0] for item in STATUS_CHOICES]
+        context['tags'] = Label.objects.all()
+        try:
+            context['request_tags'] = self.request.GET.getlist('tags')
+        except:
+            context['request_tags'] = []
+        print(context['request_tags'])
 
         try:
             params = dict()
@@ -63,6 +74,10 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
+            if self.request.GET['tags']:
+                tagsList = self.request.GET.getlist('tags')
+                tag_posts = Post.objects.filter(label__name__in=tagsList)
+                posts = tag_posts.filter(**params)
             context['total'] = posts.count()
         except Exception as e:
             context['total'] = Post.objects.all().count()
@@ -1033,6 +1048,7 @@ class ReviewPostView(LoginRequiredMixin, DetailView):
     redirect_field_name = 'redirect_to'
     model = Post
     pk_url_kwarg = 'id'
+    context_object_name = 'review'
 
 
 class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
@@ -1164,15 +1180,19 @@ class ReviewView(LoginRequiredMixin, DetailView):
         post = get_object_or_404(Post, id=self.kwargs['id'])
         object = get_object_or_404(Review.objects.filter(post=post), id=self.kwargs['review_id'])
         if not self.request.user.is_superuser:
-            user = get_object_or_404(object.users.all(), id=self.request.user.pk)
+            if not self.request.user == post.user:
+                user = get_object_or_404(object.users.all(), id=self.request.user.pk)
         return object
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['post'] = get_object_or_404(Post, id=self.kwargs['id'])
+        print('here')
         if not self.request.user.is_superuser:
-            role = get_object_or_404(UserReviewRole, user=self.request.user, review=context['object'])
-            context['role'] = role
+            if not self.request.user == context['post'].user:
+                role = get_object_or_404(UserReviewRole, user=self.request.user, review=context['object'])
+                context['role'] = role
+        context['form'] = forms.ReviewCommentForm()
         return context
 
 
@@ -1241,6 +1261,38 @@ class RejectionView(LoginRequiredMixin, CreateView):
         rejection.review = review
         rejection.save()
         print(rejection)
-        messages.success(self.request, 'Post with id: %s has been rejected, and need edit' % post.pk)
+        messages.success(self.request, 'Post with id: %s has been rejected.' % post.pk)
         return redirect('posts:home')
 
+
+class ChangePostToNeedChangesView(View):
+
+    def get(self, request, *args, **kwargs):
+        review = get_object_or_404(Review, id=kwargs['review_id'])
+        if not self.request.user.is_superuser:
+            authorized_user = get_object_or_404(UserReviewRole, review=review, user=self.request.user,
+                                                role='reviser')
+            print(self.request.user)
+        post = review.post
+        post.status = 'need_changes'
+        post.save()
+        review.status = 'completed'
+        review.save()
+        messages.success(request, 'Request to changes created')
+        return redirect('posts:post-review', id=post.pk, review_id=review.pk)
+
+
+class AddReviewCommentView(CreateView):
+    model = ReviewComment
+    fields = ('comment', )
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
+    def form_valid(self, form):
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
+        comment = form.save(commit=False)
+        comment.user = self.request.user
+        comment.review = review
+        comment.save()
+        messages.success(self.request, 'Comment has been added to review')
+        return redirect('posts:post-review', id=review.post.pk, review_id=review.pk)

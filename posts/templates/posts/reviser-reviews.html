@@ -19,7 +19,8 @@
                 {% for review in reviews %}
                     <li>
                         <strong>Post: </strong><span>{{ review.post.name }} (#{{ review.post.pk }})</span><br>
-                        <strong>Review status: </strong><span>{{ review.status }}</span> |
+                        <strong>Review status: </strong><span>{{ review.status }}</span><br>
+                        <strong>Post status: </strong><span>{{ review.post.status }}</span> |
 
                         <a style="display: inline;"
                            href="{% url 'posts:post-review' id=review.post.pk review_id=review.pk %}">View</a>

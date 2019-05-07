@@ -34,10 +34,23 @@
                                 </select>
                             {% endif %}
                             <input type="submit" value="Filter">
+                                <strong class="float-right total-posts">Total: {{ total }}</strong>
+                            <div class="tags-inputs">
+                                <span class="title">Tags</span><br>
+                                <div class="tags-input-container">
+                                    {% for tag in tags %}
+                                        <div>
+                                            <label for="tags">{{ tag.name }}</label>
+                                            {% if tag.name in request_tags %}
+                                                <input type="checkbox" name="tags" value="{{ tag.name }}" checked="checked">
+                                            {% else %}
+                                                <input type="checkbox" name="tags" value="{{ tag.name }}">
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </form>
-                    </div>
-                    <div>
-                        <strong>Total: {{ total }}</strong>
                     </div>
                 </div>
 

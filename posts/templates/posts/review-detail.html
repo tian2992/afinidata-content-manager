@@ -53,17 +53,45 @@
                         </li>
                     </ul>
 
-                    <h3>User comment:</h3>
+                    <h3>Author comment:</h3>
                     <br>
                     <p>{{ review.comment }}</p>
+                    <br>
+
+                    <h3>Review comments: </h3>
+                    <div>
+                        <ul>
+                            {% for comment in review.reviewcomment_set.all %}
+                                <li>{{ comment.comment }} ({{ comment.user.username }})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% if request.user.is_superuser or role.role == 'reviser' %}
+                        {% if post.status != 'rejected' and post.status != 'published' %}
+                            <div>
+                                <form action="{% url 'posts:comment_review' id=post.pk review_id=review.pk %}"
+                                      method="post"
+                                      class="comment-form">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <div class="actions">
+                                        <input type="submit" value="Add comment">
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
                     <br>
                     <a href="{% url 'posts:reviews' %}" style="display: inline;">Back to Reviews</a>
                     {% if review.status == 'pending' %}
                         {% if request.user.is_superuser or role.role == 'reviser' %}
                             - <a href="{% url 'posts:accept-review' review_id=review.pk %}"
-                               style="display: inline">Publish Post</a> -
+                               style="display: inline" class="btn success">Publish Post</a> -
+                            <a href="{% url 'posts:request_changes_view' review_id=review.pk %}"
+                               style="display: inline" class="btn warning">Request Changes to Post</a> -
                             <a href="{% url 'posts:reject-review' review_id=review.pk %}"
-                               style="display: inline">Reject Post</a>
+                               style="display: inline" class="btn error">Reject Post</a>
                         {% endif %}
                     {% endif %}
 

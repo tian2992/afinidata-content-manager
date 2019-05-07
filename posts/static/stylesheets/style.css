@@ -387,16 +387,42 @@ header h1 {
 }
 
 .btn {
-    color: #fff;
-    text-decoration: none;
-    background: rgba(0, 179, 236, .8);
+    color: #fff !important;
+    background: rgba(0, 179, 236, .6);
     padding: .4em 1em;
     border-radius: .3em;
     transition: all .2s;
+    border: 1px solid rgba(0,0,0, .1);
+    font-size: 14px;
 }
 
 .btn:hover {
     background: rgba(0, 179, 236, 1);
+    text-decoration: none !important;
+}
+
+.btn.success {
+    background: rgba(63, 113, 76, .7);
+}
+
+.btn.success:hover {
+    background: rgba(63, 113, 76, .9);
+}
+
+.btn.warning {
+    background: rgba(235, 181, 41, .7);
+}
+
+.btn.warning:hover {
+    background: rgba(235, 181, 41, .9);
+}
+
+.btn.error {
+    background: rgba(170, 30, 50, .7);
+}
+
+.btn.error:hover {
+    background: rgba(170, 30, 50, .9);
 }
 
 .link {
@@ -467,7 +493,8 @@ ul.list li {
     border-radius: 4px;
 }
 
-.inline-form-content input[type="submit"] {
+.inline-form-content input[type="submit"],
+.comment-form input[type="submit"]{
     padding: 8px 10px;
     border: 1px solid rgba(0,0,0, .1);
     cursor: pointer;
@@ -476,7 +503,8 @@ ul.list li {
     border-radius: 5px;
 }
 
-.inline-form-content input[type="submit"]:hover {
+.inline-form-content input[type="submit"]:hover,
+.comment-form input[type="submit"]:hover{
     background: #305876;
 }
 
@@ -502,4 +530,74 @@ ul.list li {
 
 .header-nav a:hover {
     background: rgba(0,0,0,.2);
+}
+
+.comment-form {
+    display: block;
+}
+
+.comment-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.comment-form textarea {
+    max-width: 100%;
+    min-width: 100%;
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0, .1);
+    border-right: 1px solid rgba(0,0,0, .1);
+    box-shadow: 2px 2px 6px rgba(0,0,0,.1);
+    margin-bottom: 1em;
+    padding: .8em .5em;
+    font-size: 1em;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+    background: none;
+    outline: none;
+    max-height: 100px;
+    min-height: 100px;
+}
+
+.comment-form input[type="submit"] {
+    font-size: 14px;
+}
+
+.float-right {
+    float: right;
+}
+
+.total-posts {
+    margin-top: .5em;
+}
+
+.tags-inputs {
+    margin-top: 2em;
+    border-radius: .5em;
+    border: 1px solid rgba(0,0,0,0.1);
+    display: block;
+    position: relative;
+    padding: 0 1em;
+}
+
+.tags-inputs .title {
+    display: inline-block;
+    position: relative;
+    padding: 1em 0;
+}
+
+.tags-input-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tags-input-container div {
+    padding: 0 1em 1em 0;
+}
+
+.tags-input-container label {
+    font-size: 12px;
 }

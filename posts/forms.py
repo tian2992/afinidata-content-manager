@@ -1,5 +1,5 @@
 from django.forms import ModelForm, Form, CharField, ChoiceField, RadioSelect, Select, IntegerField, BooleanField, Textarea
-from posts.models import Post, Question
+from posts import models
 
 
 class CreatePostForm(Form):
@@ -21,12 +21,19 @@ class CreatePostForm(Form):
 class UpdatePostFormModel(ModelForm):
 
     class Meta:
-        model = Post
+        model = models.Post
         fields = ['name', 'content', 'type', 'min_range', 'max_range', 'area_id', 'preview']
 
 
 class QuestionForm(ModelForm):
 
     class Meta:
-        model = Question
+        model = models.Question
         fields = ('name', 'post', 'replies')
+
+
+class ReviewCommentForm(ModelForm):
+
+    class Meta:
+        model = models.ReviewComment
+        fields = ('comment',)

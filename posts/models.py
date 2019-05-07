@@ -6,6 +6,7 @@ STATUS_CHOICES = (
     ('draft', 'draft'),
     ('review', 'review'),
     ('rejected', 'rejected'),
+    ('need_changes', 'need changes'),
     ('published', 'published')
 )
 
@@ -142,3 +143,12 @@ class Rejection(models.Model):
 
     def __str__(self):
         return "%s__%s__%s" % (self.pk, self.user.first_name, self.review.pk)
+
+
+class ReviewComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    def __str__(self):
+        return "%s" % self.comment
