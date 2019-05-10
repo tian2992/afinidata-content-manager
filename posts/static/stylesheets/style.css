@@ -601,3 +601,46 @@ ul.list li {
 .tags-input-container label {
     font-size: 12px;
 }
+
+.post-table img{
+    width: auto;
+    max-width: 250px;
+}
+
+.post-table .limited-content {
+    width: 400px;
+    height: auto;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.table-container {
+    width: 100%;
+    height: auto;
+    overflow-x: scroll;
+    border-collapse: collapse;
+}
+
+.post-table td,
+.post-table th{
+    padding: .5em 1em;
+}
+
+.post-table tr:first-child {
+    background: #2F5876;
+    color: #fff;
+    border-bottom: none;
+}
+
+.post-table tr {
+    border-bottom: 1px solid rgba(0,0,0, .1);
+}
+
+.post-table th{
+    border-right: 1px solid rgba(0,0,0, .1);
+}
+
+.messages-content {
+    background: #F9F9F9;
+    padding: 1em 0;
+}

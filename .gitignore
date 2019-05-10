@@ -2,6 +2,7 @@
 local_settings.py
 .idea/
 venv/
+uploads/
 *.DS_Store
 *.pyc
 __pycache__

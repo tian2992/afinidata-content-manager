@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'static.apps.StaticConfig',
     'messenger_users.apps.MessengerUsersConfig',
     'utilities.apps.UtilitiesConfig',
-    'dash.apps.DashConfig'
+    'dash.apps.DashConfig',
+    'upload.apps.UploadConfig'
 ]
 
 MIDDLEWARE = [
@@ -91,11 +92,19 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_NAME'))
+        'NAME': os.path.join(BASE_DIR, os.getenv('DATABASE_NAME')),
+        'USER': get_env_variable('DATABASE_USER'),
+        'PASSWORD': get_env_variable('DATABASE_PASSWORD'),
+        'HOST': get_env_variable('DATABASE_HOST'),
+        'PORT': get_env_variable('DATABASE_PORT'),
     },
     'messenger_users_db': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, os.getenv('DEVELOPMENT_DATABASE_USERS_NAME'))
+        'NAME': os.path.join(BASE_DIR, os.getenv('DATABASE_USERS_NAME')),
+        'USER': get_env_variable('DATABASE_USER'),
+        'PASSWORD': get_env_variable('DATABASE_PASSWORD'),
+        'HOST': get_env_variable('DATABASE_HOST'),
+        'PORT': get_env_variable('DATABASE_PORT'),
     }
 }
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']

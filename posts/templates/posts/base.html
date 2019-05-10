@@ -34,16 +34,21 @@
                 <li><a href="{% url 'posts:new' %}">New Post</a></li>
                 <li><a href="{% url 'posts:home' %}">Posts</a></li>
                 <li><a href="{% url 'posts:reviews' %}">Reviews</a></li>
+                <li><a href="{% url 'upload:upload' %}">Upload File</a></li>
                 <li><a href="{% url 'static:logout' %}">Logout</a></li>
             </ul>
         </nav>
     {% endif %}
         {% if messages %}
-          <ul class="messages">
-            {% for message in messages %}
-              <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-          </ul>
+          <div class="messages-content">
+            <div class="container">
+              <ul class="messages">
+                {% for message in messages %}
+                  <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         {% endif %}
     {% block content %}{% endblock %}
     {% if user.is_authenticated %}
