@@ -89,8 +89,8 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-print(os.getenv('DATABASE_ENGINE'))
-print(os.getenv('DATABASE_NAME'))
+print('engine: ', os.getenv('DATABASE_ENGINE'))
+print('db name: ', os.getenv('DATABASE_NAME'))
 
 DATABASES = {
     'default': {
