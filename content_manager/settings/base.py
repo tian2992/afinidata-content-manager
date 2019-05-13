@@ -89,25 +89,25 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-print('engine: ', os.getenv('DATABASE_ENGINE'))
-print('db name: ', os.getenv('DATABASE_NAME'))
+print('engine: ', os.getenv('CM_DATABASE_ENGINE'))
+print('db name: ', os.getenv('CM_DATABASE_NAME'))
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE'),
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+        'NAME': os.getenv('CM_DATABASE_NAME'),
+        'USER': os.getenv('CM_DATABASE_USER'),
+        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+        'HOST': os.getenv('CM_DATABASE_HOST'),
+        'PORT': os.getenv('CM_DATABASE_PORT'),
     },
     'messenger_users_db': {
-        'ENGINE': os.getenv('DATABASE_ENGINE'),
-        'NAME': os.getenv('DATABASE_USERS_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+        'NAME': os.getenv('CM_DATABASE_USERS_NAME'),
+        'USER': os.getenv('CM_DATABASE_USER'),
+        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+        'HOST': os.getenv('CM_DATABASE_HOST'),
+        'PORT': os.getenv('CM_DATABASE_PORT'),
     }
 }
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
