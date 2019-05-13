@@ -37,15 +37,18 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['user_id'] = self.request.GET['user_id']
             if self.request.GET['status']:
                 params['status'] = self.request.GET['status']
-            posts = Post.objects.filter(**params)
-            if self.request.GET['tags']:
-                tagsList = self.request.GET.getlist('tags')
-                tag_posts = Post.objects.filter(label__name__in=tagsList)
-                posts = tag_posts.filter(**params)
-                print(posts)
 
+            try:
+                if self.request.GET['tags']:
+                    tagsList = self.request.GET.getlist('tags')
+                    tag_posts = Post.objects.filter(label__name__in=tagsList)
+                    posts = tag_posts.filter(**params)
+                    print(posts)
+            except Exception as e:
+                posts = Post.objects.filter(**params)
             return posts
         except Exception as e:
+            print('Exception: %s' % e)
             return Post.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -74,10 +77,15 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
-            if self.request.GET['tags']:
-                tagsList = self.request.GET.getlist('tags')
-                tag_posts = Post.objects.filter(label__name__in=tagsList)
-                posts = tag_posts.filter(**params)
+            print(params)
+            print(posts)
+            try:
+                if self.request.GET['tags']:
+                    tagsList = self.request.GET.getlist('tags')
+                    tag_posts = Post.objects.filter(label__name__in=tagsList)
+                    posts = tag_posts.filter(**params)
+            except:
+                pass
             context['total'] = posts.count()
         except Exception as e:
             context['total'] = Post.objects.all().count()
