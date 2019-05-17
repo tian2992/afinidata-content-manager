@@ -36,7 +36,13 @@ urlpatterns = [
     path('questions/<int:id>/edit/', views.EditQuestion.as_view(), name='edit-question'),
     path('questions/<int:id>/delete/', views.DeleteQuestionView.as_view(), name='delete-question'),
     path('<int:id>/questions/', views.question_by_post, name='question_by_post'),
-    path('questions/<int:id>/response/', views.create_response_for_question, name='response_for_cuestion'),
-    path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies_for_question'),
+    path('questions/<int:id>/response/', views.create_response_for_question, name='response-for-question'),
+    path('questions/<int:id>/responses/new/', views.CreateQuestionResponseView.as_view(),
+         name='create-question-response'),
+    path('questions/<int:question_id>/responses/<int:response_id>/edit/', views.EditQuestionResponseView.as_view(),
+         name='edit-response-for-question'),
+    path('questions/<int:question_id>/responses/<int:response_id>/delete/', views.DeleteQuestionResponseView.as_view(),
+         name='delete-response-for-question'),
+    path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies-for-question'),
     path('reviews/', views.Reviews.as_view(), name='reviews')
 ]

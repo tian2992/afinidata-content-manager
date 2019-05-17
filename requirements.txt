@@ -1,7 +1,6 @@
 certifi==2019.3.9
 chardet==3.0.4
 Django==2.1.5
-env==0.1.0
 idna==2.8
 python-dateutil==2.7.5
 python-dotenv==0.10.1

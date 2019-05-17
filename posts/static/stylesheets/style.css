@@ -508,6 +508,10 @@ ul.list li {
     background: #305876;
 }
 
+.inline-form-content label {
+    margin-right: .5em;
+}
+
 .header-nav {
     background: #305876;
     display: flex;
@@ -602,6 +606,11 @@ ul.list li {
     font-size: 12px;
 }
 
+.post-table {
+    width: auto;
+    min-width: 100%;
+}
+
 .post-table img{
     width: auto;
     max-width: 250px;
@@ -642,5 +651,28 @@ ul.list li {
 
 .messages-content {
     background: #F9F9F9;
+    padding: 1em 0;
+}
+
+.responses-content {
+    background: #F9F9F9;
+    padding-bottom: 2em;
+}
+
+.responses-content .responses_form_content{
+    width: 55%;
+    margin: 0 auto;
+    position: relative;
+    background: #fff;
+    padding: 2em;
+    border-radius: 1em;
+    box-shadow: 1px 1px 3px rgba(0,0,0, .1);
+}
+
+.responses-content .responses_form_content .inline-form-content {
+    padding: 1em 0;
+}
+
+.question_responses_content {
     padding: 1em 0;
 }

@@ -24,16 +24,15 @@ POST_TYPE_CHOICES = (
 class Post(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, default='draft')
-    pretty_name = models.CharField(max_length=255, null=True)
     type = models.CharField(max_length=255, default='embeded', choices=POST_TYPE_CHOICES)
-    content = models.TextField(null=True)
-    content_activity = models.TextField(null=True)
+    content = models.TextField()
+    content_activity = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     min_range = models.IntegerField(null=True, default=0)
     max_range = models.IntegerField(null=True, default=72)
-    preview = models.TextField(null=True)
-    new = models.BooleanField(default=False, null=True)
-    thumbnail = models.TextField(null=True)
+    preview = models.TextField()
+    new = models.BooleanField(default=False)
+    thumbnail = models.TextField()
     area_id = models.IntegerField(null=True, default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -152,3 +151,15 @@ class ReviewComment(models.Model):
 
     def __str__(self):
         return "%s" % self.comment
+
+
+RESPONSE_VALUE_CHOICES = ((0, 0), (1, 1), (2, 2), (3, 3), (4, 4))
+
+
+class QuestionResponse(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    response = models.CharField(max_length=255)
+    value = models.IntegerField(choices=RESPONSE_VALUE_CHOICES)
+
+    def __str__(self):
+        return "%s__%s__%s__%s" % (self.pk, self.question.pk, self.response, self.value)

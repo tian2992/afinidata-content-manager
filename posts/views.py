@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment
+    Rejection, ReviewComment, QuestionResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from posts import forms
@@ -37,15 +37,18 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['user_id'] = self.request.GET['user_id']
             if self.request.GET['status']:
                 params['status'] = self.request.GET['status']
-            posts = Post.objects.filter(**params)
-            if self.request.GET['tags']:
-                tagsList = self.request.GET.getlist('tags')
-                tag_posts = Post.objects.filter(label__name__in=tagsList)
-                posts = tag_posts.filter(**params)
-                print(posts)
 
+            try:
+                if self.request.GET['tags']:
+                    tagsList = self.request.GET.getlist('tags')
+                    tag_posts = Post.objects.filter(label__name__in=tagsList)
+                    posts = tag_posts.filter(**params)
+                    print(posts)
+            except Exception as e:
+                posts = Post.objects.filter(**params)
             return posts
         except Exception as e:
+            print('Exception: %s' % e)
             return Post.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -74,10 +77,15 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
-            if self.request.GET['tags']:
-                tagsList = self.request.GET.getlist('tags')
-                tag_posts = Post.objects.filter(label__name__in=tagsList)
-                posts = tag_posts.filter(**params)
+            print(params)
+            print(posts)
+            try:
+                if self.request.GET['tags']:
+                    tagsList = self.request.GET.getlist('tags')
+                    tag_posts = Post.objects.filter(label__name__in=tagsList)
+                    posts = tag_posts.filter(**params)
+            except:
+                pass
             context['total'] = posts.count()
         except Exception as e:
             context['total'] = Post.objects.all().count()
@@ -496,7 +504,7 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
     pk_url_kwarg = 'id'
     context_object_name = 'post'
 
-    success_url = '/posts/list/?quest=afini'
+    success_url = '/posts/'
 
 
 @csrf_exempt
@@ -854,7 +862,8 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         new_question = form.save()
-        return redirect('posts:review', id=new_question.post.pk)
+        print(new_question)
+        return redirect('posts:edit-post', id=new_question.post.pk)
 
 
 class EditQuestion(LoginRequiredMixin, UpdateView):
@@ -870,15 +879,19 @@ class EditQuestion(LoginRequiredMixin, UpdateView):
         question = form.save()
         return redirect('posts:review', id=question.post.pk)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['response_form'] = forms.QuestionResponseForm()
+        return context
 
-class QuestionView(LoginRequiredMixin, TemplateView):
+
+class QuestionView(LoginRequiredMixin, DetailView):
     template_name = 'posts/question.html'
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
-
-    def get_context_data(self, **kwargs):
-        question = get_object_or_404(Question, pk=kwargs['id'])
-        return dict(question=question)
+    model = Question
+    context_object_name = 'question'
+    pk_url_kwarg = 'id'
 
 
 class DeleteQuestionView(LoginRequiredMixin, DeleteView):
@@ -1025,11 +1038,19 @@ def get_replies_to_question(request, id):
     except:
         return JsonResponse(dict(status='error', error='Invalid params'))
 
-    split_replies = question.replies.split(', ')
+    value_replies = question.questionresponse_set.all()
+    print(value_replies)
     quick_replies = []
-    for reply in split_replies:
-        new_reply = dict(title=reply, set_attributes=dict(response=reply), block_names=['Validador Feedback Ciclo 1-2'])
-        quick_replies.append(new_reply)
+    if not value_replies.count() > 0:
+        split_replies = question.replies.split(', ')
+        for reply in split_replies:
+            new_reply = dict(title=reply, set_attributes=dict(response=reply), block_names=['Validador Feedback Ciclo 1-2'])
+            quick_replies.append(new_reply)
+    else:
+        for reply in value_replies:
+            new_reply = dict(title=reply.response, set_attributes=dict(response=reply.value),
+                             block_names=['Validador Feedback Ciclo 1-2'])
+            quick_replies.append(new_reply)
 
     print(quick_replies)
     return JsonResponse(dict(
@@ -1265,7 +1286,9 @@ class RejectionView(LoginRequiredMixin, CreateView):
         return redirect('posts:home')
 
 
-class ChangePostToNeedChangesView(View):
+class ChangePostToNeedChangesView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
 
     def get(self, request, *args, **kwargs):
         review = get_object_or_404(Review, id=kwargs['review_id'])
@@ -1282,7 +1305,7 @@ class ChangePostToNeedChangesView(View):
         return redirect('posts:post-review', id=post.pk, review_id=review.pk)
 
 
-class AddReviewCommentView(CreateView):
+class AddReviewCommentView(LoginRequiredMixin, CreateView):
     model = ReviewComment
     fields = ('comment', )
     login_url = '/login/'
@@ -1296,3 +1319,76 @@ class AddReviewCommentView(CreateView):
         comment.save()
         messages.success(self.request, 'Comment has been added to review')
         return redirect('posts:post-review', id=review.post.pk, review_id=review.pk)
+
+
+class CreateQuestionResponseView(LoginRequiredMixin, CreateView):
+    model = QuestionResponse
+    fields = ('response', 'value')
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
+    def post(self, request, *args, **kwargs):
+        form = forms.QuestionResponseForm(self.request.POST)
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            messages.error(self.request, 'Error in form')
+            return redirect('posts:edit-question', id=self.kwargs['id'])
+
+    def form_valid(self, form):
+        response = form.save(commit=False)
+        response.question_id = self.kwargs['id']
+        response.save()
+        messages.success(self.request, 'Reply with value has been added to question')
+        return redirect('posts:edit-question', id=self.kwargs['id'])
+
+
+class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
+    model = QuestionResponse
+    fields = ('response', 'value')
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+    pk_url_kwarg = 'response_id'
+    template_name = 'posts/edit-question-response.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['question_id'] = self.kwargs['question_id']
+        return context
+
+    def get(self, *args, **kwargs):
+        question = get_object_or_404(Question, id=self.kwargs['question_id'])
+        response = get_object_or_404(question.questionresponse_set.all(), id=self.kwargs['response_id'])
+        if not(self.request.user.is_superuser or question.post.user == self.request.user):
+            last_reviews = Review.objects.filter(post=question.post, status='pending').order_by('-id')
+            if not last_reviews.count() > 0:
+                raise Http404('Not found')
+            review = last_reviews.first()
+            permit = get_object_or_404(UserReviewRole, review=review, user=self.request.user)
+        return super().get(self.request)
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Question reply has been updated.')
+        return redirect('posts:edit-question', id=self.kwargs['question_id'])
+
+
+class DeleteQuestionResponseView(LoginRequiredMixin, DeleteView):
+    model = QuestionResponse
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+    template_name = 'posts/delete-question-response.html'
+    pk_url_kwarg = 'response_id'
+    context_object_name = 'response'
+
+    success_url = '/posts/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['question_id'] = self.kwargs['question_id']
+        return context
+
+    def get_success_url(self):
+        messages.success(self.request, 'Response for question has been deleted.')
+        return reverse_lazy('posts:edit-question', kwargs=dict(id=self.kwargs['question_id']))
