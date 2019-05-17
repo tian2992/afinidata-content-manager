@@ -41,6 +41,8 @@ urlpatterns = [
          name='create-question-response'),
     path('questions/<int:question_id>/responses/<int:response_id>/edit/', views.EditQuestionResponseView.as_view(),
          name='edit-response-for-question'),
+    path('questions/<int:question_id>/responses/<int:response_id>/delete/', views.DeleteQuestionResponseView.as_view(),
+         name='delete-response-for-question'),
     path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies-for-question'),
     path('reviews/', views.Reviews.as_view(), name='reviews')
 ]

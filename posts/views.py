@@ -504,7 +504,7 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
     pk_url_kwarg = 'id'
     context_object_name = 'post'
 
-    success_url = '/posts/list/?quest=afini'
+    success_url = '/posts/'
 
 
 @csrf_exempt
@@ -862,7 +862,8 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         new_question = form.save()
-        return redirect('posts:review', id=new_question.post.pk)
+        print(new_question)
+        return redirect('posts:edit-post', id=new_question.post.pk)
 
 
 class EditQuestion(LoginRequiredMixin, UpdateView):
@@ -1351,6 +1352,11 @@ class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'response_id'
     template_name = 'posts/edit-question-response.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['question_id'] = self.kwargs['question_id']
+        return context
+
     def get(self, *args, **kwargs):
         question = get_object_or_404(Question, id=self.kwargs['question_id'])
         response = get_object_or_404(question.questionresponse_set.all(), id=self.kwargs['response_id'])
@@ -1367,3 +1373,22 @@ class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, 'Question reply has been updated.')
         return redirect('posts:edit-question', id=self.kwargs['question_id'])
 
+
+class DeleteQuestionResponseView(LoginRequiredMixin, DeleteView):
+    model = QuestionResponse
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+    template_name = 'posts/delete-question-response.html'
+    pk_url_kwarg = 'response_id'
+    context_object_name = 'response'
+
+    success_url = '/posts/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['question_id'] = self.kwargs['question_id']
+        return context
+
+    def get_success_url(self):
+        messages.success(self.request, 'Response for question has been deleted.')
+        return reverse_lazy('posts:edit-question', kwargs=dict(id=self.kwargs['question_id']))

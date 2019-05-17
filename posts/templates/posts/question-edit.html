@@ -27,7 +27,7 @@
                                         <td>{{ response.value }}</td>
                                         <td>
                                             <a href="{% url 'posts:edit-response-for-question' question_id=object.pk response_id=response.pk %}">Edit</a> -
-                                            <a href="">Delete</a></td>
+                                            <a href="{% url 'posts:delete-response-for-question' question_id=object.pk response_id=response.pk %}">Delete</a></td>
                                     </tr>
                                 {% endfor %}
                             </table>
