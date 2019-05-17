@@ -159,7 +159,7 @@ RESPONSE_VALUE_CHOICES = ((0, 0), (1, 1), (2, 2), (3, 3), (4, 4))
 class QuestionResponse(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     response = models.CharField(max_length=255)
-    value = models.CharField(max_length=255, choices=RESPONSE_VALUE_CHOICES)
+    value = models.IntegerField(choices=RESPONSE_VALUE_CHOICES)
 
     def __str__(self):
         return "%s__%s__%s__%s" % (self.pk, self.question.pk, self.response, self.value)

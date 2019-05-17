@@ -37,3 +37,10 @@ class ReviewCommentForm(ModelForm):
     class Meta:
         model = models.ReviewComment
         fields = ('comment',)
+
+
+class QuestionResponseForm(ModelForm):
+
+    class Meta:
+        model = models.QuestionResponse
+        fields = ('response', 'value')
