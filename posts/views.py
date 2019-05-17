@@ -1044,11 +1044,13 @@ def get_replies_to_question(request, id):
     if not value_replies.count() > 0:
         split_replies = question.replies.split(', ')
         for reply in split_replies:
-            new_reply = dict(title=reply, set_attributes=dict(response=reply), block_names=['Validador Feedback Ciclo 1-2'])
+            new_reply = dict(title=reply, set_attributes=dict(response=reply, response_text=reply),
+                             block_names=['Validador Feedback Ciclo 1-2'])
             quick_replies.append(new_reply)
     else:
         for reply in value_replies:
-            new_reply = dict(title=reply.response, set_attributes=dict(response=reply.value),
+            new_reply = dict(title=reply.response, set_attributes=dict(response=reply.value,
+                                                                       response_text=reply.response),
                              block_names=['Validador Feedback Ciclo 1-2'])
             quick_replies.append(new_reply)
 
