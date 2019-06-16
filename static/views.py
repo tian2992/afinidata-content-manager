@@ -5,6 +5,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.shortcuts import redirect
 from django.contrib import messages
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class IndexView(TemplateView):
@@ -40,7 +43,8 @@ class LoginView(TemplateView):
                 route = request.POST['redirect_to']
                 return redirect(route)
             except Exception as e:
-                pass
+                logger.error(e)
+
             return redirect('posts:home')
 
         messages.error(request, "Invalid credentials.")

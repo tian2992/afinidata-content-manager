@@ -100,7 +100,7 @@ class HomeView(LoginRequiredMixin, ListView):
             users = group.user_set.all()
             context['users'] = users
         except Exception as e:
-            pass
+            logger.error(e)
 
         for post in context['posts']:
             post.clicks = post.interaction_set.filter(type='opened').count()
@@ -944,16 +944,20 @@ def set_interaction_to_post(request):
         username = request.POST['username']
         user = User.objects.get(username=username)
     except Exception as e:
+        logger.error(e)
         return JsonResponse(dict(status='error', error='Invalid params.'))
     try:
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except:
+        logger.error(e)
         post = None
+
     try:
         value = request.POST['value']
-    except:
-        pass
+    except Exception as e:
+        logger.error(e)
+        value = None
 
     interaction = Interaction.objects.create(
         type=request.POST['interaction_type'],
