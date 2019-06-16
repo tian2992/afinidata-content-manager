@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
+from dotenv import load_dotenv
+
 
 if __name__ == '__main__':
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'content_manager.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'content_manager.settings.base')
+    env_path = './.env'
+
+    load_dotenv(dotenv_path=env_path)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
