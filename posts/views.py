@@ -18,6 +18,11 @@ import random
 import pytz
 import requests
 from posts.models import STATUS_CHOICES
+import logging
+
+logger = logging.getLogger(__name__)
+
+#FIXME: lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -51,7 +56,7 @@ class HomeView(LoginRequiredMixin, ListView):
             print('Exception: %s' % e)
             return Post.objects.all()
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
         get_copy = self.request.GET.copy()
@@ -197,7 +202,6 @@ def post(request, id):
                 return render(request, 'posts/post.html',
                               {'post': post, 'session_id': post_session.pk})
             except:
-
                 return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
         
         return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
@@ -299,6 +303,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
             last_review = last_reviews.first()
             review = get_object_or_404(UserReviewRole, review=last_review, user=user)
             context['role'] = 'reviser'
+            context['review'] = review.id
 
         return context
 
@@ -379,6 +384,7 @@ def set_user_send(request):
             type='sended',
             user_id=user.pk
         )
+        new_interaction.save()
 
         return JsonResponse(dict(
             status='created',
@@ -711,6 +717,8 @@ class PostsListView(LoginRequiredMixin, TemplateView):
         return context
 
 
+## FIXME: break up into simple functions
+## FIXME: delegate auth to middleware / decorator
 def post_by_limits(request):
     if request.method == 'POST':
         return JsonResponse(dict(status='error', error='Invalid method.'))
@@ -973,7 +981,7 @@ def get_thumbnail_by_post(request, id):
         print(post)
         thumbnail = post.thumbnail
     except Exception as e:
-        return JsonResponse(status='error', error='Invalid params')
+        return JsonResponse(dict(status='error', error='Invalid params'))
 
     return JsonResponse(dict(
         set_attributes=dict(),
@@ -1083,7 +1091,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
     redirect_field_name = 'redirect_to'
     template_name = 'posts/new-review.html'
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ChangePostStatusToReviewView, self).get_context_data(**kwargs)
         context['post'] = get_object_or_404(Post, id=self.kwargs['id'])
         return context
@@ -1095,7 +1103,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             last_post_review = Review.objects.filter(post=post).order_by('-id')[:1]
             last_post_review = last_post_review.first()
         except Exception as e:
-            pass
+            logger.error(e)
 
         if last_post_review and last_post_review.status == 'pending':
             messages.error(self.request, 'Post is actually in review, wait for approbation')
@@ -1144,6 +1152,8 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             new_review.save()
             author_role = UserReviewRole.objects.create(user=post_user, review=new_review)
             reviser_role = UserReviewRole.objects.create(user=post_reviser, review=new_review, role='reviser')
+            author_role.save()
+            reviser_role.save()
             post.status = 'review'
             post.save()
             messages.success(self.request, 'Your request for approbation has been created')
@@ -1165,8 +1175,7 @@ class Reviews(LoginRequiredMixin, ListView):
         try:
             status = [self.request.GET['status']]
         except Exception as e:
-            print(e)
-            pass
+            logger.error(e)
         print(status)
         if superuser:
             queryset = Review.objects.filter(status__in=status).order_by('-pk')
@@ -1205,6 +1214,7 @@ class ReviewView(LoginRequiredMixin, DetailView):
         if not self.request.user.is_superuser:
             if not self.request.user == post.user:
                 user = get_object_or_404(object.users.all(), id=self.request.user.pk)
+                ## TODO: is this supposed to be a way to ensure user exists...?
         return object
 
     def get_context_data(self, **kwargs):
@@ -1297,7 +1307,7 @@ class ChangePostToNeedChangesView(LoginRequiredMixin, View):
         if not self.request.user.is_superuser:
             authorized_user = get_object_or_404(UserReviewRole, review=review, user=self.request.user,
                                                 role='reviser')
-            print(self.request.user)
+            logger.info("User: {} is editing review {} ".format(authorized_user, review))
         post = review.post
         post.status = 'need_changes'
         post.save()
@@ -1359,7 +1369,7 @@ class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
         context['question_id'] = self.kwargs['question_id']
         return context
 
-    def get(self, *args, **kwargs):
+    def get(self, **kwargs):
         question = get_object_or_404(Question, id=self.kwargs['question_id'])
         response = get_object_or_404(question.questionresponse_set.all(), id=self.kwargs['response_id'])
         if not(self.request.user.is_superuser or question.post.user == self.request.user):

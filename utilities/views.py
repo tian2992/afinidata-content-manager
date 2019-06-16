@@ -5,6 +5,9 @@ import re
 from datetime import datetime
 from dateutil.parser import parse
 from messenger_users.models import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -14,11 +17,11 @@ def check_valid_date(request):
 
         try:
             date = request.GET['date']
-        except:
+        except Exception as e:
+            logger.error(PostsListViewe)
             return JsonResponse(dict(status='error', error='param date not defined'))
 
         new_date = parse(date)
-        print(new_date)
         day = int(str(new_date)[8:10])
         if day > 12:
             UpdateChildDOB = 'no'

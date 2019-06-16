@@ -9,7 +9,9 @@ from upload.forms import UploadForm
 from django.contrib import messages
 import csv
 import os
+import logging
 
+logger = logging.getLogger(__name__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -25,11 +27,11 @@ class UploadView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_superuser:
-            
             try:
                 author = request.user.groups.get(name='author')
-                print(author)
+                logger.info("Author: {}".format(author))
             except Exception as e:
+                logger.error(e)
                 raise Http404('Not found')
         return super().get(request)
 
@@ -37,15 +39,16 @@ class UploadView(LoginRequiredMixin, TemplateView):
         if not request.user.is_superuser:
             try:
                 author = request.user.groups.get(name='author')
-                print(author)
+                logger.info("Author: {}".format(author))
             except Exception as e:
+                logger.error(e)
                 raise Http404('Not found')
         try:
             file = request.FILES['file']
             fs = FileSystemStorage()
             new_filename = file.name.replace(" ", "_")
             filename = fs.save(os.path.join(BASE_DIR, 'uploads/%s' % new_filename), file)
-            print('filename: ', filename)
+            logger.info('filename: ', filename)
             upload_file_url = '/' + fs.url(filename)
             idx = upload_file_url.rindex('/') + 1
             path_file = upload_file_url[idx:len(upload_file_url)]
@@ -61,9 +64,9 @@ class UploadView(LoginRequiredMixin, TemplateView):
             csvFile.close()
         except Exception as e:
             return JsonResponse(dict(error="%s" % e))
-        form = UploadForm()
+        upload_form = UploadForm()
         return render(request, self.template_name, dict(posts=posts, file=path_file, length=len(posts),
-                                                        form=UploadForm()))
+                                                        form=upload_form))
 
 
 class UploadPostsView(LoginRequiredMixin, View):
@@ -74,7 +77,6 @@ class UploadPostsView(LoginRequiredMixin, View):
         if not request.user.is_superuser:
             try:
                 author = request.user.groups.get(name='author')
-                print(author)
             except Exception as e:
                 raise Http404('Not found')
 
@@ -98,6 +100,7 @@ class UploadPostsView(LoginRequiredMixin, View):
         except Exception as e:
             raise Http404('Not found')
 
+        ## FIXME: clean up "logging"
         for post in posts:
             try:
                 tags = post['tags'].split(', ')
@@ -111,8 +114,7 @@ class UploadPostsView(LoginRequiredMixin, View):
                     try:
                         tag = Label.objects.get(name=tag_item)
                         print('getted tag: ', tag)
-                    except Exception as e:
-                        print(e)
+                    except Label.DoesNotExist as e:
                         print("tag with name: %s not exist" % tag_item)
                         tag = Label.objects.create(name=tag_item)
                         print('created tag:', tag)
@@ -122,7 +124,7 @@ class UploadPostsView(LoginRequiredMixin, View):
             except Exception as e:
                 result = dict(type='error', error=str(e))
                 pass
-            print(result)
+            logger.info(result)
             results.append(result)
         print(results)
         s = ', '

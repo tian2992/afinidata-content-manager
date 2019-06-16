@@ -5,28 +5,40 @@ from django.views.decorators.csrf import csrf_exempt
 from messenger_users.forms import CreateUserFormModel
 import random
 import string
+import logging
 
+logger = logging.getLogger(__name__)
 
+## FIXME: convert to django rest views.
+
+'''Creates user from a request.'''
 @csrf_exempt
 def new_user(request):
 
     if request.method == 'POST':
 
-        checked = None
-        try:
-            checked = User.objects.get(last_channel_id=request.POST['messenger user id'])
-        except:
-            pass
-        print(checked)
+        ### TODO: Split in functions, should not be named new_user smth like refresh session (?)
 
-        if checked:
-            print('exist')
+        found_user = None
+        try:
+            found_user = User.objects.get(last_channel_id=request.POST['messenger user id'])
+            logger.info('user id found')
+        except:
+            logger.error('user could not be found from messenger user id')
+
+        if found_user:
+            return JsonResponse(dict(
+                            set_attributes=dict(
+                                hasLoggedIn=True
+                            ),
+                            messages=[]
+                        ))
 
         else:
-            print('not exist')
+            logger.info('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
             user['last_channel_id'] = request.POST['messenger user id']
-            text = "".join([random.choice(string.ascii_letters) for i in list(range(10))])
+            text = "".join([random.choice(string.ascii_letters) for i in list(range(10))]) # Should either be a friendlier "random-ish" str or a shorter hash.
             user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname'] + '.' + text
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
@@ -48,14 +60,8 @@ def new_user(request):
                             ),
                             messages=[]
                         ))
-
-        return JsonResponse(dict(
-                            set_attributes=dict(
-                                hasLoggedIn=True
-                            ),
-                            messages=[]
-                        ))
     else:
+        logger.error("New user only POST valid.")
         raise Http404('Not auth')
 
 
@@ -98,6 +104,7 @@ def by_username(request, username):
         try:
             user = User.objects.get(username=username)
         except Exception as e:
+            logger.error("No username")
             return JsonResponse(dict(status='error', error=str(e)))
 
         return JsonResponse(dict(
