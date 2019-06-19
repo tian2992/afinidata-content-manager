@@ -717,6 +717,59 @@ class PostsListView(LoginRequiredMixin, TemplateView):
         return context
 
 
+def get_posts_for_user(request):
+    if request.method == 'POST':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+
+    months_old_value = 0
+    user = None
+
+    try:
+        months_old_value = int(request.GET['value'])
+        username = request.GET['username']
+        user = User.objects.get(username=username)
+    except Exception as e:
+        logger.error(e)
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
+
+    today = datetime.now()
+    days = timedelta(days=35)
+    date_limit = today - days
+    ## Fetch sent activities to exclude
+    interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_limit)
+    
+    excluded = set()
+    for interaction in interactions:
+        if interaction.post_id:
+            excluded.add(interaction.post_id)
+    logger.info("excluding activities seen: {} ".format(excluded))
+
+    posts = Post.objects \
+        .exclude(id__in=excluded) \
+        .filter(min_range__lte=months_old_value, max_range__gte=months_old_value, status='published') #  area_id=area_id, 
+
+    if posts.count() <= 0:
+        return JsonResponse(dict(status='error', error='Not posts founded with value'))
+
+    rand_limit = random.randrange(0, posts.count())
+    service_post = posts[rand_limit]
+    if service_post.content_activity:
+        activity = " -- ".join(service_post.content_activity.split('|'))
+        logging.info("activity selected: {}".format(activity))
+
+    return JsonResponse(dict(
+        set_attributes=dict(
+            post_id=service_post.pk,
+            post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
+            post_preview=service_post.preview,
+            post_title=service_post.name
+        ),
+        messages=[]
+    ))
+
+
 ## FIXME: break up into simple functions
 ## FIXME: delegate auth to middleware / decorator
 def post_by_limits(request):
