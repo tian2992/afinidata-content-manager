@@ -1005,7 +1005,7 @@ def set_interaction_to_post(request):
     try:
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
-    except:
+    except Exception as e:
         logger.error(e)
         post = None
 
