@@ -45,4 +45,4 @@ urlpatterns = [
          name='delete-response-for-question'),
     path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies-for-question'),
     path('reviews/', views.Reviews.as_view(), name='reviews')
-]
+    path('getPostForUser', views.get_posts_for_user, name='get-post-for-user')]
