@@ -723,6 +723,7 @@ def get_posts_for_user(request):
 
     months_old_value = 0
     user = None
+    warning_message = None
 
     try:
         months_old_value = int(request.GET['value'])
@@ -748,10 +749,15 @@ def get_posts_for_user(request):
 
     posts = Post.objects \
         .exclude(id__in=excluded) \
-        .filter(min_range__lte=months_old_value, max_range__gte=months_old_value, status='published') #  area_id=area_id, 
+        .filter(min_range__lte=months_old_value, max_range__gte=months_old_value, status='published')
 
     if posts.count() <= 0:
-        return JsonResponse(dict(status='error', error='Not posts founded with value'))
+        # Repeat; report error that has been seen.
+        warning_message = 'no values without sended available'
+        logger.warning(warning_message+ ": username {}".format(username))
+        posts = Post.objects \
+        .filter(min_range__lte=months_old_value, max_range__gte=months_old_value, status='published') #  area_id=area_id, 
+
 
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
@@ -766,7 +772,8 @@ def get_posts_for_user(request):
             post_preview=service_post.preview,
             post_title=service_post.name
         ),
-        messages=[]
+        messages=[],
+        warn = warning_message
     ))
 
 
