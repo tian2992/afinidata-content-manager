@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'messenger_users.apps.MessengerUsersConfig',
     'utilities.apps.UtilitiesConfig',
     'dash.apps.DashConfig',
-    'upload.apps.UploadConfig'
+    'upload.apps.UploadConfig',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -129,6 +130,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+ #   '--cover-package=foo,bar',
 ]
 
 
