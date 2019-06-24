@@ -751,8 +751,8 @@ def get_posts_for_user(request):
     logger.info("excluding activities seen: {} ".format(excluded))
 
     if is_premium: 
-    posts = Post.objects \
-        .exclude(id__in=excluded) \
+        posts = Post.objects \
+            .exclude(id__in=excluded) \
             .filter(min_range__lte=months_old_value, 
                     max_range__gte=months_old_value, 
                     id__gte=208,
@@ -772,7 +772,7 @@ def get_posts_for_user(request):
             .filter(min_range__lte=months_old_value,
                     max_range__gte=months_old_value, 
                     status='published')
-
+        
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
     if service_post.content_activity:
@@ -1029,12 +1029,15 @@ def set_interaction_to_post(request):
     except Exception as e:
         logger.error(e)
         post = None
+        return JsonResponse(dict(status='error', error='post_id is needed param.'))
+
 
     try:
         value = request.POST['value']
     except Exception as e:
-        logger.error(e)
-        value = None
+        logger.warning("no value set")
+        logger.warning(e)
+        value = 0
 
     interaction = Interaction.objects.create(
         type=request.POST['interaction_type'],
