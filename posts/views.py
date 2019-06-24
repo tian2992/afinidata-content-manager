@@ -721,6 +721,8 @@ def get_posts_for_user(request):
     if request.method == 'POST':
         return JsonResponse(dict(status='error', error='Invalid method.'))
 
+    logger.info("getting posts for user")
+
     months_old_value = 0
     user = None
     warning_message = None
@@ -797,6 +799,9 @@ def post_by_limits(request):
     if request.method == 'POST':
         return JsonResponse(dict(status='error', error='Invalid method.'))
 
+    logger.info("getting posts by limit")
+
+
     try:
         value = int(request.GET['value'])
         area_id = int(request.GET['area_id'])
@@ -827,6 +832,7 @@ def post_by_limits(request):
 
     if uri:
         try:
+            logging.info("using URL fetch for activities")
             print('user id: ', user.pk)
             print('group: ', group)
             today = datetime.now()
@@ -858,17 +864,15 @@ def post_by_limits(request):
         today = datetime.now()
         days = timedelta(days=35)
         date_to_use = today - days
-        print(date_to_use)
         interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
         excluded = set()
         for interaction in interactions:
             if interaction.post_id:
                 excluded.add(interaction.post_id)
-        print(excluded)
+        logging.info(excluded)
 
         utc = pytz.UTC
         new_user_limit = utc.localize(datetime(2019, 3, 20, 0, 0, 0))
-        print(new_user_limit)
         if user.created_at > new_user_limit:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
@@ -883,9 +887,10 @@ def post_by_limits(request):
 
         rand_limit = random.randrange(0, posts.count())
         service_post = posts[rand_limit]
+    
     if service_post.content_activity:
         activity = service_post.content_activity.split('|')
-        print(activity)
+        logging.info("sent activity {}".format(activity))
     return JsonResponse(dict(
         set_attributes=dict(
             post_id=service_post.pk,
@@ -1017,6 +1022,8 @@ def set_interaction_to_post(request):
         return JsonResponse(dict(status='error', error='Invalid method.'))
     value = 0
 
+    logger.info('setting interaction')
+
     try:
         username = request.POST['username']
         user = User.objects.get(username=username)
@@ -1027,6 +1034,7 @@ def set_interaction_to_post(request):
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
+        logger.error("error when setting interaction post_id needed or invalid: {}".format(post_id))
         logger.error(e)
         post = None
         return JsonResponse(dict(status='error', error='post_id is needed param.'))
