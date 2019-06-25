@@ -1171,7 +1171,7 @@ class ReviewPostView(LoginRequiredMixin, DetailView):
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
     model = Post
-    pk_url_kwarg = 'id'
+    pk_url_kwarg = 'pid'
     context_object_name = 'review'
 
 
