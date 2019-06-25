@@ -1030,16 +1030,16 @@ def set_interaction_to_post(request):
     except Exception as e:
         logger.error(e)
         return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    ## if post id set get post, if not; then cannot be post interaction
     try:
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
-        logger.error(request)
-        logger.error("error when setting interaction post_id needed or invalid")
-        logger.error(e)
+        logger.warning(request)
+        logger.warning("error when setting interaction post_id needed or invalid")
+        logger.warning(e)
         post = None
-        return JsonResponse(dict(status='error', error='post_id is needed param.'))
-
 
     try:
         value = request.POST['value']
