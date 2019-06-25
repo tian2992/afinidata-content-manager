@@ -1034,9 +1034,9 @@ def set_interaction_to_post(request):
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
+        logger.error(request)
         logger.error("error when setting interaction post_id needed or invalid")
         logger.error(e)
-        logger.info(request)
         post = None
         return JsonResponse(dict(status='error', error='post_id is needed param.'))
 
