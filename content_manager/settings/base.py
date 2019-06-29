@@ -93,24 +93,39 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 print('engine: ', os.getenv('CM_DATABASE_ENGINE'))
 print('db name: ', os.getenv('CM_DATABASE_NAME'))
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
-        'NAME': os.getenv('CM_DATABASE_NAME'),
-        'USER': os.getenv('CM_DATABASE_USER'),
-        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
-        'HOST': os.getenv('CM_DATABASE_HOST'),
-        'PORT': os.getenv('CM_DATABASE_PORT'),
-    },
-    'messenger_users_db': {
-        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
-        'NAME': os.getenv('CM_DATABASE_USERS_NAME'),
-        'USER': os.getenv('CM_DATABASE_USER'),
-        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
-        'HOST': os.getenv('CM_DATABASE_HOST'),
-        'PORT': os.getenv('CM_DATABASE_PORT'),
+# Hacky, should depend instead on production.py
+if os.getenv("CM_DATABASE_NAME"):        
+    DATABASES = {
+        'default': {
+            'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+            'NAME': os.getenv('CM_DATABASE_NAME'),
+            'USER': os.getenv('CM_DATABASE_USER'),
+            'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+            'HOST': os.getenv('CM_DATABASE_HOST'),
+            'PORT': os.getenv('CM_DATABASE_PORT'),
+        },
+        'messenger_users_db': {
+            'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+            'NAME': os.getenv('CM_DATABASE_USERS_NAME'),
+            'USER': os.getenv('CM_DATABASE_USER'),
+            'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+            'HOST': os.getenv('CM_DATABASE_HOST'),
+            'PORT': os.getenv('CM_DATABASE_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'default',
+        },
+        'messenger_users_db': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'messengeruser',
+        }
+    }
+        
+
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
 
 
