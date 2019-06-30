@@ -6,6 +6,10 @@
 Welcome to Afinidata Content Manager's documentation!
 =====================================================
 
+Afinidata Content Manager handles content for populating the posts collectionf for the Afinidata Chatbot.
+
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

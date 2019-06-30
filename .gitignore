@@ -18,3 +18,4 @@ content_manager/settings/production.py
 *.sqlite3
 
 databasesConfig\.txt
+docs/_build
