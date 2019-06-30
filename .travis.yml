@@ -7,6 +7,8 @@ install:
   # - pip install .
 # command to run tests
 script:
+  - python manage.py makemigrations
+  - python manage.py migrate
   - python manage.py test
 # Push the results back to codecov
 after_success:
