@@ -105,26 +105,32 @@ DATABASES = {
         'NAME': 'messengeruser',
     }
 }
-
-if os.getenv("CM_DATABASE_NAME"):        
-    DATABASES = {
-        'default': {
-            'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
-            'NAME': os.getenv('CM_DATABASE_NAME'),
-            'USER': os.getenv('CM_DATABASE_USER'),
-            'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
-            'HOST': os.getenv('CM_DATABASE_HOST'),
-            'PORT': os.getenv('CM_DATABASE_PORT'),
-        },
-        'messenger_users_db': {
-            'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
-            'NAME': os.getenv('CM_DATABASE_USERS_NAME'),
-            'USER': os.getenv('CM_DATABASE_USER'),
-            'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
-            'HOST': os.getenv('CM_DATABASE_HOST'),
-            'PORT': os.getenv('CM_DATABASE_PORT'),
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+        'NAME': os.getenv('CM_DATABASE_NAME'),
+        'USER': os.getenv('CM_DATABASE_USER'),
+        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+        'HOST': os.getenv('CM_DATABASE_HOST'),
+        'PORT': os.getenv('CM_DATABASE_PORT'),
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'default',
+        }
+    },
+    'messenger_users_db': {
+        'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
+        'NAME': os.getenv('CM_DATABASE_USERS_NAME'),
+        'USER': os.getenv('CM_DATABASE_USER'),
+        'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
+        'HOST': os.getenv('CM_DATABASE_HOST'),
+        'PORT': os.getenv('CM_DATABASE_PORT'),
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'messengeruser',
         }
     }
+}
 
         
 

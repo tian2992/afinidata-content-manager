@@ -10,7 +10,8 @@ script:
   - python manage.py makemigrations
   - python manage.py migrate --database=default
   - python manage.py migrate --database=messenger_users_db
-  - python manage.py test
+  - python manage.py createsuperuser
+  - python manage.py test -k
 # Push the results back to codecov
 after_success:
   - codecov
