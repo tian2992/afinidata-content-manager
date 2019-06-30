@@ -93,7 +93,19 @@ WSGI_APPLICATION = 'content_manager.wsgi.application'
 print('engine: ', os.getenv('CM_DATABASE_ENGINE'))
 print('db name: ', os.getenv('CM_DATABASE_NAME'))
 
-# Hacky, should depend instead on production.py
+
+## Hacky, should depend instead on production.py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'default',
+    },
+    'messenger_users_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'messengeruser',
+    }
+}
+
 if os.getenv("CM_DATABASE_NAME"):        
     DATABASES = {
         'default': {
@@ -113,17 +125,7 @@ if os.getenv("CM_DATABASE_NAME"):
             'PORT': os.getenv('CM_DATABASE_PORT'),
         }
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'default',
-        },
-        'messenger_users_db': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'messengeruser',
-        }
-    }
+
         
 
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
