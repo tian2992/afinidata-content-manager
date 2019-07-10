@@ -27,6 +27,7 @@ class Post(models.Model):
 
     Post has some properties related to a post on a web, a generic container for content in Afinidata.
 
+    Args:
         name: Nombre del post.
         status: Puede ser: draft, review, rejected, need_changes, published. Donde “draft” representa que aún está en borrador, “review” que se encuentra en revisión, “rejected” que ha sido rechazado, “need_changes” que hay cambios por realizar y “published”, que representa que el servicio que distribuye los posts lo tomará en cuenta.
         type: Puede ser: embeded, youtube. Donde embeded muestra en un iframe que ocupa toda la pantalla el contenido de un link, y youtube muestra un vídeo de youtube a través de su ID. (Próximo paso, un editor WYSIWYG y un type extra llamado “content”).
@@ -66,6 +67,7 @@ class Interaction(models.Model):
 
     Tracking the user interaction with content (or general interaction with the system).
 
+    Args:
         post: Post asociado a la interacción. (Puede ser nulo, acciones como “iniciar sesión” no van asociadas a ningún post. Acciones como calificar si).
         user_id: ID del usuario del bot asociado a la interaction.
         username: Username del usuario del bot asociado a la interaction (Redundancia que se utiliza para ciertos reportes).
@@ -93,6 +95,7 @@ class Feedback(models.Model):
     """
     Feedback
 
+    Args:
         post: Post que recibe la calificación del usuario.
         user_id: ID del usuario del bot asociado a la interaction.
         username: Username del usuario del bot asociado a la interaction (Redundancia que se utiliza para ciertos reportes).
@@ -120,6 +123,7 @@ class Label(models.Model):
     """
     Label
 
+    Args:
         name: Nombre de la categoría
         posts: Referencia de muchos a muchos con el modelo Posts.
         created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
@@ -142,6 +146,7 @@ class Question(models.Model):
     """
     Question:
 
+    Args:
         name: Texto de pregunta que le llega al usuario (si se solicita a través de un servicio).
         Post: Referencia al post que pertenece esa pregunta.
         Replies (Por eliminar): Casilla de texto que guardaba las posibles respuestas a una pregunta.
@@ -161,6 +166,7 @@ class Response(models.Model):
     """
     Response:
 
+    Args:
         question: Referencia a la question respondida.
         user_id: ID del usuario del bot que respondió a la pregunta.
         username: Username del usuario del bot que respondió la pregunta.
@@ -181,6 +187,8 @@ class Response(models.Model):
 class Review(models.Model):
     """
     Review:
+
+    Args:
         post: Post por revisar
         status: Estado del review. Puede ser: pending, completed.
         comment: Casilla que permite que el creador del post deje un comentario para el revisor sobre su post.
