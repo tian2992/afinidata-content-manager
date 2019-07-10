@@ -54,7 +54,6 @@ class HomeView(LoginRequiredMixin, ListView):
             return posts
         except Exception as e:
             logger.warning("error when filtering")
-            logger.warning("request {}".format(request.headers))
             logger.warning(e)
             return Post.objects.all()
 
@@ -650,7 +649,8 @@ def remove_tag_for_post(request, id):
 
     try:
         search_tag = post.label_set.get(id=tag.pk)
-        print(search_tag)
+        logger.info('found tag to remove')
+        logger.info(search_tag)
     except:
         search_tag = None
 
@@ -658,7 +658,7 @@ def remove_tag_for_post(request, id):
         return JsonResponse(dict(status='error', error='Post has not tag with name'))
 
     result = post.label_set.remove(tag)
-    print(result)
+    logger.info(result)
     return JsonResponse(dict(status='removed', data=dict(id=tag.pk, name=tag.name)))
 
 
@@ -1041,7 +1041,7 @@ def set_interaction_to_post(request):
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
-        logger.warning(request.headers)
+        logger.warning(request.POST)
         logger.warning("error when setting interaction post_id needed or invalid")
         logger.warning(e)
         post = None
