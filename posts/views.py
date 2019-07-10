@@ -1039,7 +1039,7 @@ def set_interaction_to_post(request):
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
-        logger.warning(request)
+        logger.warning(request.headers)
         logger.warning("error when setting interaction post_id needed or invalid")
         logger.warning(e)
         post = None
@@ -1074,7 +1074,7 @@ def get_thumbnail_by_post(request, id):
 
     try:
         post = Post.objects.get(pk=id)
-        print(post)
+        logger.info("creating a new post")
         thumbnail = post.thumbnail
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params'))
