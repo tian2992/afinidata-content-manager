@@ -9,6 +9,10 @@ Welcome to Afinidata Content Manager's documentation!
 Afinidata Content Manager handles content for populating the posts collection for the Afinidata Chatbot.
 
 
+Browse the Class directory. Main apps to note are Posts, Interactions and review system.
+
+.. image:: https://github.com/afinidata2019/afinidata-content-manager/blob/master/docs/static/afinidata-content-manager-diagram.png?raw=true
+
 
 
 .. toctree::
