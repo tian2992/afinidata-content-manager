@@ -781,6 +781,9 @@ def get_posts_for_user(request):
         activity = " -- ".join(service_post.content_activity.split('|'))
         logging.info("activity selected: {}".format(activity))
 
+    post_dispatch = Interaction(post=service_post, user=user, type='dispatched', value=1)
+    post_dispatch.save()
+
     return JsonResponse(dict(
         set_attributes=dict(
             post_id=service_post.pk,
