@@ -22,6 +22,25 @@ POST_TYPE_CHOICES = (
 
 
 class Post(models.Model):
+    """
+    Post Model
+
+    Post has some properties related to a post on a web, a generic container for content in Afinidata.
+
+        name: Nombre del post.
+        status: Puede ser: draft, review, rejected, need_changes, published. Donde “draft” representa que aún está en borrador, “review” que se encuentra en revisión, “rejected” que ha sido rechazado, “need_changes” que hay cambios por realizar y “published”, que representa que el servicio que distribuye los posts lo tomará en cuenta.
+        type: Puede ser: embeded, youtube. Donde embeded muestra en un iframe que ocupa toda la pantalla el contenido de un link, y youtube muestra un vídeo de youtube a través de su ID. (Próximo paso, un editor WYSIWYG y un type extra llamado “content”).
+        content: Dependiendo del type, debería ser un link en el type “embeded”, y el ID del vídeo de Youtube en el type “youtube”. (Próximo paso, contenido resultante del editor WYSIWYG en el type “content”).
+        content_activity: Contenido que es enviado al usuario del bot cuando este por problemas de conexión no puede ver el enlace o el vídeo del post. Se utiliza este signo “|” para delimitar el contenido de cada mensaje a través del chatbot.
+        user: Usuario creador del post.
+        min_range: El servicio que devuelve actividades se basa en un value para devolver un post dentro del rango, si value es mayor a este atributo el post es candidato para ser enviado.
+        max_range: El servicio que devuelve actividades se basa en un value para devolver un post dentro del rango, si value es menor a este atributo el post es candidato para ser enviado.
+        preview: El servicio que devuelve actividades, devuelve un pequeño resumen de qué trata esta actividad para llamar la atención del usuario, es este atributo.
+        new (Por eliminar): Delimitaba en cierta fecha si el servicio debía de tomar en cuenta el post para enviarse a usuarios.
+        thumbnail: El servicio que devuelve actividades, devuelve una imagen relacionada a la actividad. La url de la imagen debe guardarse en este atributo.
+        area_id (Para uso próximo): En idea, guarda el id del área al que pertenecen (Áreas basadas en el proyecto Core (cognitivo, motor, emocional)). Para que el servicio basado en el área solicitada devuelva únicamente posts de esa área. Por defecto se están solicitando a través del chatbot únicamente posts con área 1, mismo valor que se está guardando automáticamente en el modelo.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     name = models.CharField(max_length=255)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, default='draft')
     type = models.CharField(max_length=255, default='embeded', choices=POST_TYPE_CHOICES)
@@ -42,6 +61,20 @@ class Post(models.Model):
 
 
 class Interaction(models.Model):
+    """
+    Interaction
+
+    Tracking the user interaction with content (or general interaction with the system).
+
+        post: Post asociado a la interacción. (Puede ser nulo, acciones como “iniciar sesión” no van asociadas a ningún post. Acciones como calificar si).
+        user_id: ID del usuario del bot asociado a la interaction.
+        username: Username del usuario del bot asociado a la interaction (Redundancia que se utiliza para ciertos reportes).
+        channel_id: channel id del usuario del bot.
+        bot_id: Bot al cual está conectado el usuario.
+        type: String que guarda el tipo de interaction que ejecutó el usuario, estas pueden ser de cualquier tipo. De uso cotidiano en la plataforma en ciertas cosas se encuentran ‘session’ y ‘opened’, su uso puede ser muy variado.
+        value: Valor de tipo Entero que puede almacenarse en las interacciones. (Formato de Entero posiblemente temporal, guardado así por alguna necesidad, por revisar)
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     user_id = models.IntegerField(default=0)
     username = models.CharField(max_length=255, null=True)
@@ -57,6 +90,19 @@ class Interaction(models.Model):
 
 
 class Feedback(models.Model):
+    """
+    Feedback
+
+        post: Post que recibe la calificación del usuario.
+        user_id: ID del usuario del bot asociado a la interaction.
+        username: Username del usuario del bot asociado a la interaction (Redundancia que se utiliza para ciertos reportes).
+        channel_id: channel id del usuario del bot.
+        bot_id: Bot al cual está conectado el usuario.
+        Value: Valor de tipo entero que el usuario del bot le dio al post.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+
+    """
+
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     user_id = models.IntegerField(default=0)
     username = models.CharField(max_length=255, null=True)
@@ -71,6 +117,18 @@ class Feedback(models.Model):
 
 
 class Label(models.Model):
+    """
+    Label
+
+        name: Nombre de la categoría
+        posts: Referencia de muchos a muchos con el modelo Posts.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+        Question:
+        name: Texto de pregunta que le llega al usuario (si se solicita a través de un servicio).
+        Post: Referencia al post que pertenece esa pregunta.
+        Replies (Por eliminar): Casilla de texto que guardaba las posibles respuestas a una pregunta.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     name = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -81,6 +139,14 @@ class Label(models.Model):
 
 
 class Question(models.Model):
+    """
+    Question:
+
+        name: Texto de pregunta que le llega al usuario (si se solicita a través de un servicio).
+        Post: Referencia al post que pertenece esa pregunta.
+        Replies (Por eliminar): Casilla de texto que guardaba las posibles respuestas a una pregunta.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     name = models.CharField(max_length=255, unique=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     replies = models.TextField()
@@ -92,6 +158,15 @@ class Question(models.Model):
 
 
 class Response(models.Model):
+    """
+    Response:
+
+        question: Referencia a la question respondida.
+        user_id: ID del usuario del bot que respondió a la pregunta.
+        username: Username del usuario del bot que respondió la pregunta.
+        response: Respuesta del usuario a la pregunta.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user_id = models.IntegerField()
     username = models.CharField(max_length=255)
@@ -104,6 +179,14 @@ class Response(models.Model):
 
 
 class Review(models.Model):
+    """
+    Review:
+        post: Post por revisar
+        status: Estado del review. Puede ser: pending, completed.
+        comment: Casilla que permite que el creador del post deje un comentario para el revisor sobre su post.
+        users: Usuarios vinculados a esta Revisión. (Author y Revisor) a través del modelo UserReviewRole.
+        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+    """
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     status = models.CharField(choices=REVIEW_STATUS_CHOICES, default='pending', max_length=20)
     comment = models.TextField(null=True)
