@@ -18,9 +18,8 @@
                 </div>
                 <div>
                     <small><i>Taxonomy</i></small>
-                    <small>Area: {{ post.taxonomy.get_area_display }},</small>
-                    <small>Subarea: {{ post.taxonomy.get_subarea_display  }},</small>
-                    <small>Cont: {{ post.taxonomy.get_content_display  }}</small>
+                    <small>Area: {{ post.taxonomy.get_area_display }}, &gt;  {{ post.taxonomy.get_subarea_display  }},</small>
+                    <small>&gt; {{ post.taxonomy.get_component_display  }}</small>
                 </div>
             </h1>
                 <form method="post">
