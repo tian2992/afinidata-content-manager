@@ -184,6 +184,77 @@ class Response(models.Model):
         return str(self.pk)
 
 
+# https://anthonyfox.io/posts/choices-for-choices-in-django-charfields
+# https://docs.djangoproject.com/en/2.2/ref/models/instances/#django.db.models.Model.get_FOO_display
+
+AREA = [
+    ('cogni', 'Cognitivo & Lenguaje'),
+    ('motor', 'Motor'),
+    ('socio', 'Socioemocional'),
+]
+
+SUBAREA = [
+    ('lang', "Lenguaje"),
+    ('soc', "Socioemocional"),
+    ('premath', "Prematemática"),
+    ('sensor', "Sensorial"),
+    ('motof', "Motricidad Fina"),
+    ('motol', "Motricidad Gruesa"),
+    ('sci', "Ciencias"),
+    ('art', "Arte & Cultura"),
+]
+
+COMPONENTS = [
+    ("vocabulario", "Vocabulario"),
+    ("articulacionfonetica", "Articulación y Fonética"),
+    ("sintaxiscomunicacion", "Sintaxis/Comunicación"),
+    ("lectoescritura", "Lectoescritura"),
+    ("literatura", "Literatura"),
+    ("autoconocimiento", "Autoconocimiento"),
+    ("autonomia", "Autonomía y Vida Práctica"),
+    ("autocontrol", "Autocontrol"),
+    ("empatia", "Empatía"),
+    ("hsocial", "Habilidades Sociales"),
+    ("plogico", "Pensamiento Lógico"),
+    ("numconteo", "Números y Conteo"),
+    ("problemasOperacionesRazonamiento", "Resolución de Problemas y Operaciones / Razonamiento"),
+    ("pVisual", "Percepción Visual"),
+    ("pAuditiva", "Percepción Auditiva"),
+    ("pHaptica", "Percepción háptica"),
+    ("pGustativa", "Percepción Gustativa"),
+    ("pOlfativa", "Percepción Olfativa"),
+    ("egnostico", "Estereognóstico"),
+    ("om", "Coordinación Ojo-Mano"),
+    ("pinza", "Movimiento de Pinza"),
+    ("desplaza", "Desplazamiento"),
+    ("balance", "Balance-Equilibrio"),
+    ("tono", "Fuerza-Tonicidad Muscular"),
+    ("coordinacion", "Coordinación"),
+    ("experimentos", "Experimentos"),
+    ("botanica", "Botánica"),
+    ("zoologia", "Zoología"),
+    ("astronomia", "Astronomía"),
+    ("cuidadomh", "Cuidado del Medio Ambiente"),
+    ("medionatural", "Medio Natural"),
+    ("tech", "Tecnología"),
+    ("geo", "Geografía"),
+    ("plasticas", "Artes Plásticas"),
+    ("musik", "Música"),
+    ("danzaTeatro", "Danza y Teatro"),
+    ("culturas", "Culturas del Mundo"),
+]
+
+
+class Taxonomy(models.Model):
+    post = models.OneToOneField(Post,
+                                on_delete=models.CASCADE,
+                                primary_key=False,
+                                )
+    area = models.CharField(choices=AREA, max_length=250)
+    subarea = models.CharField(choices=SUBAREA, max_length=250)
+    component = models.CharField(choices=COMPONENTS, max_length=250)
+
+
 class Review(models.Model):
     """
     Review:
