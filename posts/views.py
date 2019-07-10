@@ -146,7 +146,7 @@ class HomeView(LoginRequiredMixin, ListView):
         return context
 
 
-def post(request, id):
+def fetch_post(request, id):
 
     if request.method == 'GET':
         post = Post.objects.get(id=id)
