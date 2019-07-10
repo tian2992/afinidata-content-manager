@@ -6,7 +6,8 @@
 Welcome to Afinidata Content Manager's documentation!
 =====================================================
 
-Afinidata Content Manager handles content for populating the posts collectionf for the Afinidata Chatbot.
+Afinidata Content Manager handles content for populating the posts collection for the Afinidata Chatbot.
+
 
 
 

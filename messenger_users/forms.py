@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from messenger_users.models import User, UserData
 
-
+'''This form creates users'''
 class CreateUserFormModel(ModelForm):
 
     class Meta:
