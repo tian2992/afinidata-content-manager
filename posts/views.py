@@ -53,7 +53,9 @@ class HomeView(LoginRequiredMixin, ListView):
                 posts = Post.objects.filter(**params)
             return posts
         except Exception as e:
-            print('Exception: %s' % e)
+            logger.warning("error when filtering")
+            logger.warning("request {}".format(request.headers))
+            logger.warning(e)
             return Post.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -82,8 +84,8 @@ class HomeView(LoginRequiredMixin, ListView):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
-            print(params)
-            print(posts)
+            logger.info(params)
+            logger.info(posts)
             try:
                 if self.request.GET['tags']:
                     tagsList = self.request.GET.getlist('tags')
