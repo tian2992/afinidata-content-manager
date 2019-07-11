@@ -182,7 +182,7 @@ def fetch_post(request, id):
             try:
 
                 bot_id = request.GET['bot_id']
-                Interaction\
+                o = Interaction\
                     .objects\
                     .create(
                         post=post,
@@ -192,6 +192,7 @@ def fetch_post(request, id):
                         type='opened',
                         user_id=user.pk
                 )
+                o.save()
                 post_session = Interaction(post=post,
                                            channel_id=user.last_channel_id,
                                            bot_id=bot_id,
