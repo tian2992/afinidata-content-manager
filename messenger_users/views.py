@@ -32,7 +32,8 @@ def new_user(request):
         if found_user:
             return JsonResponse(dict(
                             set_attributes=dict(
-                                hasLoggedIn=True
+                                hasLoggedIn=True,
+                                username=found_user.username
                             ),
                             messages=[]
                         ))
