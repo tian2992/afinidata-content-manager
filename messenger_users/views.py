@@ -26,7 +26,8 @@ def new_user(request):
             found_user = User.objects.get(last_channel_id=request.POST['messenger_user_id'])
             logger.info('user id found')
         except:
-            logger.error('user could not be found from messenger user id')
+            logger.error(request.POST)
+            logger.error('user could not be found from user id')
 
         if found_user:
             return JsonResponse(dict(
