@@ -38,7 +38,7 @@ def new_user(request):
                         ))
 
         else:
-            logger.info('Creating New User')
+            logger.warning('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
 
             fname = request.POST['first_name']
@@ -54,8 +54,8 @@ def new_user(request):
             UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=fname)
             UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=lname)
 
-            logger.info("Created user")
-            logger.info(user_to_save)
+            logger.warning("Created user")
+            logger.warning(user_to_save)
 
             return JsonResponse(dict(
                             set_attributes=dict(
