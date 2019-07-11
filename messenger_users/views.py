@@ -23,7 +23,7 @@ def new_user(request):
 
         found_user = None
         try:
-            found_user = User.objects.get(last_channel_id=request.POST['messenger user id'])
+            found_user = User.objects.get(last_channel_id=request.POST['messenger_user_id'])
             logger.info('user id found')
         except:
             logger.error('user could not be found from messenger user id')
@@ -52,6 +52,9 @@ def new_user(request):
 
             UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=fname)
             UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=lname)
+
+            logger.info("Created user")
+            logger.info(user_to_save)
 
             return JsonResponse(dict(
                             set_attributes=dict(
