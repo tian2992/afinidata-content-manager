@@ -2,7 +2,9 @@ from django.shortcuts import render
 from messenger_users.models import User, UserData
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.template.defaultfilters import slugify
 from messenger_users.forms import CreateUserFormModel
+
 import random
 import string
 import logging
@@ -37,20 +39,19 @@ def new_user(request):
         else:
             logger.info('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
-            user['last_channel_id'] = request.POST['messenger user id']
-            text = "".join([random.choice(string.ascii_letters) for i in list(range(10))]) # Should either be a friendlier "random-ish" str or a shorter hash.
-            user['backup_key'] = request.POST['parentName'] + request.POST['parentLastname'] + '.' + text
+
+            fname = request.POST['first_name']
+            lname = request.POST['last_name']
+
+            user['last_channel_id'] = request.POST['messenger_user_id']
+            user['backup_key'] = ''
             user['bot_id'] = request.POST['bot_id']
+            user['username'] = slugify(fname + lname)
             user_to_save = User(**user)
             user_to_save.save()
 
-            user_to_update = User.objects.filter(last_channel_id=request.POST['messenger user id'])
-            user_to_update.update(username=request.POST['parentName'] + str(user_to_save.pk))
-
-            UserData.objects.create(user=user_to_save, data_key='parentName', data_value=request.POST['parentName'])
-            UserData.objects.create(user=user_to_save, data_key='parentLastname', data_value=request.POST['parentLastname'])
-            UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=request.POST['first name'])
-            UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=request.POST['last name'])
+            UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=fname)
+            UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=lname)
 
             return JsonResponse(dict(
                             set_attributes=dict(
