@@ -60,7 +60,7 @@ def new_user(request):
 
             return JsonResponse(dict(
                             set_attributes=dict(
-                                username=request.POST['parentName'] + str(user_to_save.pk),
+                                username=user_to_save.username,
                                 backup_key=user['backup_key'],
                                 user_id=user_to_save.pk
                             ),
