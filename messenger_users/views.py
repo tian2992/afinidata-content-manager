@@ -46,9 +46,9 @@ def new_user(request):
             lname = request.POST['last_name']
 
             user['last_channel_id'] = request.POST['messenger_user_id']
-            user['backup_key'] = ''
-            user['bot_id'] = request.POST['bot_id']
             user['username'] = slugify(fname + lname)
+            user['backup_key'] = user['username']+request.POST['messenger_user_id']
+            user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
             user_to_save.save()
 
