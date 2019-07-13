@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 STATUS_CHOICES = (
     ('draft', 'draft'),
     ('review', 'review'),
@@ -126,11 +125,6 @@ class Label(models.Model):
     Args:
         name: Nombre de la categoría
         posts: Referencia de muchos a muchos con el modelo Posts.
-        created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
-        Question:
-        name: Texto de pregunta que le llega al usuario (si se solicita a través de un servicio).
-        Post: Referencia al post que pertenece esa pregunta.
-        Replies (Por eliminar): Casilla de texto que guardaba las posibles respuestas a una pregunta.
         created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
     """
     name = models.CharField(max_length=255, unique=True)
