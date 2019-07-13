@@ -42,10 +42,12 @@ def new_user(request):
             logger.warning('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
 
-            fname = request.POST['first_name']
-            lname = request.POST['last_name']
+            mess_id = request.POST['messenger_user_id']
 
-            user['last_channel_id'] = request.POST['messenger_user_id']
+            fname = request.POST.get('first_name', "no{}".format(mess_id))
+            lname = request.POST.get('last_name', "no{}".format(mess_id))
+
+            user['last_channel_id'] = mess_id
             user['username'] = slugify(fname + lname)
             user['backup_key'] = user['username']+request.POST['messenger_user_id']
             user['bot_id'] = request.POST['bot_id']
