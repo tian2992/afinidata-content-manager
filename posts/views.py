@@ -739,6 +739,7 @@ def get_posts_for_user(request):
     except Exception as e:
         logger.error("Invalid Parameters on getting posts for user")
         logger.error(e)
+        logger.error(POST)
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
     logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
@@ -1023,7 +1024,7 @@ def question_by_post(request, id):
 
 
 @csrf_exempt
-def set_interaction_to_post(request):
+def set_interaction(request):
     if request.method == 'GET':
         return JsonResponse(dict(status='error', error='Invalid method.'))
     value = 0
@@ -1042,9 +1043,7 @@ def set_interaction_to_post(request):
         post_id = request.POST['post_id']
         post=Post.objects.get(id=post_id)
     except Exception as e:
-        logger.warning(request.POST)
-        logger.warning("error when setting interaction post_id needed or invalid")
-        logger.warning(e)
+        logger.info("setting interaction w no post_id")
         post = None
 
     try:
