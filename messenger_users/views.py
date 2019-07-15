@@ -13,19 +13,24 @@ logger = logging.getLogger(__name__)
 
 ## FIXME: convert to django rest views.
 
-'''Creates user from a request.'''
+
 @csrf_exempt
-def new_user(request):
-
-
+def cf_user(request):
     # hackish hak :( for chatfuel mishap
     c_fid = request.POST.get("chatfuel_id")
 
     if c_fid:
+        logger.warning(request.POST)
+        logger.warning("rehashing chatfuel id")
         # we're in
         muid = request.POST['messenger_user_id']
         us = User.objects.get(last_channel_id=c_fid)
         us.last_channel_id = muid
+
+
+'''Creates user from a request.'''
+@csrf_exempt
+def new_user(request):
 
     if request.method == 'POST':
 
