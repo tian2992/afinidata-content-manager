@@ -41,8 +41,14 @@ def new_user(request):
         else:
             logger.warning('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
+            logger.info(request.POST)
 
-            mess_id = request.POST['messenger_user_id']
+            try:
+                mess_id = request.POST['messenger_user_id']
+            except:
+                logger.error(exc_info=True)
+                logger.error("no messenger_user_id try messenger user id ")
+                mess_id = request.POST['messenger user id']
 
             fname = request.POST.get('first_name', "no{}".format(mess_id))
             lname = request.POST.get('last_name', "no{}".format(mess_id))
