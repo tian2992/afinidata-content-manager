@@ -69,7 +69,7 @@ def new_user(request):
             lname = request.POST.get('last_name', "no{}".format(mess_id))
 
             user['last_channel_id'] = mess_id
-            user['username'] = slugify(fname + lname)
+            user['username'] = slugify(fname + lname)+mess_id[-8::]
             user['backup_key'] = user['username']+mess_id
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
