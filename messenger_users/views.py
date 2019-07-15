@@ -17,6 +17,16 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 def new_user(request):
 
+
+    # hackish hak :( for chatfuel mishap
+    c_fid = request.POST.get("chatfuel_id")
+
+    if c_fid:
+        # we're in
+        muid = request.POST['messenger_user_id']
+        us = User.objects.get(last_channel_id=c_fid)
+        us.last_channel_id = muid
+
     if request.method == 'POST':
 
         ### TODO: Split in functions, should not be named new_user smth like refresh session (?)
