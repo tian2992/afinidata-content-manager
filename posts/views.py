@@ -1065,6 +1065,7 @@ def set_interaction(request):
         value = request.POST['value']
     except Exception as e:
         logger.warning("no value set")
+        logger.warning("POST {}".format(request.POST))
         logger.warning(e)
         value = 0
 
