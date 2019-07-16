@@ -60,8 +60,8 @@ def new_user(request):
 
             try:
                 mess_id = request.POST['messenger_user_id']
-            except:
-                logger.error(exc_info=True)
+            except Exception as e:
+                logger.error(e, exc_info=True)
                 logger.error("no messenger_user_id try messenger user id ")
                 mess_id = request.POST['messenger user id']
 
@@ -69,8 +69,10 @@ def new_user(request):
             lname = request.POST.get('last_name', "no{}".format(mess_id))
 
             user['last_channel_id'] = mess_id
-            user['username'] = slugify(fname + lname)+mess_id[-8::]
-            user['backup_key'] = user['username']+mess_id
+
+            uname = slugify(fname + lname)+mess_id[-8::]
+            user['username'] = uname
+            user['backup_key'] = uname
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
             user_to_save.save()
