@@ -27,12 +27,12 @@ def cf_user(request):
             muid = request.POST['messenger_user_id']
             us = User.objects.get(last_channel_id=c_fid)
             us.last_channel_id = muid
-            return JsonResponse({})
+            return JsonResponse({"status":"ok"})
         except:
             logging.error("POST TO CHATFUEL requries chatfuel_id var")
             logging.error(request.POST)
 
-        return JsonResponse({})
+        return JsonResponse({"status":"ok"})
 
 
 '''Creates user from a request.'''
@@ -73,14 +73,14 @@ def new_user(request):
                 logger.error("no messenger_user_id try messenger user id ")
                 mess_id = request.POST['messenger user id']
 
-            fname = request.POST.get('first_name', "no{}".format(mess_id))
-            lname = request.POST.get('last_name', "no{}".format(mess_id))
+            fname = request.POST.get('first_name', "no{}".format(mess_id))[:20]
+            lname = request.POST.get('last_name', "no{}".format(mess_id))[:20]
 
             user['last_channel_id'] = mess_id
 
             uname = slugify(fname + lname)+mess_id[-8::]
             user['username'] = uname
-            user['backup_key'] = uname
+            user['backup_key'] = uname[:50]
             user['bot_id'] = request.POST['bot_id']
             user_to_save = User(**user)
             user_to_save.save()
