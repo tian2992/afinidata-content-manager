@@ -27,9 +27,12 @@ def cf_user(request):
             muid = request.POST['messenger_user_id']
             us = User.objects.get(last_channel_id=c_fid)
             us.last_channel_id = muid
+            return JsonResponse({})
         except:
             logging.error("POST TO CHATFUEL requries chatfuel_id var")
             logging.error(request.POST)
+
+        return JsonResponse({})
 
 
 '''Creates user from a request.'''
@@ -52,7 +55,8 @@ def new_user(request):
             return JsonResponse(dict(
                             set_attributes=dict(
                                 hasLoggedIn=True,
-                                username=found_user.username
+                                username=found_user.username,
+                                user_id=found_user.id
                             ),
                             messages=[]
                         ))
