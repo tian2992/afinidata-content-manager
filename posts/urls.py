@@ -6,6 +6,7 @@ app_name = 'posts'
 urlpatterns = [
     path('', views.HomeView.as_view(), name="home"),
     path('new/', views.NewPostView.as_view(), name='new'),
+    path('set_taxonomy', views.set_taxonomy, name='set-taxonomy'),
     path('<int:id>/edit/', views.EditPostView.as_view(), name="edit-post"),
     path('<int:id>/', views.fetch_post, name="post"),
     path('<int:id>/delete/', views.DeletePostView.as_view(), name='delete'),

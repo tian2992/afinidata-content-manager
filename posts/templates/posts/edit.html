@@ -55,7 +55,16 @@
                     {% endif %}
 
                     <a href="{% url 'posts:new-question' %}" class="link">Add post question</a>
+
+                                <div class="inline-form-content">
+                    <form method="post" action="/posts/set_taxonomy" >
+                        {% csrf_token %}
+                    {{ tax.as_p }}
+                    <input type="submit" value="Taxonomia" />
+                    </form>
                 </div>
+                </div>
+
 
             </article>
         </div>

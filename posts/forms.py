@@ -25,6 +25,12 @@ class UpdatePostFormModel(ModelForm):
         fields = ['name', 'content', 'type', 'min_range', 'max_range', 'area_id', 'preview']
 
 
+class UpdateTaxonomy(ModelForm):
+    class Meta:
+        model = models.Taxonomy
+        fields = ['post', 'area', 'subarea', 'component']
+
+
 class QuestionForm(ModelForm):
 
     class Meta:

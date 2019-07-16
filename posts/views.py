@@ -274,6 +274,16 @@ class NewPostView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'The post with id %s has been created' % post.pk)
         return redirect('posts:edit-post', id=post.pk)
 
+@csrf_exempt
+def set_taxonomy(request):
+    post = get_object_or_404(Post, id=request.POST.get("post"))
+    t = forms.UpdateTaxonomy(instance = post.taxonomy, data=request.POST)
+    if t.is_valid():
+        taxonomy = t.save(commit=False)
+        post.taxonomy = taxonomy
+        taxonomy.save()
+        post.save()
+    return redirect('posts:edit-post', id=post.pk)
 
 class EditPostView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
@@ -306,6 +316,11 @@ class EditPostView(LoginRequiredMixin, UpdateView):
             review = get_object_or_404(UserReviewRole, review=last_review, user=user)
             context['role'] = 'reviser'
             context['review'] = review.id
+
+        if post.taxonomy:
+            tax = post.taxonomy
+            ftax = forms.UpdateTaxonomy(instance=tax)
+            context['tax'] = ftax
 
         return context
 
