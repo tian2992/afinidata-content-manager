@@ -23,9 +23,13 @@ def cf_user(request):
         logger.warning(request.POST)
         logger.warning("rehashing chatfuel id")
         # we're in
-        muid = request.POST['messenger_user_id']
-        us = User.objects.get(last_channel_id=c_fid)
-        us.last_channel_id = muid
+        try:
+            muid = request.POST['messenger_user_id']
+            us = User.objects.get(last_channel_id=c_fid)
+            us.last_channel_id = muid
+        except:
+            logging.error("POST TO CHATFUEL requries chatfuel_id var")
+            logging.error(request.POST)
 
 
 '''Creates user from a request.'''
