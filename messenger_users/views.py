@@ -4,6 +4,8 @@ from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
 from messenger_users.forms import CreateUserFormModel
+from django.db import connections
+
 
 import random
 import string
@@ -132,6 +134,37 @@ def add_attribute(request, channel_id):
             return JsonResponse(dict(status="finished", data=dict(user_id=user.pk, added_attributes=results)))
     else:
         return JsonResponse(dict(hello='world'))
+
+
+@csrf_exempt
+def last_interacted(request, id=None):
+    def dictfetchall(cursor):
+        "Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+
+    def get_user(r_dict):
+        usr = None
+        uname = r_dict.get('username')
+        if not uname:
+            usr = User.objects.get(id=int(id))
+        else:
+            usr = User.objects.get(username=uname)
+        return usr
+
+    user = get_user(request.POST)
+
+    with connections['default'].cursor() as cursor:
+        cursor.execute("SELECT type, MAX(created_at) AS last, user_id, username FROM \
+                CM_BD.posts_interaction WHERE user_id = %s GROUP BY type ORDER BY created_at DESC", [user.id])
+        results = dictfetchall(cursor)
+        return JsonResponse(dict(set_attributes=results,
+                                 messages=[]))
+
+    return JsonResponse(dict('status', "error"))
 
 
 @csrf_exempt
