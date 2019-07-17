@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from messenger_users.models import User, UserData
-from posts import Interaction
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
