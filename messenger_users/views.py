@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from messenger_users.models import User, UserData
+from posts import Interaction
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
@@ -158,7 +159,7 @@ def last_interacted(request, id=None):
     user = get_user(request.POST)
 
     with connections['default'].cursor() as cursor:
-        cursor.execute("SELECT type, TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) last, user_id, username FROM CM_BD.posts_interaction"
+        cursor.execute("SELECT type, TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) last FROM CM_BD.posts_interaction"
                        " WHERE user_id = %s GROUP BY type ORDER BY created_at desc ;", [user.id])
         results = dictfetchall(cursor)
         return JsonResponse(dict(set_attributes=results,
