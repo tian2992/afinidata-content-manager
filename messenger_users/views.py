@@ -158,8 +158,8 @@ def last_interacted(request, id=None):
     user = get_user(request.POST)
 
     with connections['default'].cursor() as cursor:
-        cursor.execute("SELECT type, MAX(created_at) AS last, user_id, username FROM \
-                CM_BD.posts_interaction WHERE user_id = %s GROUP BY type ORDER BY created_at DESC", [user.id])
+        cursor.execute("SELECT type, TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) last, user_id, username FROM CM_BD.posts_interaction"
+                       " WHERE user_id = %s GROUP BY type ORDER BY created_at desc ;", [user.id])
         results = dictfetchall(cursor)
         return JsonResponse(dict(set_attributes=results,
                                  messages=[]))
