@@ -138,13 +138,20 @@ def add_attribute(request, channel_id):
 
 @csrf_exempt
 def last_interacted(request, id=None):
-    def dictfetchall(cursor):
+    def fetch_interactionz(cursor):
         "Return all rows from a cursor as a dict"
-        columns = [col[0]+'_time' for col in cursor.description]
-        return [
+        columns = [col[0] for col in cursor.description]
+        intz = {}
+        roz = [
             dict(zip(columns, row))
             for row in cursor.fetchall()
         ]
+        for r in roz:
+            kval = r['type']+"_last_h"
+            intz[kval] = r["last"]
+
+        return intz
+
 
     def get_user(r_dict):
         usr = None
@@ -160,7 +167,7 @@ def last_interacted(request, id=None):
     with connections['default'].cursor() as cursor:
         cursor.execute("SELECT type, TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) last FROM CM_BD.posts_interaction"
                        " WHERE user_id = %s GROUP BY type ORDER BY created_at desc ;", [user.id])
-        results = dictfetchall(cursor)
+        results = fetch_interactionz(cursor)
         return JsonResponse(dict(set_attributes=results,
                                  messages=[]))
 
