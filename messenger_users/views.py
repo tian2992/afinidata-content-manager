@@ -148,7 +148,7 @@ def last_interacted(request, id=None):
         ]
         for r in roz:
             kval = r['type']+"_last_h"
-            intz[kval] = r["last"]
+            intz[kval] = str(r["last"])
 
         return intz
 
