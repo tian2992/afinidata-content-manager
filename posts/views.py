@@ -803,14 +803,18 @@ def get_posts_for_user(request):
     post_dispatch = Interaction(post=service_post, user_id=user.id, type='dispatched', value=1)
     post_dispatch.save()
 
-    return JsonResponse(dict(
-        set_attributes=dict(
+    resp = dict(
             post_id=service_post.pk,
             post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
             post_preview=service_post.preview,
             post_title=service_post.name,
-            warn = warning_message
-        ),
+            warn=warning_message
+        )
+
+    logging.info("sent activity: {}".format(resp))
+
+    return JsonResponse(dict(
+        set_attributes=resp,
         messages=[],
     ))
 

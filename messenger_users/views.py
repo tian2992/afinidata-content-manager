@@ -152,7 +152,6 @@ def last_interacted(request, id=None):
 
         return intz
 
-
     def get_user(r_dict):
         usr = None
         uname = r_dict.get('username')
