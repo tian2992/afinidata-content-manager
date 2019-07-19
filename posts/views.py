@@ -811,7 +811,7 @@ def get_posts_for_user(request):
             warn=warning_message
         )
 
-    logging.info("sent activity: {}".format(resp))
+    logging.warning("sent activity: {}".format(resp))
 
     return JsonResponse(dict(
         set_attributes=resp,
