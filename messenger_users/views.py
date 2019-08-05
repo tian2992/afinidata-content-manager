@@ -182,14 +182,15 @@ def by_username(request, username):
     else:
         try:
             user = User.objects.get(username=username)
-            logger.warning("user found: {}",format(user))
+            logger.warning("user found: {}", format(user))
         except Exception as e:
             logger.error("No username")
             return JsonResponse(dict(status='error', error=str(e)))
 
-        return JsonResponse(dict(
-                                set_attributes=dict(
-                                    user_id=user.pk
-                                ),
-                                messages=[]
-                            ))
+        attrs = dict(
+            set_attributes=dict(
+                user_id=user.pk
+            ),
+            messages=[]
+        )
+        return JsonResponse(attrs)
