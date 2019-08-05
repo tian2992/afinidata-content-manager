@@ -1,5 +1,5 @@
 from django.urls import path
-from messenger_users.views import new_user, cf_user, add_attribute, by_username, last_interacted
+from messenger_users.views import new_user, add_attribute, by_username, last_interacted
 
 app_name = 'messenger_users'
 
