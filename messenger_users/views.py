@@ -134,6 +134,12 @@ def last_interacted(request, id=None):
 
     user = get_user(request.POST)
 
+    interact_type = request.POST.get("interaction_type")
+    if interact_type:
+        i = Interaction.objects.order_by("-created_at").get(user_id=user.pk, type=interact_type)
+        time = i.created_at
+        return JsonResponse(dict(set_attributes=dict(interaction_type=interact_type), messages=[]))
+
     with connections['default'].cursor() as cursor:
         cursor.execute("SELECT type, TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) last FROM CM_BD.posts_interaction"
                        " WHERE user_id = %s GROUP BY type ORDER BY created_at desc ;", [user.id])
