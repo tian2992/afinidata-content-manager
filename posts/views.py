@@ -155,27 +155,25 @@ def fetch_post(request, id):
         try:
             username = request.GET['username']
             user = User.objects.get(username=username)
-            print('user: ', user)
+            logger.info('fetching post for user : ', user)
         except:
-            print('not user with username')
+            logger.warning('not user with username')
             pass
 
         if not user:
             try:
                 channel_id = request.GET['channel_id']
                 user = User.objects.get(last_channel_id=channel_id)
-                print(user)
             except:
-                print('not user with last channel id')
+                logger.warning('not user with last channel id')
                 pass
 
         if not user:
             try:
                 channel_id = request.GET['channel_id']
                 user = User.objects.get(channel_id=channel_id)
-                print(user)
             except:
-                print('not user with channel id')
+                logger.warning('not user with channel id')
                 pass
 
         if user:
