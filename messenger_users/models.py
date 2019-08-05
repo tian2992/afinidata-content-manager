@@ -11,7 +11,7 @@ class User(models.Model):
     username = models.CharField(max_length=100, null=True, unique=True)
 
     def __str__(self):
-        return self.last_channel_id
+        return "User with m_id: {}; username = {}".format(self.last_channel_id, self.username)
 
     class Meta:
         app_label = 'messenger_users'
