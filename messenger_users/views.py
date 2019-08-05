@@ -177,12 +177,12 @@ def last_interacted(request, id=None):
 def by_username(request, username):
     logger.warning("running by_username")
     logger.warning(username)
-    logger.warning(request.POST)
     if request.method != 'POST':
         return JsonResponse(dict(status='error', error='Invalid method'))
     else:
         try:
             user = User.objects.get(username=username)
+            logger.warning("user found: {}",format(user))
         except Exception as e:
             logger.error("No username")
             return JsonResponse(dict(status='error', error=str(e)))
