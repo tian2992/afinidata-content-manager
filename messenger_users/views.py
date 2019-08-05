@@ -175,8 +175,10 @@ def last_interacted(request, id=None):
 
 @csrf_exempt
 def by_username(request, username):
-    print(username)
-    if request.method == 'POST':
+    logger.warning("running by_username")
+    logger.warning(username)
+    logger.warning(request.POST)
+    if request.method != 'POST':
         return JsonResponse(dict(status='error', error='Invalid method'))
     else:
         try:
