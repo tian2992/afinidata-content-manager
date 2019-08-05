@@ -1,59 +1,34 @@
-from django.shortcuts import render
+from django.utils.datastructures import MultiValueDictKeyError
 from messenger_users.models import User, UserData
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
-from messenger_users.forms import CreateUserFormModel
 from django.db import connections
 
 
-import random
-import string
 import logging
 
 logger = logging.getLogger(__name__)
 
-## FIXME: convert to django rest views.
-
-
-@csrf_exempt
-def cf_user(request):
-    # hackish hak :( for chatfuel mishap
-    c_fid = request.POST.get("chatfuel_id")
-
-    if c_fid:
-        logger.warning(request.POST)
-        logger.warning("rehashing chatfuel id")
-        # we're in
-        try:
-            muid = request.POST['messenger_user_id']
-            us = User.objects.get(last_channel_id=c_fid)
-            us.last_channel_id = muid
-            return JsonResponse({"status":"ok"})
-        except:
-            logging.error("POST TO CHATFUEL requries chatfuel_id var")
-            logging.error(request.POST)
-
-        return JsonResponse({"status":"ok"})
+# FIXME: convert to django rest views.
 
 
 '''Creates user from a request.'''
 @csrf_exempt
 def new_user(request):
 
-    if request.method == 'POST':
+    if request.method != 'POST':
+        logger.error("New user only POST valid.")
+        raise Http404('Not auth')
 
-        ### TODO: Split in functions, should not be named new_user smth like refresh session (?)
+    ### TODO: Split in functions, should be named smth like refresh session (?)
 
-        found_user = None
+    try:
+        mess_id = request.POST['messenger_user_id']
+        logger.info('attempting fetch for user id: {}'.format(mess_id))
         try:
-            found_user = User.objects.get(last_channel_id=request.POST['messenger_user_id'])
+            found_user = User.objects.get(last_channel_id=mess_id)
             logger.info('user id found')
-        except:
-            logger.error(request.POST)
-            logger.error('user could not be found from user id')
-
-        if found_user:
             return JsonResponse(dict(
                             set_attributes=dict(
                                 hasLoggedIn=True,
@@ -62,18 +37,11 @@ def new_user(request):
                             ),
                             messages=[]
                         ))
+        except User.DoesNotExist:
+            logger.warning('user could not be found from user id given')
 
-        else:
-            logger.warning('Creating New User')
+            logger.info('Creating New User')
             user = dict(bot_id=None, last_channel_id=None, backup_key=None)
-            logger.info(request.POST)
-
-            try:
-                mess_id = request.POST['messenger_user_id']
-            except Exception as e:
-                logger.error(e, exc_info=True)
-                logger.error("no messenger_user_id try messenger user id ")
-                mess_id = request.POST['messenger user id']
 
             fname = request.POST.get('first_name', "no{}".format(mess_id))[:20]
             lname = request.POST.get('last_name', "no{}".format(mess_id))[:20]
@@ -90,8 +58,8 @@ def new_user(request):
             UserData.objects.create(user=user_to_save, data_key='channel_first_name', data_value=fname)
             UserData.objects.create(user=user_to_save, data_key='channel_last_name', data_value=lname)
 
-            logger.warning("Created user")
-            logger.warning(user_to_save)
+            logger.info("Created user")
+            logger.info(user_to_save)
 
             return JsonResponse(dict(
                             set_attributes=dict(
@@ -101,9 +69,12 @@ def new_user(request):
                             ),
                             messages=[]
                         ))
-    else:
-        logger.error("New user only POST valid.")
-        raise Http404('Not auth')
+
+    except MultiValueDictKeyError:
+        logger.error("impossible to get without argument messenger_user_id")
+        logger.error("post data includes: {}".format(request.POST))
+
+        return 500
 
 
 @csrf_exempt
@@ -175,17 +146,13 @@ def last_interacted(request, id=None):
 
 @csrf_exempt
 def by_username(request, username):
-    logger.warning("running by_username")
-    logger.warning(username)
+    logger.info("running by_username")
     if request.method != 'POST':
         return JsonResponse(dict(status='error', error='Invalid method'))
-    else:
-        try:
-            user = User.objects.get(username=username)
-            logger.warning("user found: {}", format(user))
-        except Exception as e:
-            logger.error("No username")
-            return JsonResponse(dict(status='error', error=str(e)))
+
+    try:
+        user = User.objects.get(username=username)
+        logger.warning("user found: {}", format(user))
 
         attrs = dict(
             set_attributes=dict(
@@ -194,3 +161,8 @@ def by_username(request, username):
             messages=[]
         )
         return JsonResponse(attrs)
+    except Exception as e:
+        logger.error("No username")
+        return JsonResponse(dict(status='error', error=str(e)))
+
+
