@@ -1,5 +1,6 @@
 from django.utils.datastructures import MultiValueDictKeyError
-from messenger_users.models import User, UserData
+from messenger_users.models import User, UserData, Referral
+from posts.models import Interaction
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
@@ -147,7 +148,7 @@ def last_interacted(request, id=None):
         return JsonResponse(dict(set_attributes=results,
                                  messages=[]))
 
-    return JsonResponse(dict('status', "error"))
+    return JsonResponse(dict(status="error"))
 
 
 @csrf_exempt
@@ -170,5 +171,49 @@ def by_username(request, username):
     except Exception as e:
         logger.error("No username")
         return JsonResponse(dict(status='error', error=str(e)))
+
+
+def set_referral(request):
+    try:
+        user_id = request.POST['messenger_id']
+        ref = request.POST['ref']
+
+        blacklist = ["ad id", "Welcome", "Greet", "Piecitos", "Email", "limitation"]
+
+        for non_user in blacklist:
+            if ref.startswith(non_user):
+                logger.warning("ref user is not user value")
+                return 200
+                # return JsonResponse(dict(status='error', error="invalid_ref"))
+        user = User.objects.get(last_channel_id=user_id)
+
+        ref_user = None
+
+        if ref.startswith("user-"):
+            logger.info("attempt ref with username prefix")
+            ref_user = User.objects.get(username=ref.lstrip("user-"))
+            logger.info("user that referred obtained")
+        else:
+            logger.info("attempt ref without username prefix")
+            ref_user = User.objects.get(username=ref)
+            logger.info("user that referred obtained")
+
+        ref_obj = Referral(user_share=user, user_open=ref_user, ref_type="ref")
+        ref_obj.save()
+
+        attrs = dict(
+            set_attributes=dict(
+                ref_id=ref_obj.pk
+            ),
+            messages=[]
+        )
+        return JsonResponse(attrs)
+    except Exception as e:
+        logger.exception("No username ")
+        return JsonResponse(dict(status='error', error=str(e)))
+
+
+def childId_from_user():
+    pass
 
 
