@@ -217,8 +217,51 @@ def set_referral(request):
         return JsonResponse(dict(status='error', error=str(e)))
 
 
+def get_referral(request):
+    pass
 
-def childId_from_user():
+
+def user_interaction(request):
+    if request.method == 'GET':
+        return JsonResponse(dict(status='error', error='Invalid method.'))
+    value = 0
+    ref_type = ''
+
+    logger.info('setting interaction')
+
+    try:
+        ref_type = request.POST['interaction_type']
+        username = request.POST['username']
+        user = User.objects.get(username=username)
+    except Exception as e:
+        logger.error(e)
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    try:
+        value = request.POST['value']
+    except Exception as e:
+        logger.warning("no value set")
+        logger.warning(e)
+        value = 0
+
+    interaction = Interaction.objects.create(
+        type=ref_type,
+        channel_id=user.last_channel_id,
+        username=user.username,
+        user_id=user.pk,
+        value=value
+    )
+    return JsonResponse(dict(status='done', data=dict(
+        interaction=dict(
+            id=interaction.pk
+        )
+    )))
+
+def child_interaction(request):
+    pass
+
+
+def childId_from_user_Id(request, user_id):
     pass
 
 
