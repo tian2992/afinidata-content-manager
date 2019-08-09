@@ -190,18 +190,22 @@ def set_referral(request):
         user = User.objects.get(username=username)
         ref_user = None
 
+        if ref.startswith("ref-"):
+            stripd_user = ref[4::]
+            logger.info("attempt ref with ref prefix {}".format(stripd_user))
+            ref_user = User.objects.get(username=stripd_user)
         if ref.startswith("user-"):
             stripd_user = ref[5::]
             logger.info("attempt ref with username prefix {}".format(stripd_user))
             ref_user = User.objects.get(username=stripd_user)
-            logger.info("user that referred obtained")
         else:
             logger.info("attempt ref without username prefix")
             ref_user = User.objects.get(username=ref)
-            logger.info("user that referred obtained")
 
         if not ref_user:
             return JsonResponse(dict(status='error', error="no-ref"))
+
+        logger.info("user that referred obtained")
 
         ref_obj = Referral(user_shared=ref_user, user_opened=user, ref_type="ref")
         ref_obj.save()
@@ -218,6 +222,7 @@ def set_referral(request):
         return JsonResponse(dict(status='error', error=str(e)))
 
 
+@csrf_exempt
 def get_referrals_count(request, username):
     try:
         user = User.objects.get(username=username)
@@ -236,6 +241,7 @@ def get_referrals_count(request, username):
         return JsonResponse(dict(status='error', error=str(e)))
 
 
+@csrf_exempt
 def user_interaction(request):
     if request.method == 'GET':
         return JsonResponse(dict(status='error', error='Invalid method.'))
@@ -272,10 +278,13 @@ def user_interaction(request):
         )
     )))
 
+
+@csrf_exempt
 def child_interaction(request):
     pass
 
 
+@csrf_exempt
 def childId_from_user_Id(request, user_id):
     pass
 
