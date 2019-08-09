@@ -202,7 +202,7 @@ def set_referral(request):
         if not ref_user:
             return JsonResponse(dict(status='error', error="no-ref"))
 
-        ref_obj = Referral(user_share=user, user_open=ref_user, ref_type="ref")
+        ref_obj = Referral(user_shared=user, user_opened=ref_user, ref_type="ref")
         ref_obj.save()
 
         attrs = dict(

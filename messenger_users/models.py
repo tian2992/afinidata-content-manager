@@ -61,4 +61,4 @@ class Referral(models.Model):
         app_label = 'messenger_users'
 
     def __str__(self):
-        return "User '{}' referred '{}'".format(self.user_share, self.user_open)
+        return "User '{}' referred '{}'".format(self.user_shared, self.user_opened)
