@@ -174,8 +174,9 @@ def by_username(request, username):
 
 
 def set_referral(request):
+    """Makes a ref from a username and a ref value with user- prefixed username."""
     try:
-        user_id = request.POST['messenger_id']
+        username = request.POST['username']
         ref = request.POST['ref']
 
         blacklist = ["ad id", "Welcome", "Greet", "Piecitos", "Email", "limitation"]
@@ -185,7 +186,7 @@ def set_referral(request):
                 logger.warning("ref user is not user value")
                 return 200
                 # return JsonResponse(dict(status='error', error="invalid_ref"))
-        user = User.objects.get(last_channel_id=user_id)
+        user = User.objects.get(username=username)
 
         ref_user = None
 
@@ -197,6 +198,9 @@ def set_referral(request):
             logger.info("attempt ref without username prefix")
             ref_user = User.objects.get(username=ref)
             logger.info("user that referred obtained")
+
+        if not ref_user:
+            return JsonResponse(dict(status='error', error="no-ref"))
 
         ref_obj = Referral(user_share=user, user_open=ref_user, ref_type="ref")
         ref_obj.save()
@@ -211,6 +215,7 @@ def set_referral(request):
     except Exception as e:
         logger.exception("No username ")
         return JsonResponse(dict(status='error', error=str(e)))
+
 
 
 def childId_from_user():
