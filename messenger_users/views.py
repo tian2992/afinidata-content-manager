@@ -203,7 +203,7 @@ def set_referral(request):
         if not ref_user:
             return JsonResponse(dict(status='error', error="no-ref"))
 
-        ref_obj = Referral(user_shared=user, user_opened=ref_user, ref_type="ref")
+        ref_obj = Referral(user_shared=ref_user, user_opened=user, ref_type="ref")
         ref_obj.save()
 
         attrs = dict(
@@ -218,8 +218,22 @@ def set_referral(request):
         return JsonResponse(dict(status='error', error=str(e)))
 
 
-def get_referral(request):
-    pass
+def get_referrals_count(request, username):
+    try:
+        user = User.objects.get(username=username)
+        count = Referral.objects.filter(user_opened=user).count()
+
+        attrs = dict(
+            set_attributes=dict(
+                ref_count=count
+            ),
+            messages=[]
+        )
+        return JsonResponse(attrs)
+
+    except Exception as e:
+        logger.exception("fail counting refs")
+        return JsonResponse(dict(status='error', error=str(e)))
 
 
 def user_interaction(request):
