@@ -173,6 +173,7 @@ def by_username(request, username):
         return JsonResponse(dict(status='error', error=str(e)))
 
 
+@csrf_exempt
 def set_referral(request):
     """Makes a ref from a username and a ref value with user- prefixed username."""
     try:
