@@ -54,7 +54,7 @@ class Referral(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_shared = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='shared_ref')
     user_opened = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='opened_ref', null=True)
-    ref_type = models.CharField(choices=["link", "ref"], default="link", max_length=15)
+    ref_type = models.CharField(choices=[("link", "link"), ("ref","ref")], default="link", max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
