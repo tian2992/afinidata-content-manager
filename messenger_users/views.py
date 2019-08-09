@@ -188,12 +188,12 @@ def set_referral(request):
                 return 200
                 # return JsonResponse(dict(status='error', error="invalid_ref"))
         user = User.objects.get(username=username)
-
         ref_user = None
 
         if ref.startswith("user-"):
-            logger.info("attempt ref with username prefix")
-            ref_user = User.objects.get(username=ref.lstrip("user-"))
+            stripd_user = ref[5::]
+            logger.info("attempt ref with username prefix {}".format(stripd_user))
+            ref_user = User.objects.get(username=stripd_user)
             logger.info("user that referred obtained")
         else:
             logger.info("attempt ref without username prefix")
