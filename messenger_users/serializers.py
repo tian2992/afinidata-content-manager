@@ -5,6 +5,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        exclude = ['created_at']
 
 
 class UserDataSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class UserDataSerializer(serializers.ModelSerializer):
 class ChildSerializer(serializers.ModelSerializer):
     class Meta:
         model = Child
+        exclude = ['created']
 
 
 class ChildDataSerializer(serializers.ModelSerializer):
