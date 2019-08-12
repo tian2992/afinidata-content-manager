@@ -1,7 +1,7 @@
 from django.utils.datastructures import MultiValueDictKeyError
-from messenger_users.models import User, UserData, Referral
+from messenger_users.models import User, Child, ChildData, UserData, Referral
 from posts.models import Interaction
-from .serializers import UserDataSerializer
+from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
 from rest_framework import viewsets
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -281,12 +281,38 @@ def user_interaction(request):
     )))
 
 
+class ChildViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Child.objects.all()
+    serializer_class = ChildSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 class UserDataViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = UserData.objects.all()
     serializer_class = UserDataSerializer
+
+
+class ChildDataViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = ChildData.objects.all()
+    serializer_class = ChildDataSerializer
+
+
 
 
 @csrf_exempt

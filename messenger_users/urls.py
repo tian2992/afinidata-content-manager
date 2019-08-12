@@ -1,5 +1,6 @@
 from django.urls import path, include
-from messenger_users.views import new_user, add_attribute, by_username, last_interacted, set_referral, get_referrals_count, user_interaction, UserDataViewSet
+from messenger_users.views import new_user, add_attribute, by_username, last_interacted, set_referral,\
+    get_referrals_count, user_interaction, UserDataViewSet, ChildDataViewSet, ChildViewSet, UserViewSet
 from rest_framework import routers
 
 
@@ -8,6 +9,10 @@ app_name = 'messenger_users'
 
 api_router = routers.DefaultRouter()
 api_router.register(r'userData', UserDataViewSet)
+api_router.register(r'childData', ChildDataViewSet)
+api_router.register(r'child', ChildViewSet)
+api_router.register(r'user', UserViewSet)
+
 
 urlpatterns = [
     path('new/', new_user, name="new"),
