@@ -22,6 +22,7 @@ class UserData(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     data_key = models.CharField(max_length=30)
     data_value = models.TextField()
+    created = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.data_value
@@ -62,3 +63,10 @@ class Referral(models.Model):
 
     def __str__(self):
         return "User '{}' referred '{}'".format(self.user_shared, self.user_opened)
+
+
+class UserActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        app_label = 'messenger_users'

@@ -1,6 +1,8 @@
 from django.utils.datastructures import MultiValueDictKeyError
 from messenger_users.models import User, UserData, Referral
 from posts.models import Interaction
+from .serializers import UserDataSerializer
+from rest_framework import viewsets
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
@@ -277,6 +279,14 @@ def user_interaction(request):
             id=interaction.pk
         )
     )))
+
+
+class UserDataViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = UserData.objects.all()
+    serializer_class = UserDataSerializer
 
 
 @csrf_exempt

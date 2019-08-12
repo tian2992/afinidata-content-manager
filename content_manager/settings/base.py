@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'dash.apps.DashConfig',
     'upload.apps.UploadConfig',
     'django_nose',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -184,6 +185,11 @@ NOSE_ARGS = [
  #   '--cover-package=foo,bar',
 ]
 
+# REST config
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 35
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

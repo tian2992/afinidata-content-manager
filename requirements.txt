@@ -13,3 +13,4 @@ coverage
 django-nose
 recommonmark
 django-request-logging
+djangorestframework
