@@ -228,7 +228,7 @@ def set_referral(request):
 def get_referrals_count(request, username):
     try:
         user = User.objects.get(username=username)
-        count = Referral.objects.filter(user_opened=user).count()
+        count = Referral.objects.filter(user_shared=user).count()
 
         attrs = dict(
             set_attributes=dict(
