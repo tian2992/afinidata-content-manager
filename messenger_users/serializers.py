@@ -25,4 +25,4 @@ class ChildDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChildData
-        exclude = ['created']
+        exclude = ['timestamp']
