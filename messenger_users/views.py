@@ -3,7 +3,7 @@ from messenger_users.models import User, Child, ChildData, UserData, Referral
 from posts.models import Interaction
 from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
 from rest_framework import viewsets
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
 from django.db import connections
@@ -313,6 +313,19 @@ class ChildDataViewSet(viewsets.ModelViewSet):
     serializer_class = ChildDataSerializer
 
 
+def get_last_action(request, user_id, *args, **kwargs):
+    pass
+
+
+@api_view(['POST'])
+def set_user_action(request, user_id, *args, **kwargs):
+    pass
+
+
+
+def get_user_activity_status(request, user_id, *args, **kwargs):
+    return HttpResponse(200) #  {"status": "ok"}
+    pass
 
 
 @csrf_exempt
@@ -323,5 +336,4 @@ def child_interaction(request):
 @csrf_exempt
 def childId_from_user_Id(request, user_id):
     pass
-
 

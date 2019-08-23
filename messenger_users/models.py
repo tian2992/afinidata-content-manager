@@ -80,6 +80,7 @@ class UserActivity(models.Model):
     BROADCAST_START= 'broadcast_start'
     TIMED_START = 'timed_start'
     ACTIVE_SESSION = 'active_session'
+    PRE_CHURN = 'pre_churn'
     DISPATCHED = 'dispatched'
     OPENED = 'opened'
     FOLLOW_UP = 'follow_up'
@@ -116,6 +117,8 @@ def init_state_machine(instance, **kwargs):
     machine.add_transition('want_activity', instance.BROADCAST_START, instance.ACTIVE_SESSION)
     machine.add_transition('want_activity', instance.TIMED_START, instance.ACTIVE_SESSION)
     machine.add_transition('get_post', instance.ACTIVE_SESSION, instance.DISPATCHED)
+    machine.add_transition('set_pre_churn', instance.ACTIVE_SESSION, instance.PRE_CHURN)
+    machine.add_transition('get_post', instance.PRE_CHURN, instance.DISPATCHED)
     machine.add_transition('open_post', instance.DISPATCHED, instance.OPENED)
     machine.add_transition('give_feedback', instance.OPENED, instance.FOLLOW_UP)
     machine.add_transition('give_feedback', instance.FOLLOW_UP, instance.FOLLOW_UP)
