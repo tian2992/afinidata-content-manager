@@ -1,4 +1,10 @@
 from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework.decorators import api_view
+from rest_framework_bulk import (
+    BulkListSerializer,
+    BulkSerializerMixin,
+    ListBulkCreateAPIView,
+)
 from messenger_users.models import User, Child, ChildData, UserData, Referral
 from posts.models import Interaction
 from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
@@ -313,6 +319,16 @@ class ChildDataViewSet(viewsets.ModelViewSet):
     serializer_class = ChildDataSerializer
 
 
+class UserDataListSerializer(BulkSerializerMixin, UserDataSerializer):
+    class Meta(object):
+        model = UserData
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
+
+
+class UserDataBulkView(ListBulkCreateAPIView):
+    queryset = UserData.objects.all()
+    serializer_class = UserDataListSerializer
 
 
 @csrf_exempt
