@@ -1,7 +1,7 @@
 from django.urls import path, include
 from messenger_users.views import new_user, add_attribute, by_username, last_interacted, set_referral,\
     get_referrals_count, user_interaction, UserDataViewSet, ChildDataViewSet, ChildViewSet, UserViewSet, \
-    get_last_action, set_user_action, get_user_activity_status, UserDataBulkView
+    UserDataBulkView
 from rest_framework import routers
 
 
