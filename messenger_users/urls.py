@@ -24,6 +24,6 @@ urlpatterns = [
     path('get_refs_count/<username>', get_referrals_count, name='get_ref'),
     path('user_interaction/', user_interaction, name='user_interaction'),
     path('api/', include(api_router.urls)),
-    path('userData/bulk/create', UserDataBulkView.as_view(), name='create_list_user_data'),
+    path('userData/bulk', UserDataBulkView.as_view(), name='create_list_user_data'),
 
 ]
