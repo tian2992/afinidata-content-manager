@@ -1,6 +1,7 @@
 from django.urls import path, include
 from messenger_users.views import new_user, add_attribute, by_username, last_interacted, set_referral,\
-    get_referrals_count, user_interaction, UserDataViewSet, ChildDataViewSet, ChildViewSet, UserViewSet
+    get_referrals_count, user_interaction, UserDataViewSet, ChildDataViewSet, ChildViewSet, UserViewSet, \
+    UserDataBulkView
 from rest_framework import routers
 
 
@@ -14,7 +15,6 @@ api_router.register(r'child', ChildViewSet)
 api_router.register(r'user', UserViewSet)
 
 
-
 urlpatterns = [
     path('new/', new_user, name="new"),
     path('<channel_id>/add_attribute/', add_attribute, name="add_attribute"),
@@ -23,10 +23,11 @@ urlpatterns = [
     path('set_referral/', set_referral, name='set_ref'),
     path('get_refs_count/<username>', get_referrals_count, name='get_ref'),
     path('user_interaction/', user_interaction, name='user_interaction'),
-    # path('set_child_interaction/', child_interaction, name='child_interaction'),
     path('api/', include(api_router.urls)),
     path('actions/user/<user_id>/', get_last_action, name='get_last_user_action'),
     path('actions/user/<user_id>/set', set_user_action, name='set_user_action'),
     path('status/user/<user_id>/', get_user_activity_status, name='get_user_status'),
+
+    path('userData/bulk', UserDataBulkView.as_view(), name='create_list_user_data'),
 
 ]
