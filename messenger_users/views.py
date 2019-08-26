@@ -5,7 +5,7 @@ from rest_framework_bulk import (
     BulkSerializerMixin,
     ListBulkCreateAPIView,
 )
-from messenger_users.models import User, Child, ChildData, UserData, Referral
+from messenger_users.models import User, Child, ChildData, UserData, Referral, UserActivity
 from posts.models import Interaction
 from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
 from rest_framework import viewsets
@@ -324,14 +324,35 @@ def get_last_action(request, user_id, *args, **kwargs):
 
 
 @api_view(['POST'])
-def set_user_action(request, user_id, *args, **kwargs):
-    pass
+def set_user_action(request, user_id, action, *args, **kwargs):
+    ua = UserActivity.objects.get(user_id=int(user_id))
+
+    try:
+        transition_call = getattr(ua, action)
+    except:
+        logger.exception("error on setting action")
+        return JsonResponse({"error": "invalid action"})
+
+    if not callable(transition_call):
+        return JsonResponse({"error": "invalid action call"})
+
+    logger.info("calling")
+    if len(request.POST) > 0:
+        transition_call(**request.POST)
+    else:
+        transition_call()
+    ua.save()
+
+    resp = dict()
+    resp['set_variable'] = ua.state
+    return JsonResponse(resp)
 
 
 
+@api_view()
 def get_user_activity_status(request, user_id, *args, **kwargs):
-    return HttpResponse(200) #  {"status": "ok"}
-    pass
+    ua = UserActivity.objects.get(user_id=int(user_id))
+    return JsonResponse({"status": ua.state})
 
 
 class UserDataListSerializer(BulkSerializerMixin, UserDataSerializer):

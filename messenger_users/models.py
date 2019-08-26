@@ -70,11 +70,14 @@ class Referral(models.Model):
 
 class UserActivity(models.Model):
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
 
     class Meta:
         app_label = 'messenger_users'
 
+    PRE_REGISTER = 'pre_register'
+    IN_REGISTRATION = 'in_registration'
+    USER_DEAD = 'user_dead'
     WAIT = 'wait'
     USER_QUERY = 'user_query'
     BROADCAST_START= 'broadcast_start'
@@ -85,7 +88,27 @@ class UserActivity(models.Model):
     OPENED = 'opened'
     FOLLOW_UP = 'follow_up'
 
+    ## Transition consts
+    START_REGISTER = 'start_register'
+    FINISH_REGISTER = 'finish_register'
+    USER_DIE = 'decay'
+    RECEIVE_USER_MESSAGE = 'receive_user_message'
+    SEND_BROADCAST = 'send_broadcast'
+    AWAITED_ENOUGH = 'awaited_enough'
+    WANT_ACTIVITY = 'want_activity'
+    GET_POST = 'get_post'
+    SET_PRE_CHURN = 'set_pre_churn'
+    GET_POST = 'get_post'
+    OPEN_POST = 'open_post'
+    NO_OPEN = 'no_open'
+    GIVE_FEEDBACK = 'give_feedback'
+    END_FEEDBACK = 'end_feedback'
+    NO_FEEDBACK = 'no_feedback'
+
     STATE_TYPES = [
+        (PRE_REGISTER, PRE_REGISTER),
+        (IN_REGISTRATION, IN_REGISTRATION),
+        (USER_DEAD, USER_DEAD),
         (WAIT, WAIT),
         (USER_QUERY, USER_QUERY),
         (BROADCAST_START, BROADCAST_START),
@@ -96,6 +119,10 @@ class UserActivity(models.Model):
         (FOLLOW_UP, FOLLOW_UP),
     ]
 
+    TRANSITIONS = [
+        # TODO: fill
+    ]
+
     state = models.CharField(
         "state",
         max_length=100,
@@ -104,23 +131,32 @@ class UserActivity(models.Model):
         help_text='stado',
     )
 
+    def on_enter_active_session(self, **kwargs):
+        pass
+
 
 @receiver(post_init, sender=UserActivity)
 def init_state_machine(instance, **kwargs):
     states = [state for state, _ in instance.STATE_TYPES]
     machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
                                          ignore_invalid_triggers=True)
-    machine.add_transition('receive_user_message', instance.WAIT, instance.USER_QUERY)
-    machine.add_transition('send_broadcast', instance.WAIT, instance.BROADCAST_START)
-    machine.add_transition('awaited_enough', instance.WAIT, instance.TIMED_START)
-    machine.add_transition('want_activity', instance.USER_QUERY, instance.ACTIVE_SESSION)
-    machine.add_transition('want_activity', instance.BROADCAST_START, instance.ACTIVE_SESSION)
-    machine.add_transition('want_activity', instance.TIMED_START, instance.ACTIVE_SESSION)
-    machine.add_transition('get_post', instance.ACTIVE_SESSION, instance.DISPATCHED)
-    machine.add_transition('set_pre_churn', instance.ACTIVE_SESSION, instance.PRE_CHURN)
-    machine.add_transition('get_post', instance.PRE_CHURN, instance.DISPATCHED)
-    machine.add_transition('open_post', instance.DISPATCHED, instance.OPENED)
-    machine.add_transition('give_feedback', instance.OPENED, instance.FOLLOW_UP)
-    machine.add_transition('give_feedback', instance.FOLLOW_UP, instance.FOLLOW_UP)
-    machine.add_transition('end_feedback', instance.FOLLOW_UP, instance.WAIT)
-    machine.add_transition('no_feedback', instance.OPENED, instance.WAIT)
+    machine.add_transition(UserActivity.START_REGISTER, UserActivity.WAIT, UserActivity.USER_QUERY)
+    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.WAIT, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)
+    machine.add_transition(UserActivity.USER_DIE, '*', UserActivity.USER_DEAD)
+
+    machine.add_transition(UserActivity.RECEIVE_USER_MESSAGE, UserActivity.WAIT, UserActivity.USER_QUERY)
+    machine.add_transition(UserActivity.SEND_BROADCAST, UserActivity.WAIT, UserActivity.BROADCAST_START)
+    machine.add_transition(UserActivity.AWAITED_ENOUGH, UserActivity.WAIT, UserActivity.TIMED_START)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.USER_QUERY, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.BROADCAST_START, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.TIMED_START, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.GET_POST, UserActivity.ACTIVE_SESSION, UserActivity.DISPATCHED)
+    machine.add_transition(UserActivity.SET_PRE_CHURN, UserActivity.ACTIVE_SESSION, UserActivity.PRE_CHURN)
+    machine.add_transition(UserActivity.GET_POST, UserActivity.PRE_CHURN, UserActivity.DISPATCHED)
+    machine.add_transition(UserActivity.OPEN_POST, UserActivity.DISPATCHED, UserActivity.OPENED)
+    machine.add_transition(UserActivity.NO_OPEN, UserActivity.DISPATCHED, UserActivity.WAIT)
+    machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.OPENED, UserActivity.FOLLOW_UP)
+    machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.FOLLOW_UP, UserActivity.FOLLOW_UP)
+    machine.add_transition(UserActivity.END_FEEDBACK, UserActivity.FOLLOW_UP, UserActivity.WAIT)
+    machine.add_transition(UserActivity.NO_FEEDBACK, UserActivity.OPENED, UserActivity.WAIT)
