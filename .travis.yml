@@ -2,9 +2,11 @@ dist: xenial   # required for Python >= 3.7
 language: python
 python:
   - "3.7"
-# command to install dependencies
+services:
+  - mysql
 install:
   - pip install -r requirements.txt
+  - mv .env-test .env
   # - pip install .
 # command to run tests
 script:
