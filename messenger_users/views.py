@@ -325,7 +325,13 @@ def get_last_action(request, user_id, *args, **kwargs):
 
 @api_view(['POST'])
 def set_user_action(request, user_id, action, *args, **kwargs):
-    ua = UserActivity.objects.get(user_id=int(user_id))
+    resp = dict()
+
+    try:
+        ua = UserActivity.objects.get(user_id=int(user_id))
+    except UserActivity.DoesNotExist:
+        logger.exception("no machine for user, let's make one")
+        ua = UserActivity(user_id=int(user_id))
 
     try:
         transition_call = getattr(ua, action)
@@ -343,7 +349,6 @@ def set_user_action(request, user_id, action, *args, **kwargs):
         transition_call()
     ua.save()
 
-    resp = dict()
     resp['set_variable'] = ua.state
     return JsonResponse(resp)
 
