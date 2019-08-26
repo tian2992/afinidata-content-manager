@@ -330,7 +330,7 @@ def set_user_action(request, user_id, action, *args, **kwargs):
     try:
         ua = UserActivity.objects.get(user_id=int(user_id))
     except UserActivity.DoesNotExist:
-        logger.exception("no machine for user, let's make one")
+        logger.info("no machine for user, let's make one")
         ua = UserActivity(user_id=int(user_id))
 
     try:
