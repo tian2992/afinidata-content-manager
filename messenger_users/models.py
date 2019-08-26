@@ -1,5 +1,8 @@
 import uuid
 from django.db import models
+from transitions import Machine
+from django.db.models.signals import post_init
+from django.dispatch import receiver
 
 
 class User(models.Model):
@@ -66,7 +69,94 @@ class Referral(models.Model):
 
 
 class UserActivity(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
 
     class Meta:
         app_label = 'messenger_users'
+
+    PRE_REGISTER = 'pre_register'
+    IN_REGISTRATION = 'in_registration'
+    USER_DEAD = 'user_dead'
+    WAIT = 'wait'
+    USER_QUERY = 'user_query'
+    BROADCAST_START= 'broadcast_start'
+    TIMED_START = 'timed_start'
+    ACTIVE_SESSION = 'active_session'
+    PRE_CHURN = 'pre_churn'
+    DISPATCHED = 'dispatched'
+    OPENED = 'opened'
+    FOLLOW_UP = 'follow_up'
+
+    ## Transition consts
+    START_REGISTER = 'start_register'
+    FINISH_REGISTER = 'finish_register'
+    USER_DIE = 'decay'
+    RECEIVE_USER_MESSAGE = 'receive_user_message'
+    SEND_BROADCAST = 'send_broadcast'
+    AWAITED_ENOUGH = 'awaited_enough'
+    WANT_ACTIVITY = 'want_activity'
+    GET_POST = 'get_post'
+    SET_PRE_CHURN = 'set_pre_churn'
+    GET_POST = 'get_post'
+    OPEN_POST = 'open_post'
+    NO_OPEN = 'no_open'
+    GIVE_FEEDBACK = 'give_feedback'
+    END_FEEDBACK = 'end_feedback'
+    NO_FEEDBACK = 'no_feedback'
+
+    STATE_TYPES = [
+        (PRE_REGISTER, PRE_REGISTER),
+        (IN_REGISTRATION, IN_REGISTRATION),
+        (USER_DEAD, USER_DEAD),
+        (WAIT, WAIT),
+        (USER_QUERY, USER_QUERY),
+        (BROADCAST_START, BROADCAST_START),
+        (TIMED_START, TIMED_START),
+        (ACTIVE_SESSION, ACTIVE_SESSION),
+        (DISPATCHED, DISPATCHED),
+        (OPENED, OPENED),
+        (FOLLOW_UP, FOLLOW_UP),
+    ]
+
+    TRANSITIONS = [
+        # TODO: fill
+    ]
+
+    state = models.CharField(
+        "state",
+        max_length=100,
+        choices=STATE_TYPES,
+        default=WAIT,
+        help_text='stado',
+    )
+
+    def on_enter_active_session(self, **kwargs):
+        pass
+
+
+@receiver(post_init, sender=UserActivity)
+def init_state_machine(instance, **kwargs):
+    states = [state for state, _ in instance.STATE_TYPES]
+    machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
+                                         ignore_invalid_triggers=True)
+    machine.add_transition(UserActivity.START_REGISTER, UserActivity.WAIT, UserActivity.USER_QUERY)
+    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.WAIT, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)
+    machine.add_transition(UserActivity.USER_DIE, '*', UserActivity.USER_DEAD)
+
+    machine.add_transition(UserActivity.RECEIVE_USER_MESSAGE, UserActivity.WAIT, UserActivity.USER_QUERY)
+    machine.add_transition(UserActivity.SEND_BROADCAST, UserActivity.WAIT, UserActivity.BROADCAST_START)
+    machine.add_transition(UserActivity.AWAITED_ENOUGH, UserActivity.WAIT, UserActivity.TIMED_START)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.USER_QUERY, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.BROADCAST_START, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.TIMED_START, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.GET_POST, UserActivity.ACTIVE_SESSION, UserActivity.DISPATCHED)
+    machine.add_transition(UserActivity.SET_PRE_CHURN, UserActivity.ACTIVE_SESSION, UserActivity.PRE_CHURN)
+    machine.add_transition(UserActivity.GET_POST, UserActivity.PRE_CHURN, UserActivity.DISPATCHED)
+    machine.add_transition(UserActivity.OPEN_POST, UserActivity.DISPATCHED, UserActivity.OPENED)
+    machine.add_transition(UserActivity.NO_OPEN, UserActivity.DISPATCHED, UserActivity.WAIT)
+    machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.OPENED, UserActivity.FOLLOW_UP)
+    machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.FOLLOW_UP, UserActivity.FOLLOW_UP)
+    machine.add_transition(UserActivity.END_FEEDBACK, UserActivity.FOLLOW_UP, UserActivity.WAIT)
+    machine.add_transition(UserActivity.NO_FEEDBACK, UserActivity.OPENED, UserActivity.WAIT)
