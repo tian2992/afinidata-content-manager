@@ -68,6 +68,14 @@ class Referral(models.Model):
         return "User '{}' referred '{}'".format(self.user_shared, self.user_opened)
 
 
+class UserActivityLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    initial_state = models.CharField(max_length=25)
+    final_state = models.CharField(max_length=25)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=False)
+
+
 class UserActivity(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
@@ -130,6 +138,8 @@ class UserActivity(models.Model):
         default=WAIT,
         help_text='stado',
     )
+
+    last_change = models.DateTimeField(auto_now=True)
 
     def on_enter_active_session(self, **kwargs):
         pass
