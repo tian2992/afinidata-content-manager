@@ -7,15 +7,12 @@ services:
 install:
   - pip install -r requirements.txt
   - mv .env-test .env
-  # - pip install .
+  - pip install .
 # command to run tests
 script:
   - python manage.py makemigrations
-  - python manage.py makemigrations --database=messenger_users_db
-  - python manage.py makemigrations content_manager
-  - python manage.py makemigrations users
-  - python manage.py syncdb
   - python manage.py migrate content_manager
+  - python manage.py migrate messenger_users
   - python manage.py migrate --database=default
   - python manage.py migrate --database=messenger_users_db
   # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
