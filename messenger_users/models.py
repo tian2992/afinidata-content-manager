@@ -150,8 +150,8 @@ def init_state_machine(instance, **kwargs):
     states = [state for state, _ in instance.STATE_TYPES]
     machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
                                          ignore_invalid_triggers=True)
-    machine.add_transition(UserActivity.START_REGISTER, UserActivity.WAIT, UserActivity.USER_QUERY)
-    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.WAIT, UserActivity.ACTIVE_SESSION)
+    machine.add_transition(UserActivity.START_REGISTER, UserActivity.PRE_REGISTER, UserActivity.IN_REGISTRATION)
+    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.IN_REGISTRATION, UserActivity.ACTIVE_SESSION)
     machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)
     machine.add_transition(UserActivity.USER_DIE, '*', UserActivity.USER_DEAD)
 
