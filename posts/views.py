@@ -752,7 +752,7 @@ def get_posts_for_user(request):
     except Exception as e:
         logger.error("Invalid Parameters on getting posts for user")
         logger.error(e)
-        logger.error(POST)
+        logger.error(request.POST)
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
     logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
