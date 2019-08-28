@@ -122,6 +122,7 @@ class UserActivity(models.Model):
         (BROADCAST_START, BROADCAST_START),
         (TIMED_START, TIMED_START),
         (ACTIVE_SESSION, ACTIVE_SESSION),
+        (PRE_CHURN, PRE_CHURN),
         (DISPATCHED, DISPATCHED),
         (OPENED, OPENED),
         (FOLLOW_UP, FOLLOW_UP),
