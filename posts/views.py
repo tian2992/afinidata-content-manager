@@ -1,13 +1,13 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse, UserActivity
+    Rejection, ReviewComment, QuestionResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from posts import forms
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from messenger_users.models import User
+from messenger_users.models import User, UserActivity
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib import messages
 from datetime import datetime, timedelta
