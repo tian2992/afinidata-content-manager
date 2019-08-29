@@ -106,7 +106,6 @@ class UserActivity(models.Model):
     WANT_ACTIVITY = 'want_activity'
     GET_POST = 'get_post'
     SET_PRE_CHURN = 'set_pre_churn'
-    GET_POST = 'get_post'
     OPEN_POST = 'open_post'
     NO_OPEN = 'no_open'
     GIVE_FEEDBACK = 'give_feedback'

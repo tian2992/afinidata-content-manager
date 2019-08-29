@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse
+    Rejection, ReviewComment, QuestionResponse, UserActivity
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from posts import forms
@@ -199,6 +199,14 @@ def fetch_post(request, id):
                                            user_id=user.pk,
                                            value=-1)
                 post_session.save()
+
+                try:
+                    ua = UserActivity.objects.get(user_id=user.id)
+                    ua.open_post()
+                    ua.save()
+                except Exception:
+                    logger.exception("fail on setting opened User Activity")
+
                 return render(request, 'posts/post.html',
                               {'post': post, 'session_id': post_session.pk})
             except:
@@ -800,6 +808,13 @@ def get_posts_for_user(request):
 
     post_dispatch = Interaction(post=service_post, user_id=user.id, type='dispatched', value=1)
     post_dispatch.save()
+
+    try:
+        ua = UserActivity.objects.get(user_id=user.id)
+        ua.get_post()
+        ua.save()
+    except Exception:
+        logger.exception("fail on setting User Activity")
 
     resp = dict(
             post_id=service_post.pk,
