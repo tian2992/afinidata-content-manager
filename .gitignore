@@ -19,3 +19,7 @@ content_manager/settings/production.py
 
 databasesConfig\.txt
 docs/_build
+
+default
+
+messengeruser
