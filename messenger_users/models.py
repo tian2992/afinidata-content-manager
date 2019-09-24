@@ -23,7 +23,7 @@ class User(models.Model):
 
 class UserData(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    data_key = models.CharField(max_length=30)
+    data_key = models.CharField(max_length=128)
     data_value = models.TextField()
     created = models.DateTimeField(auto_now=True)
 
@@ -66,6 +66,20 @@ class Referral(models.Model):
 
     def __str__(self):
         return "User '{}' referred '{}'".format(self.user_shared, self.user_opened)
+
+
+class UserActivityLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    initial_state = models.CharField(max_length=25)
+    final_state = models.CharField(max_length=25)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=False)
+
+
+def track_activity(*args, **kwargs):
+    print(args)
+    print(kwargs)
+    pass
 
 
 class UserActivity(models.Model):
@@ -114,6 +128,7 @@ class UserActivity(models.Model):
         (BROADCAST_START, BROADCAST_START),
         (TIMED_START, TIMED_START),
         (ACTIVE_SESSION, ACTIVE_SESSION),
+        (PRE_CHURN, PRE_CHURN),
         (DISPATCHED, DISPATCHED),
         (OPENED, OPENED),
         (FOLLOW_UP, FOLLOW_UP),
@@ -131,6 +146,8 @@ class UserActivity(models.Model):
         help_text='stado',
     )
 
+    last_change = models.DateTimeField(auto_now=True)
+
     def on_enter_active_session(self, **kwargs):
         pass
 
@@ -139,9 +156,9 @@ class UserActivity(models.Model):
 def init_state_machine(instance, **kwargs):
     states = [state for state, _ in instance.STATE_TYPES]
     machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
-                                         ignore_invalid_triggers=True)
-    machine.add_transition(UserActivity.START_REGISTER, UserActivity.WAIT, UserActivity.USER_QUERY)
-    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.WAIT, UserActivity.ACTIVE_SESSION)
+                                         ignore_invalid_triggers=True, prepare_event=track_activity)
+    machine.add_transition(UserActivity.START_REGISTER, UserActivity.PRE_REGISTER, UserActivity.IN_REGISTRATION)
+    machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.IN_REGISTRATION, UserActivity.ACTIVE_SESSION)
     machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)
     machine.add_transition(UserActivity.USER_DIE, '*', UserActivity.USER_DEAD)
 

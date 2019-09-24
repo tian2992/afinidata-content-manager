@@ -182,6 +182,8 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
+    '--cover-tests',
+    '--cover-package=content_manager,messenger_users,posts'
  #   '--cover-package=foo,bar',
 ]
 
