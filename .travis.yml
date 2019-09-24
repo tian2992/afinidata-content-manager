@@ -7,6 +7,9 @@ services:
 env:
   - CM_DATABASE_NAME='cm_db' CM_DATABASE_ENGINE='django.db.backends.mysql' CM_DATABASE_USER='root' CM_DATABASE_PASSWORD='' \
     CM_DATABASE_HOST='localhost' CM_DATABASE_PORT='3306' CM_DATABASE_USERS_NAME='user_db' CM_DATABASE_USERS_ENGINE='django.db.backends.mysql'
+before_install:
+  - mysql -e 'CREATE DATABASE cm_db;'
+  - mysql -e 'CREATE DATABASE user_db;'
 install:
   - pip install -r requirements.txt
   - pip install .
