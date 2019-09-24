@@ -134,10 +134,6 @@ if os.getenv('CM_DATABASE_HOST'):
             'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
-            'TEST': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': 'default',
-            }
         },
         'messenger_users_db': {
             'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
@@ -146,10 +142,6 @@ if os.getenv('CM_DATABASE_HOST'):
             'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
-            'TEST': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': 'messengeruser',
-            }
         }
     }
 
