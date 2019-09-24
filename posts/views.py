@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse
+    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost
+from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from posts import forms
@@ -290,6 +291,7 @@ def set_taxonomy(request):
         taxonomy.save()
         post.save()
     return redirect('posts:edit-post', id=post.pk)
+
 
 class EditPostView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
@@ -1535,3 +1537,27 @@ class DeleteQuestionResponseView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, 'Response for question has been deleted.')
         return reverse_lazy('posts:edit-question', kwargs=dict(id=self.kwargs['question_id']))
+
+
+class AddCommentToPostByUserView(CreateView):
+    model = MessengerUserCommentPost
+    fields = ('post', 'user_id', 'comment')
+
+    # for view data in form only
+    # template_name = 'posts/onlytest_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AddCommentToPostByUserView, self).dispatch(request, *args, **kwargs)
+
+    # not visible for all people, ignore for view form
+    def get(self, *args, **kwargs):
+        raise Http404('Not found')
+
+    def form_valid(self, form):
+        form.save()
+        return JsonResponse(dict(status='done', data=dict(message='Gracias por contestar')))
+
+    def form_invalid(self, form):
+        return JsonResponse(dict(status='error', error='invalid form'))
+
