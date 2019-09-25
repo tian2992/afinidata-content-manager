@@ -1,13 +1,14 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse
+    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost
+from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
 from posts import forms
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from messenger_users.models import User
+from messenger_users.models import User, UserActivity
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib import messages
 from datetime import datetime, timedelta
@@ -199,6 +200,14 @@ def fetch_post(request, id):
                                            user_id=user.pk,
                                            value=-1)
                 post_session.save()
+
+                try:
+                    ua = UserActivity.objects.get(user_id=user.id)
+                    ua.open_post()
+                    ua.save()
+                except Exception:
+                    logger.exception("fail on setting opened User Activity")
+
                 return render(request, 'posts/post.html',
                               {'post': post, 'session_id': post_session.pk})
             except:
@@ -282,6 +291,7 @@ def set_taxonomy(request):
         taxonomy.save()
         post.save()
     return redirect('posts:edit-post', id=post.pk)
+
 
 class EditPostView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
@@ -752,7 +762,7 @@ def get_posts_for_user(request):
     except Exception as e:
         logger.error("Invalid Parameters on getting posts for user")
         logger.error(e)
-        logger.error(POST)
+        logger.error(request.POST)
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
     logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
@@ -800,6 +810,13 @@ def get_posts_for_user(request):
 
     post_dispatch = Interaction(post=service_post, user_id=user.id, type='dispatched', value=1)
     post_dispatch.save()
+
+    try:
+        ua = UserActivity.objects.get(user_id=user.id)
+        ua.get_post()
+        ua.save()
+    except Exception:
+        logger.exception("fail on setting User Activity")
 
     resp = dict(
             post_id=service_post.pk,
@@ -1520,3 +1537,27 @@ class DeleteQuestionResponseView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, 'Response for question has been deleted.')
         return reverse_lazy('posts:edit-question', kwargs=dict(id=self.kwargs['question_id']))
+
+
+class AddCommentToPostByUserView(CreateView):
+    model = MessengerUserCommentPost
+    fields = ('post', 'user_id', 'comment')
+
+    # for view data in form only
+    # template_name = 'posts/onlytest_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AddCommentToPostByUserView, self).dispatch(request, *args, **kwargs)
+
+    # not visible for all people, ignore for view form
+    def get(self, *args, **kwargs):
+        raise Http404('Not found')
+
+    def form_valid(self, form):
+        form.save()
+        return JsonResponse(dict(status='done', data=dict(message='Gracias por contestar')))
+
+    def form_invalid(self, form):
+        return JsonResponse(dict(status='error', error='invalid form'))
+

@@ -112,7 +112,6 @@ class UserActivity(models.Model):
     WANT_ACTIVITY = 'want_activity'
     GET_POST = 'get_post'
     SET_PRE_CHURN = 'set_pre_churn'
-    GET_POST = 'get_post'
     OPEN_POST = 'open_post'
     NO_OPEN = 'no_open'
     GIVE_FEEDBACK = 'give_feedback'
@@ -156,7 +155,7 @@ class UserActivity(models.Model):
 def init_state_machine(instance, **kwargs):
     states = [state for state, _ in instance.STATE_TYPES]
     machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
-                                         ignore_invalid_triggers=True, prepare_event=track_activity)
+                                         ignore_invalid_triggers=True)
     machine.add_transition(UserActivity.START_REGISTER, UserActivity.PRE_REGISTER, UserActivity.IN_REGISTRATION)
     machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.IN_REGISTRATION, UserActivity.ACTIVE_SESSION)
     machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)
@@ -170,6 +169,7 @@ def init_state_machine(instance, **kwargs):
     machine.add_transition(UserActivity.WANT_ACTIVITY, UserActivity.TIMED_START, UserActivity.ACTIVE_SESSION)
     machine.add_transition(UserActivity.GET_POST, UserActivity.ACTIVE_SESSION, UserActivity.DISPATCHED)
     machine.add_transition(UserActivity.SET_PRE_CHURN, UserActivity.ACTIVE_SESSION, UserActivity.PRE_CHURN)
+    machine.add_transition(UserActivity.SET_PRE_CHURN, UserActivity.WAIT, UserActivity.PRE_CHURN)
     machine.add_transition(UserActivity.GET_POST, UserActivity.PRE_CHURN, UserActivity.DISPATCHED)
     machine.add_transition(UserActivity.OPEN_POST, UserActivity.DISPATCHED, UserActivity.OPENED)
     machine.add_transition(UserActivity.NO_OPEN, UserActivity.DISPATCHED, UserActivity.WAIT)
