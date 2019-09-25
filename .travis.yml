@@ -3,8 +3,8 @@ language: python
 python:
   - "3.7"
 env:
-  - CM_DATABASE_NAME='cm_db' CM_DATABASE_ENGINE='django.db.backends.sqlite3' CM_DATABASE_USER='' CM_DATABASE_PASSWORD='' \
-    CM_DATABASE_HOST='localhost' CM_DATABASE_PORT='' CM_DATABASE_USERS_NAME='' CM_DATABASE_USERS_ENGINE='django.db.backends.sqlite3'
+  - CM_DATABASE_NAME='cm_db' CM_DATABASE_USERS_NAME='users' CM_DATABASE_ENGINE='django.db.backends.sqlite3' CM_DATABASE_USER='' CM_DATABASE_PASSWORD='' \
+    CM_DATABASE_HOST='' CM_DATABASE_PORT='' CM_DATABASE_USERS_ENGINE='django.db.backends.sqlite3'
 install:
   - pip install -r requirements.txt
   - pip install .
