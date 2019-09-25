@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from messenger_users.models import User as MessengerUser
 
 STATUS_CHOICES = (
     ('draft', 'draft'),
@@ -319,3 +320,14 @@ class QuestionResponse(models.Model):
 
     def __str__(self):
         return "%s__%s__%s__%s" % (self.pk, self.question.pk, self.response, self.value)
+
+
+class MessengerUserCommentPost(models.Model):
+    user_id = models.IntegerField(choices=[(user.pk, user.pk) for user in MessengerUser.objects.all()])
+    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s__%s__%s" % (self.pk, self.post_id, self.user_id)
