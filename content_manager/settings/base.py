@@ -144,7 +144,17 @@ if os.getenv('CM_DATABASE_HOST'):
             'PORT': os.getenv('CM_DATABASE_PORT'),
         }
     }
-
+else: 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'cm_db.sqlite3',
+        },
+        'messenger_users_db': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'messenger_users_db.sqlite3',
+        }
+    }
         
 
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']

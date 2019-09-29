@@ -323,7 +323,7 @@ class QuestionResponse(models.Model):
 
 
 class MessengerUserCommentPost(models.Model):
-    user_id = models.IntegerField(choices=[(user.pk, user.pk) for user in MessengerUser.objects.all()])
+    user_id = models.IntegerField() # FIXME: this breaks shit choices=[(user.pk, user.pk) for user in MessengerUser.objects.all()])
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

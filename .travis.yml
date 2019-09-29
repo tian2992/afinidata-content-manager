@@ -11,7 +11,6 @@ install:
 # command to run tests
 script:
   - python manage.py makemigrations
-  - python manage.py makemigrations --database=messenger_users_db
   - python manage.py migrate auth
   - python manage.py migrate --database=default
   - python manage.py migrate --database=messenger_users_db
