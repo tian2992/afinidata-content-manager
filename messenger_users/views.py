@@ -19,12 +19,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# FIXME: convert to django rest views.
+## FIXME: convert to django rest views.
 
 
-'''Creates user from a request.'''
 @csrf_exempt
 def new_user(request):
+    '''Creates user from a request.'''
 
     if request.method != 'POST':
         logger.error("New user only POST valid.")
@@ -39,13 +39,13 @@ def new_user(request):
             found_user = User.objects.get(last_channel_id=mess_id)
             logger.info('user id found')
             return JsonResponse(dict(
-                            set_attributes=dict(
-                                hasLoggedIn=True,
-                                username=found_user.username,
-                                user_id=found_user.id
-                            ),
-                            messages=[]
-                        ))
+                set_attributes=dict(
+                    hasLoggedIn=True,
+                    username=found_user.username,
+                    user_id=found_user.id
+                ),
+                messages=[]
+            ))
         except User.DoesNotExist:
             logger.warning('user could not be found from user id given')
 
@@ -71,13 +71,13 @@ def new_user(request):
             logger.info(user_to_save)
 
             return JsonResponse(dict(
-                            set_attributes=dict(
-                                username=user_to_save.username,
-                                backup_key=user['backup_key'],
-                                user_id=user_to_save.pk
-                            ),
-                            messages=[]
-                        ))
+                set_attributes=dict(
+                    username=user_to_save.username,
+                    backup_key=user['backup_key'],
+                    user_id=user_to_save.pk
+                ),
+                messages=[]
+            ))
 
     except MultiValueDictKeyError:
         logger.error("impossible to get without argument messenger_user_id")

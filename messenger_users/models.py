@@ -6,6 +6,12 @@ from django.dispatch import receiver
 
 
 class User(models.Model):
+    '''
+    Describes users as we see them inside the messenger_users app.
+
+    >>> User(1,1,"back", username="test")
+    <User: User 1 with m_id: 1; username = test>
+    '''
     last_channel_id = models.CharField(max_length=50, unique=True)
     channel_id = models.CharField(max_length=50, null=True, unique=True)
     backup_key = models.CharField(max_length=50, unique=True)

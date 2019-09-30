@@ -20,10 +20,10 @@ import pytz
 import requests
 from posts.models import STATUS_CHOICES
 import logging
+## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 logger = logging.getLogger(__name__)
 
-#FIXME: lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 
 class HomeView(LoginRequiredMixin, ListView):
