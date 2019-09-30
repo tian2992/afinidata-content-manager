@@ -1,4 +1,3 @@
-from django.test import TestCase
 import unittest.mock
 from django.contrib.messages.api import MessageFailure
 from nose.tools import *
