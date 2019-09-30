@@ -22,7 +22,7 @@ class User(models.Model):
 
 
 class UserData(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     data_key = models.CharField(max_length=128)
     data_value = models.TextField()
     created = models.DateTimeField(auto_now=True)
