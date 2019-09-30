@@ -2,15 +2,15 @@ dist: xenial   # required for Python >= 3.7
 language: python
 python:
   - "3.7"
-env:
-  - CM_DATABASE_NAME='cm_db.sqlite3' CM_DATABASE_USERS_NAME='messenger_users_db.sqlite3' CM_DATABASE_ENGINE='django.db.backends.sqlite3' CM_DATABASE_USER='' CM_DATABASE_PASSWORD='' \
-    CM_DATABASE_HOST='' CM_DATABASE_PORT='' CM_DATABASE_USERS_ENGINE='django.db.backends.sqlite3'
 install:
   - pip install -r requirements.txt
   - pip install .
 # command to run tests
 script:
-  - python manage.py makemigrations && python manage.py migrate auth && python manage.py migrate --database=default && python manage.py migrate --database=messenger_users_db && python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'adminpass')" &&  python manage.py test --keepdb
+  - python manage.py makemigrations
+  - python manage.py migrate auth && python manage.py migrate --database=default && python manage.py migrate --database=messenger_users_db
+  - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'adminpass')"
+  - python manage.py test --keepdb
   # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
 # Push the results back to codecov
 after_success:

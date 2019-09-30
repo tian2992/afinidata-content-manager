@@ -119,13 +119,22 @@ print('db name: ', os.getenv('CM_DATABASE_NAME'))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'default',
+        'NAME': 'cm_db.sqlite3',
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'cm_db.sqlite3',
+        }
     },
     'messenger_users_db': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'messengeruser',
+        'NAME': 'messenger_users_db.sqlite3',
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'messenger_users_db.sqlite3',
+        }
     }
 }
+
 if os.getenv('CM_DATABASE_HOST'):
     DATABASES = {
         'default': {
@@ -145,18 +154,6 @@ if os.getenv('CM_DATABASE_HOST'):
             'PORT': os.getenv('CM_DATABASE_PORT'),
         }
     }
-else: 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'cm_db.sqlite3',
-        },
-        'messenger_users_db': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'messenger_users_db.sqlite3',
-        }
-    }
-        
 
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
 

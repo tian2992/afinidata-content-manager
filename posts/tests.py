@@ -25,3 +25,10 @@ class PostsTest(TestCase):
         post.name = newval
         post.save()
         eq_(post.name, newval)
+
+    def test_create_old_interaction(self):
+        us_id, us_name = 123, "testuser"
+        interact = Interaction(user_id=us_id, username=us_name)
+        eq_(interact.user_id, us_id)
+
+
