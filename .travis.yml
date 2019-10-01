@@ -14,4 +14,4 @@ script:
   # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
 # Push the results back to codecov
 after_success:
-  - codecov
+  - python -m codecov
