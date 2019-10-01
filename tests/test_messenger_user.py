@@ -25,7 +25,7 @@ class PostsViewsTest(TestCase):
 
     def make_user(self, channel_id=1):
         if not hasattr(self, 'user') or channel_id != 1:
-            use = user = MUser(last_channel_id=channel_id,
+            use = MUser(last_channel_id=channel_id,
                                channel_id=channel_id,
                                backup_key="backz{}".format(channel_id),
                                username="test{}".format(channel_id))
@@ -55,6 +55,12 @@ class PostsViewsTest(TestCase):
         response = self.client.post('/messenger_users/last_interaction/user/{}'.format(idz),
                                     {"interaction_type": "open"})
         eq_(response.status_code, 200)
+
+    def test_make_user_interaction(self):
+        self.make_user()
+        resp = self.client.post("/messenger_users/user_interaction/", {"username": self.user.username,
+                                                               "interaction_type": "opened"})
+        eq_(resp.status_code, 200)
 
     def test_get_w_username(self):
         self.make_user()
@@ -96,3 +102,26 @@ class PostsViewsTest(TestCase):
         eq_(resp.status_code, 200) # should have message of error
         resp = self.client.get(f"/messenger_users/status/user/{self.user.id}/")
         eq_(resp.status_code, 200)
+
+
+class ProperGetAndPostTest(TestCase):
+    # databases = "__all__"
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_new_get(self):
+        r = self.client.get("/messenger_users/new/")
+        eq_(r.status_code, 404)
+
+
+    # def test_new_broken_post(self):
+    #     channel_id=1
+    #     use = MUser(last_channel_id=channel_id,
+    #                 channel_id=channel_id,
+    #                 backup_key="backz{}".format(channel_id),
+    #                 username="test{}".format(channel_id))
+    #     use.save()
+    #
+    #     r = self.client.post("/messenger_users/new/", {"test": "var"})
+    #     eq_(r.status_code, 500)
