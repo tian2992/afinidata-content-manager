@@ -6,6 +6,12 @@ from django.dispatch import receiver
 
 
 class User(models.Model):
+    '''
+    Describes users as we see them inside the messenger_users app.
+
+    >>> User(1,1,"back", username="test")
+    <User: User 1 with m_id: 1; username = test>
+    '''
     last_channel_id = models.CharField(max_length=50, unique=True)
     channel_id = models.CharField(max_length=50, null=True, unique=True)
     backup_key = models.CharField(max_length=50, unique=True)
@@ -22,7 +28,7 @@ class User(models.Model):
 
 
 class UserData(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     data_key = models.CharField(max_length=128)
     data_value = models.TextField()
     created = models.DateTimeField(auto_now=True)
@@ -74,6 +80,12 @@ class UserActivityLog(models.Model):
     final_state = models.CharField(max_length=25)
     timestamp = models.DateTimeField(auto_now_add=True)
     success = models.BooleanField(default=False)
+
+
+def track_activity(*args, **kwargs):
+    print(args)
+    print(kwargs)
+    pass
 
 
 class UserActivity(models.Model):
@@ -149,7 +161,7 @@ class UserActivity(models.Model):
 def init_state_machine(instance, **kwargs):
     states = [state for state, _ in instance.STATE_TYPES]
     machine = instance.machine = Machine(model=instance, states=states, initial=instance.WAIT, \
-                                         ignore_invalid_triggers=True)
+                                         ignore_invalid_triggers=True, prepare_event=track_activity)
     machine.add_transition(UserActivity.START_REGISTER, UserActivity.PRE_REGISTER, UserActivity.IN_REGISTRATION)
     machine.add_transition(UserActivity.FINISH_REGISTER, UserActivity.IN_REGISTRATION, UserActivity.ACTIVE_SESSION)
     machine.add_transition(UserActivity.USER_DIE, UserActivity.START_REGISTER, UserActivity.USER_DEAD)

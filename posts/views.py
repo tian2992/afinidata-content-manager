@@ -20,10 +20,10 @@ import pytz
 import requests
 from posts.models import STATUS_CHOICES
 import logging
+## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 logger = logging.getLogger(__name__)
 
-#FIXME: lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -831,115 +831,6 @@ def get_posts_for_user(request):
     return JsonResponse(dict(
         set_attributes=resp,
         messages=[],
-    ))
-
-
-## FIXME: break up into simple functions
-## FIXME: delegate auth to middleware / decorator
-def post_by_limits(request):
-    if request.method == 'POST':
-        return JsonResponse(dict(status='error', error='Invalid method.'))
-
-    logger.info("getting posts by limit")
-
-
-    try:
-        value = int(request.GET['value'])
-        area_id = int(request.GET['area_id'])
-        username = request.GET['username']
-        user = User.objects.get(username=username)
-    except Exception as e:
-        return JsonResponse(dict(status='error', error='Invalid params.'))
-
-    group = 'C'
-
-    try:
-        group_register = user.userdata_set.get(data_key='AB_group')
-        group = group_register.data_value
-    except Exception as e:
-        print(str(e))
-        pass
-
-    print(group)
-
-    if group == 'A':
-        uri = 'https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=10&criterion=read_rate&' \
-              'method=deterministic&upto=2019-04-15' % (user.pk, value)
-    elif group == 'B':
-        uri = 'https://metrics.afinidata.com/recommend?user_id=%s&months=%s&n=10&criterion=feedback' \
-              '&method=deterministic&upto=2019-04-15' % (user.pk, value)
-    else:
-        uri = False
-
-    if uri:
-        try:
-            logging.info("using URL fetch for activities")
-            print('user id: ', user.pk)
-            print('group: ', group)
-            today = datetime.now()
-            days = timedelta(days=35)
-            date_to_use = today - days
-            r = requests.get(uri)
-            response = r.json()
-            service_post_list = [int(x) for x in response['recommendation']]
-            print('service give posts with id')
-            print(service_post_list)
-            user_opened_post_list = [x.post_id for x in Interaction.objects.filter(type__in=['sended', 'opened'],
-                                                                                    user_id=user.pk,
-                                                                                    created_at__gt=date_to_use)]
-            print('local excluded')
-            print(user_opened_post_list)
-            #user_opened_post_list = [131, 128, 88, 47]
-            print('fake excluded (for dev only)')
-            print(user_opened_post_list)
-            recommendations = [x for x in service_post_list if x not in user_opened_post_list]
-            print(recommendations)
-            feedback_post_id = int(recommendations[0])
-            print('id: ', feedback_post_id)
-            #feedback_post_id = 1
-            service_post = Post.objects.get(id=feedback_post_id)
-        except Exception as e:
-            logger.error(e)
-            return JsonResponse(dict(status='error', error='Invalid params.'))
-    else:
-        today = datetime.now()
-        days = timedelta(days=35)
-        date_to_use = today - days
-        interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_to_use)
-        excluded = set()
-        for interaction in interactions:
-            if interaction.post_id:
-                excluded.add(interaction.post_id)
-        logging.info(excluded)
-
-        utc = pytz.UTC
-        new_user_limit = utc.localize(datetime(2019, 3, 20, 0, 0, 0))
-        if user.created_at > new_user_limit:
-            posts = Post.objects \
-                .exclude(id__in=excluded) \
-                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True, status='published')
-        else:
-            posts = Post.objects \
-                .exclude(id__in=excluded) \
-                .filter(min_range__lte=value, max_range__gte=value, area_id=area_id, new=True, status='published')
-
-        if posts.count() <= 0:
-            return JsonResponse(dict(status='error', error='Not posts founded with value'))
-
-        rand_limit = random.randrange(0, posts.count())
-        service_post = posts[rand_limit]
-    
-    if service_post.content_activity:
-        activity = service_post.content_activity.split('|')
-        logging.info("sent activity {}".format(activity))
-    return JsonResponse(dict(
-        set_attributes=dict(
-            post_id=service_post.pk,
-            post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
-            post_preview=service_post.preview,
-            post_title=service_post.name
-        ),
-        messages=[]
     ))
 
 

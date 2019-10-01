@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'posts.apps.PostsConfig',
     'static.apps.StaticConfig',
     'messenger_users.apps.MessengerUsersConfig',
@@ -118,13 +119,22 @@ print('db name: ', os.getenv('CM_DATABASE_NAME'))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'default',
+        'NAME': 'cm_db.sqlite3',
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'cm_db.sqlite3',
+        }
     },
     'messenger_users_db': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'messengeruser',
+        'NAME': 'messenger_users_db.sqlite3',
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'messenger_users_db.sqlite3',
+        }
     }
 }
+
 if os.getenv('CM_DATABASE_HOST'):
     DATABASES = {
         'default': {
@@ -134,10 +144,6 @@ if os.getenv('CM_DATABASE_HOST'):
             'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
-            'TEST': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': 'default',
-            }
         },
         'messenger_users_db': {
             'ENGINE': os.getenv('CM_DATABASE_ENGINE'),
@@ -146,14 +152,8 @@ if os.getenv('CM_DATABASE_HOST'):
             'PASSWORD': os.getenv('CM_DATABASE_PASSWORD'),
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
-            'TEST': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': 'messengeruser',
-            }
         }
     }
-
-        
 
 DATABASE_ROUTERS = ['messenger_users.routers.MessengerUsersRouter']
 
@@ -181,7 +181,11 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
-    '--with-coverage',
+    '--verbosity=3',
+    # '--with-coverage',
+    # '--cover-tests',
+    # '--cover-package=content_manager,messenger_users,posts',
+    # '--with-doctest'
  #   '--cover-package=foo,bar',
 ]
 

@@ -76,6 +76,10 @@ class Interaction(models.Model):
         type: String que guarda el tipo de interaction que ejecutó el usuario, estas pueden ser de cualquier tipo. De uso cotidiano en la plataforma en ciertas cosas se encuentran ‘session’ y ‘opened’, su uso puede ser muy variado.
         value: Valor de tipo Entero que puede almacenarse en las interacciones. (Formato de Entero posiblemente temporal, guardado así por alguna necesidad, por revisar)
         created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
+
+    >>> Interaction(1,1,"user",1.1)
+    <Interaction: >
+
     """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     user_id = models.IntegerField(default=0)
@@ -323,7 +327,7 @@ class QuestionResponse(models.Model):
 
 
 class MessengerUserCommentPost(models.Model):
-    user_id = models.IntegerField(choices=[(user.pk, user.pk) for user in MessengerUser.objects.all()])
+    user_id = models.IntegerField() # FIXME: this breaks shit choices=[(user.pk, user.pk) for user in MessengerUser.objects.all()])
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

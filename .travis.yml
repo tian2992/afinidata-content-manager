@@ -2,18 +2,16 @@ dist: xenial   # required for Python >= 3.7
 language: python
 python:
   - "3.7"
-# command to install dependencies
 install:
   - pip install -r requirements.txt
-  # - pip install .
+  - pip install .
 # command to run tests
 script:
   - python manage.py makemigrations
-  - python manage.py migrate --database=default
-  - python manage.py migrate --database=messenger_users_db
-  # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
+  - python manage.py migrate auth && python manage.py migrate --database=default && python manage.py migrate --database=messenger_users_db
   - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'adminpass')"
-  # - python manage.py test
+  - python manage.py test --keepdb
+  # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
 # Push the results back to codecov
 after_success:
-  - codecov
+  - python -m codecov

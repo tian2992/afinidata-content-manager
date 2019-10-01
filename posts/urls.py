@@ -30,7 +30,6 @@ urlpatterns = [
     path('<int:id>/remove_tag', views.remove_tag_for_post, name='remove-tag-for-post'),
     path('list/', views.PostsListView.as_view(), name="posts-list"),
     path('set_user_send/', views.set_user_send, name='set-user-send'),
-    path('by_limit/', views.post_by_limits, name='posts_by_limit'),
     path('questions/<int:id>/', views.QuestionView.as_view(), name='question'),
     path('questions/', views.QuestionsView.as_view(), name='questions'),
     path('questions/new/', views.CreateQuestion.as_view(), name='new-question'),
