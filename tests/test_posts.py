@@ -1,10 +1,14 @@
-import unittest.mock
+from unittest.mock import Mock, MagicMock
 from django.contrib.messages.api import MessageFailure
 from nose.tools import *
 from posts.models import Post, Interaction
 from django.contrib.auth.models import AnonymousUser, User as DjangoUser
+from messenger_users.models import User as MUser
 from django.test import Client, RequestFactory, TestCase
-from posts.views import HomeView, NewPostView, fetch_post
+
+from posts.routers import PostsRouter
+from posts.views import HomeView, NewPostView, QuestionsView, StatisticsView, EditPostView, PostsListView, \
+    fetch_post, get_posts_for_user
 
 
 class PostsTest(TestCase):
@@ -45,8 +49,9 @@ class PostsViewsTest(TestCase):
                           'min_range': 5,
                           'max_range': 32,
                           'content': "http://sample.afinidata.com",
-                          'content_activity': "test test test",
-                          'preview': 'previu'
+                          'content_activity': "test | test | test",
+                          'preview': 'previu',
+                          'status': "published"
                           }
         self.factory = RequestFactory()
         self.client = Client()
@@ -55,9 +60,18 @@ class PostsViewsTest(TestCase):
 
     def save_post(self):
         self.post = Post(user = self.user, **self.POST_DATA)
-        self.post_id = self.post.save()
-        return self.post_id
+        self.post.save()
+        return self.post.id
 
+    def make_interaction(self, user, i_type="", post_id=None):
+        i = Interaction()
+        i.username = user.username
+        i.post_id=post_id
+        i.user_id = user.id
+        i.value = 1
+        i.type = i_type
+        i.save()
+        return i
 
     @raises(AttributeError)
     def test_fail_create_post(self):
@@ -66,19 +80,22 @@ class PostsViewsTest(TestCase):
         response = NewPostView.as_view()(request)
         eq_(response.status_code, 500)
 
-
     def test_get_home_view(self):
         request = self.factory.get('/posts/')
         request.user = self.user
         response = HomeView.as_view()(request)
         eq_(response.status_code, 200)
 
-
     def test_create_post(self):
         datao = self.POST_DATA
         response = self.client.post('/posts/new/', datao)
         eq_(response.status_code, 302)
 
+    def test_new_post_view(self):
+        request = self.factory.get('/posts/new/')
+        request.user = self.user
+        response = NewPostView.as_view()(request)
+        eq_(response.status_code, 200)
 
     def test_fetch_post(self):
         p_id = self.save_post()
@@ -87,6 +104,56 @@ class PostsViewsTest(TestCase):
         response = self.client.get('/posts/{}/'.format(p_id))
         eq_(response.status_code, 200)
 
+    def test_get_statistics_view(self):
+        p_id = self.save_post()
+        self.make_interaction(self.user, "opened", post_id=p_id)
+        self.make_interaction(self.user, "session", post_id=p_id)
+        self.make_interaction(self.user, "sended", post_id=p_id)
+        self.make_interaction(self.user, "used", post_id=p_id)
+        request = self.factory.get('/posts/1/statistics/')
+        request.user = self.user
+        response = StatisticsView.as_view()(request,
+                                            id=p_id)
+        eq_(response.status_code, 200)
+
+    def test_edit_post_view(self):
+        p_id = self.save_post()
+        request = self.factory.get('/posts/1/edit/')
+        request.user = self.user
+        response = EditPostView.as_view()(request,
+                                          id=p_id)
+        eq_(response.status_code, 200)
+
+    def test_post_question(self):
+        p_id = self.save_post()
+        request = self.factory.get('/posts/questions/')
+        request.user = self.user
+        response = QuestionsView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_question_by_post(self):
+        p_id = self.save_post()
+        response = self.client.get('/posts/1/questions/')
+        eq_(response.status_code, 200)
+
+    def test_get_post_list_view(self):
+        self.make_interaction(self.user, "opened")
+        self.make_interaction(self.user, "session")
+        self.make_interaction(self.user, "sended")
+        self.make_interaction(self.user, "used")
+        request = self.factory.get('/posts/list/')
+        request.user = self.user
+        response = PostsListView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_get_thumbnail(self):
+        p_id = self.save_post()
+        response = self.client.get('/posts/1/thumbnail/')
+        eq_(response.status_code, 200)
+        eq_(response.content,  b'{"set_attributes": {}, "messages": [{"attachment": {"type": "image", "payload": {"url": "http://afinidata.com/logo.png"}}}]}')
+
+    def test_set_taxonomy(self):
+        p_id = self.save_post()
 
     @raises(Post.DoesNotExist)
     def test_fail_fetch_post(self):
@@ -94,6 +161,11 @@ class PostsViewsTest(TestCase):
         request.user = AnonymousUser()
         response = fetch_post(request, 123)
         eq_(response.status_code, 404)
+
+    def test_post_activity(self):
+        p_id = self.save_post()
+        response = self.client.get('/posts/{}/activity/'.format(p_id), {"post_count": 1})
+        eq_(response.status_code, 200)
 
     #
     # def test_details(self):
@@ -123,3 +195,52 @@ class PostsViewsTest(TestCase):
 #         self.assertEquals(s.query, 'test')
 #         s.query = 'who cares'
 #         s.save()
+
+class PostForUser(TestCase):
+    databases = ['default', 'messenger_users_db']
+
+    def setUp(self):
+        self.POST_DATA = {"name": 'test',
+                          'thumbnail': "http://afinidata.com/logo.png",
+                          'min_range': 5,
+                          'max_range': 32,
+                          'content': "http://sample.afinidata.com",
+                          'content_activity': "test test test",
+                          'preview': 'previu',
+                          'status': "published"
+                          }
+        self.user = DjangoUser.objects.create_user(
+            username='jacob', email='jacob@example.com', password='top_secret')
+        self.post = Post(user=self.user, **self.POST_DATA)
+        self.post.save()
+
+    def test_get_post_for_user(self):
+        user = MUser(last_channel_id=1,
+                     channel_id=1,
+                     backup_key="backz1",
+                     username="test1")
+        user.save()
+        user_data = {'username': "test1", 'value': 15, 'premium': False}
+        response = self.client.get('/posts/getPostForUser', user_data)
+
+
+class PostRouterTest(TestCase):
+    def setUp(self) -> None:
+        self.router = PostsRouter()
+        self.m, self.n = MagicMock(), MagicMock()
+        self.m._meta.app_label = 'posts'
+        self.n._meta.app_label = 'not_posts'
+
+    def test_db_router_read(self):
+        eq_(self.router.db_for_read(self.m), 'posts_db')
+        assert_is_none(self.router.db_for_read(self.n), None)
+
+    def test_db_router_write(self):
+        eq_(self.router.db_for_write(self.m), 'posts_db')
+        assert_is_none(self.router.db_for_write(self.n), None)
+
+    def test_db_allow_relation(self):
+        ok_(self.router.allow_relation(self.m, self.m))
+        assert_is_none(self.router.allow_relation(self.n, self.n))
+
+

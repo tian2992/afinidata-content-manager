@@ -325,11 +325,17 @@ class EditPostView(LoginRequiredMixin, UpdateView):
             context['role'] = 'reviser'
             context['review'] = review.id
 
-        if post.taxonomy:
+        try:
             tax = post.taxonomy
             ftax = forms.UpdateTaxonomy(instance=tax)
             context['tax'] = ftax
-
+        except Post.taxonomy.RelatedObjectDoesNotExist:
+            logger.exception("no taxonomy object on post, lets set")
+            try:
+                post.taxonomy = forms.UpdateTaxonomy(instance=tax)
+                context['tax'] = post.taxonomy
+            except:
+                logger.exception("no taxonomy available")
         return context
 
 
@@ -1002,7 +1008,7 @@ def get_thumbnail_by_post(request, id):
 
     try:
         post = Post.objects.get(pk=id)
-        logger.info("creating a new post")
+        logger.info("getting thumbnail for post")
         thumbnail = post.thumbnail
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params'))
