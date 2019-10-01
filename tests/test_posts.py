@@ -111,13 +111,14 @@ class PostsViewsTest(TestCase):
         response = HomeView.as_view()(request)
         eq_(response.status_code, 200)
 
-    def test_get_home_view_with_status(self):
+    def test_get_home_view_with_name(self):
+        sp = self.save_post()
         request = self.factory.get('/posts/', {"name": self.post.name})
         request.user = self.user
         response = HomeView.as_view()(request)
         eq_(response.status_code, 200)
 
-    def test_get_home_view_with_status(self):
+    def test_get_home_view_with_uid(self):
         request = self.factory.get('/posts/', {"user_id": self.user.id})
         request.user = self.user
         response = HomeView.as_view()(request)

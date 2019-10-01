@@ -74,13 +74,13 @@ class HomeView(LoginRequiredMixin, ListView):
 
         try:
             params = dict()
-            if self.request.GET['name']:
+            if self.request.GET.get('name'):
                 params['name__contains'] = self.request.GET['name']
                 context['name'] = self.request.GET['name']
-            if self.request.GET['user_id']:
+            if self.request.GET.get('user_id'):
                 params['user_id'] = self.request.GET['user_id']
                 context['user_id'] = int(self.request.GET['user_id'])
-            if self.request.GET['status']:
+            if self.request.GET.get('status'):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
