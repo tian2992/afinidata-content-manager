@@ -1,11 +1,13 @@
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, MagicMock, patch
 from django.contrib.messages.api import MessageFailure
 from nose.tools import *
 from posts.models import Post, Interaction, UserReviewRole, Review
 from django.contrib.auth.models import AnonymousUser, User as DjangoUser, Group
 from django.test import Client, RequestFactory, TestCase
 
-from posts.views import CreateQuestion, QuestionsView, ChangePostStatusToReviewView
+import posts.views
+from posts.views import CreateQuestion, QuestionsView, ChangePostStatusToReviewView, \
+                        RejectionView, AcceptReviewView, ReviewView
 from .test_posts import POST_DATA
 
 class PostsReviewTest(TestCase):
@@ -14,10 +16,13 @@ class PostsReviewTest(TestCase):
         self.factory = RequestFactory()
         self.client = Client()
         self.user = DjangoUser.objects.create_superuser('adminz', 'admizn@example.com', 'adminpass')
+        self.user2 = DjangoUser.objects.create_superuser('Xtraadminz', 'xtra@example.com', 'adminpass')
+
         # g = Group.objects.get(name="reviser")
         g = Group(name="reviser")
         g.save()
         self.user.groups.add(g)
+        self.user2.groups.add(g)
         self.post = Post(user=self.user, **POST_DATA)
         self.post.save()
 
@@ -35,7 +40,34 @@ class PostsReviewTest(TestCase):
         request.user = self.user
         response = ChangePostStatusToReviewView.as_view()(request, id=self.post.id)
         eq_(response.status_code, 302)
-        pass
+
+    def test_rejection_view(self):
+        riviu_aidi = Review.objects.first()
+        self.test_view_send_to_review()
+        request = self.factory.get(f'/posts/{riviu_aidi}/reject/')
+        request.user = self.user
+        response = RejectionView.as_view()(request, review_id=self.post.id)
+        eq_(response.status_code, 200)
+
+    @patch("posts.views.messages")
+    def test_accept_review_view(self, mock_message):
+        riviu_aidi = Review.objects.first()
+        self.test_view_send_to_review()
+        request = self.factory.get(f'/posts/{riviu_aidi}/accept/')
+        request.user = self.user
+        response = AcceptReviewView.as_view()(request, review_id=self.post.id)
+        eq_(response.status_code, 302)
+
+    @patch("posts.views.messages")
+    def test_review_view(self, mock_message):
+        riviu_aidi = Review.objects.first()
+        self.test_view_send_to_review()
+        request = self.factory.get(f'/posts/{self.post.id}/review/{riviu_aidi}/')
+        request.user = self.user
+        response = ReviewView.as_view()(request, id=self.post.id, review_id=self.post.id)
+        eq_(response.status_code, 200)
+
+
 
 class PostsQuestionTest(TestCase):
 

@@ -88,6 +88,41 @@ class PostsViewsTest(TestCase):
         response = HomeView.as_view()(request)
         eq_(response.status_code, 200)
 
+    def test_get_homeview_full(self):
+        p_id = self.save_post()
+        self.make_interaction(self.user, "opened", post_id=p_id)
+        self.make_interaction(self.user, "session", post_id=p_id)
+        self.make_interaction(self.user, "sended", post_id=p_id)
+        self.make_interaction(self.user, "used", post_id=p_id)
+        request = self.factory.get('/posts/list/')
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_get_home_view_with_tags(self):
+        request = self.factory.get('/posts/', {"tags": ["notag"]})
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_get_home_view_with_status(self):
+        request = self.factory.get('/posts/', {"status": "published"})
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_get_home_view_with_status(self):
+        request = self.factory.get('/posts/', {"name": self.post.name})
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        eq_(response.status_code, 200)
+
+    def test_get_home_view_with_status(self):
+        request = self.factory.get('/posts/', {"user_id": self.user.id})
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        eq_(response.status_code, 200)
+
     def test_create_post(self):
         datao = self.POST_DATA
         response = self.client.post('/posts/new/', datao)
@@ -132,14 +167,16 @@ class PostsViewsTest(TestCase):
         eq_(response.status_code, 200)
 
     def test_get_post_list_view(self):
-        self.make_interaction(self.user, "opened")
-        self.make_interaction(self.user, "session")
-        self.make_interaction(self.user, "sended")
-        self.make_interaction(self.user, "used")
+        p_id = self.save_post()
+        self.make_interaction(self.user, "opened", post_id=p_id)
+        self.make_interaction(self.user, "session", post_id=p_id)
+        self.make_interaction(self.user, "sended", post_id=p_id)
+        self.make_interaction(self.user, "used", post_id=p_id)
         request = self.factory.get('/posts/list/')
         request.user = self.user
         response = PostsListView.as_view()(request)
         eq_(response.status_code, 200)
+
 
     def test_get_thumbnail(self):
         p_id = self.save_post()
@@ -222,12 +259,20 @@ class PostForUser(TestCase):
         response = self.client.get('/posts/getPostForUser', user_data)
 
 
+    def test_fail_post_for_user(self):
+        user_data = {"asdf":"fasd"}
+        response = self.client.get('/posts/getPostForUser', user_data)
+        #TODO: json error
+
     def test_fetch_post(self):
         p_id = self.post.id
         self.client.post(f"/messenger_users/actions/user/{self.muser.id}/set/set active_session")
         response = self.client.get(f'/posts/{p_id}/', {"username": self.muser.username, 'bot_id': 1})
         eq_(response.status_code, 200)
 
+    def test_set_interaction(self):
+        data = {"username": self.muser.username, "bot_id": "1", "post_id": self.post.id, "interaction_type": "opened"}
+        response = self.client.post('/posts/set_interaction/', data)
 
 
 class PostRouterTest(TestCase):
