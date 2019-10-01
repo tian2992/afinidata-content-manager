@@ -37,11 +37,11 @@ class HomeView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         try:
             params = dict()
-            if self.request.GET['name']:
+            if self.request.GET.get('name'):
                 params['name__contains'] = self.request.GET['name']
-            if self.request.GET['user_id']:
+            if self.request.GET.get('user_id'):
                 params['user_id'] = self.request.GET['user_id']
-            if self.request.GET['status']:
+            if self.request.GET.get('status'):
                 params['status'] = self.request.GET['status']
 
             try:

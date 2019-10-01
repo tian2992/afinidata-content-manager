@@ -8,7 +8,7 @@ from django.test import Client, RequestFactory, TestCase
 
 from posts.routers import PostsRouter
 from posts.views import HomeView, NewPostView, QuestionsView, StatisticsView, EditPostView, PostsListView, \
-    fetch_post, get_posts_for_user
+    fetch_post, get_posts_for_user, Reviews
 
 
 class PostsTest(TestCase):
@@ -165,6 +165,17 @@ class PostsViewsTest(TestCase):
     def test_post_activity(self):
         p_id = self.save_post()
         response = self.client.get('/posts/{}/activity/'.format(p_id), {"post_count": 1})
+        eq_(response.status_code, 200)
+
+    def test_reviews(self):
+        p_id = self.save_post()
+        response = self.client.get('/posts/{}/activity/'.format(p_id), {"post_count": 1})
+        eq_(response.status_code, 200)
+
+    def test_review(self):
+        request = self.factory.get('/posts/reviews/')
+        request.user = self.user
+        response = Reviews.as_view()(request)
         eq_(response.status_code, 200)
 
     #
