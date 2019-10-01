@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AnonymousUser, User as DjangoUser
 from django.test import Client, RequestFactory, TestCase
 from messenger_users.views import new_user, add_attribute, last_interacted
-from messenger_users.models import User as MUser, Referral
+from messenger_users.models import User as MUser, Referral, UserActivity
 from posts.models import Interaction
 
 from nose.tools import *
@@ -26,9 +26,9 @@ class PostsViewsTest(TestCase):
     def make_user(self, channel_id=1):
         if not hasattr(self, 'user') or channel_id != 1:
             use = user = MUser(last_channel_id=channel_id,
-                              channel_id=channel_id,
-                              backup_key="backz{}".format(channel_id),
-                              username="test{}".format(channel_id))
+                               channel_id=channel_id,
+                               backup_key="backz{}".format(channel_id),
+                               username="test{}".format(channel_id))
             use.save()
             if not hasattr(self, 'user'):
                 self.user = use
@@ -76,3 +76,23 @@ class PostsViewsTest(TestCase):
         response = self.client.get('/messenger_users/get_refs_count/{}'.format(u2.username))
         eq_(response.content, b'{"set_attributes": {"ref_count": 2}, "messages": []}')
 
+    def test_unit_user_with_state_machine(self):
+        user = self.make_user()
+        ua = UserActivity()
+        ua.user = user
+        ua.save()
+        ua.to_pre_register()
+        ua.start_register()
+        ua.finish_register()
+        eq_(ua.state, ua.ACTIVE_SESSION)
+        ua.send_broadcast()
+
+    def test_view_user_state_machine(self):
+        user = self.make_user()
+        self.client.post(f"/messenger_users/actions/user/{self.user.id}/set/set pre_register")
+        self.client.post(f"/messenger_users/actions/user/{self.user.id}/set/start_register")
+        self.client.post(f"/messenger_users/actions/user/{self.user.id}/set/finish_register")
+        resp = self.client.post(f"/messenger_users/actions/user/{self.user.id}/set/non_exist")
+        eq_(resp.status_code, 200) # should have message of error
+        resp = self.client.get(f"/messenger_users/status/user/{self.user.id}/")
+        eq_(resp.status_code, 200)

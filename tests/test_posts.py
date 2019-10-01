@@ -10,6 +10,16 @@ from posts.routers import PostsRouter
 from posts.views import HomeView, NewPostView, QuestionsView, StatisticsView, EditPostView, PostsListView, \
     fetch_post, get_posts_for_user, Reviews
 
+POST_DATA = {"name": 'test',
+                          'thumbnail': "http://afinidata.com/logo.png",
+                          'min_range': 5,
+                          'max_range': 32,
+                          'content': "http://sample.afinidata.com",
+                          'content_activity': "test | test | test",
+                          'preview': 'previu',
+                          'status': "published"
+                          }
+
 
 class PostsTest(TestCase):
     def make_a_user(self):
@@ -44,15 +54,7 @@ class PostsTest(TestCase):
 class PostsViewsTest(TestCase):
     def setUp(self):
         # Every test needs access to the request factory.
-        self.POST_DATA = {"name": 'test',
-                          'thumbnail': "http://afinidata.com/logo.png",
-                          'min_range': 5,
-                          'max_range': 32,
-                          'content': "http://sample.afinidata.com",
-                          'content_activity': "test | test | test",
-                          'preview': 'previu',
-                          'status': "published"
-                          }
+        self.POST_DATA = POST_DATA
         self.factory = RequestFactory()
         self.client = Client()
         self.user = DjangoUser.objects.create_user(
@@ -99,9 +101,9 @@ class PostsViewsTest(TestCase):
 
     def test_fetch_post(self):
         p_id = self.save_post()
-        print(Post.objects.get().id)
+        print(Post.objects.first().id)
         p_id = 1
-        response = self.client.get('/posts/{}/'.format(p_id))
+        response = self.client.get(f'/posts/{p_id}/', {"username": self.user.username, 'bot_id': 1})
         eq_(response.status_code, 200)
 
     def test_get_statistics_view(self):
@@ -124,13 +126,6 @@ class PostsViewsTest(TestCase):
                                           id=p_id)
         eq_(response.status_code, 200)
 
-    def test_post_question(self):
-        p_id = self.save_post()
-        request = self.factory.get('/posts/questions/')
-        request.user = self.user
-        response = QuestionsView.as_view()(request)
-        eq_(response.status_code, 200)
-
     def test_question_by_post(self):
         p_id = self.save_post()
         response = self.client.get('/posts/1/questions/')
@@ -148,7 +143,7 @@ class PostsViewsTest(TestCase):
 
     def test_get_thumbnail(self):
         p_id = self.save_post()
-        response = self.client.get('/posts/1/thumbnail/')
+        response = self.client.get(f'/posts/{p_id}/thumbnail/')
         eq_(response.status_code, 200)
         eq_(response.content,  b'{"set_attributes": {}, "messages": [{"attachment": {"type": "image", "payload": {"url": "http://afinidata.com/logo.png"}}}]}')
 
@@ -211,28 +206,28 @@ class PostForUser(TestCase):
     databases = ['default', 'messenger_users_db']
 
     def setUp(self):
-        self.POST_DATA = {"name": 'test',
-                          'thumbnail': "http://afinidata.com/logo.png",
-                          'min_range': 5,
-                          'max_range': 32,
-                          'content': "http://sample.afinidata.com",
-                          'content_activity': "test test test",
-                          'preview': 'previu',
-                          'status': "published"
-                          }
+        self.POST_DATA = POST_DATA
         self.user = DjangoUser.objects.create_user(
             username='jacob', email='jacob@example.com', password='top_secret')
         self.post = Post(user=self.user, **self.POST_DATA)
         self.post.save()
-
-    def test_get_post_for_user(self):
-        user = MUser(last_channel_id=1,
+        self.muser = MUser(last_channel_id=1,
                      channel_id=1,
                      backup_key="backz1",
                      username="test1")
-        user.save()
+        self.muser.save()
+
+    def test_get_post_for_user(self):
         user_data = {'username': "test1", 'value': 15, 'premium': False}
         response = self.client.get('/posts/getPostForUser', user_data)
+
+
+    def test_fetch_post(self):
+        p_id = self.post.id
+        self.client.post(f"/messenger_users/actions/user/{self.muser.id}/set/set active_session")
+        response = self.client.get(f'/posts/{p_id}/', {"username": self.muser.username, 'bot_id': 1})
+        eq_(response.status_code, 200)
+
 
 
 class PostRouterTest(TestCase):
