@@ -1080,7 +1080,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 
         if not post_reviser:
             messages.error(self.request, 'User with role reviser not exist')
-            return redirect('posts:new-review', id=self.kwargs['id'])
+            return redirect('posts:send_to_review', id=self.kwargs['id'])
 
         if reviser_list.count() > 1:
             print('more revisers')
@@ -1116,7 +1116,10 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             reviser_role.save()
             post.status = 'review'
             post.save()
-            messages.success(self.request, 'Your request for approbation has been created')
+            try:
+                messages.success(self.request, 'Your request for approbation has been created')
+            except messages.api.MessageFailure:
+                logger.error("Request approved yet no messages app installed")
             return redirect('posts:edit-post', id=post.pk)
 
 
