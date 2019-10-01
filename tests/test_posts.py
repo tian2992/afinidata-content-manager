@@ -56,7 +56,6 @@ class PostsViewsTest(TestCase):
         # Every test needs access to the request factory.
         self.POST_DATA = POST_DATA
         self.factory = RequestFactory()
-        self.client = Client()
         self.user = DjangoUser.objects.create_user(
             username='jacob', email='jacob@example.com', password='top_secret')
 
@@ -274,6 +273,9 @@ class PostForUser(TestCase):
     def test_set_interaction(self):
         data = {"username": self.muser.username, "bot_id": "1", "post_id": self.post.id, "interaction_type": "opened"}
         response = self.client.post('/posts/set_interaction/', data)
+
+    def test_comment_post(self):
+        pass
 
 
 class PostRouterTest(TestCase):

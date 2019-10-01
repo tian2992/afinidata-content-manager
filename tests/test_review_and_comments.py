@@ -8,7 +8,9 @@ from django.test import Client, RequestFactory, TestCase
 import posts.views
 from posts.views import CreateQuestion, QuestionsView, ChangePostStatusToReviewView, \
                         RejectionView, AcceptReviewView, ReviewView, DeleteQuestionView, \
-                        question_by_post, ChangePostToNeedChangesView, AddReviewCommentView, CreateQuestionResponseView
+                        question_by_post, ChangePostToNeedChangesView, AddReviewCommentView, CreateQuestionResponseView, \
+                        EditQuestionResponseView
+
 from .test_posts import POST_DATA
 
 
@@ -135,17 +137,27 @@ class PostsQuestionTest(TestCase):
     @patch("posts.views.messages")
     def test_create_q_response_view(self, mock_message, data=None):
         self.test_add_question()
-        qr = Question.objects.first()
-        if not data:
-            data = {"id": qr.id, "question": qr.id, "response": "yeah!", "value": 0}
         q = Question.objects.first()
+        if not data:
+            data = {"id": q.id, "question": q.id, "response": "yeah!", "value": 0}
         request = self.factory.post(f'/posts/questions/{q.id}/responses/new/', data)
         request.user = self.user
         response = CreateQuestionResponseView.as_view()(request, id=q.id)
         eq_(response.status_code, 302)
         return QuestionResponse.objects.first()
 
-    def test_edit_question_response_view(self):
+    @patch("posts.views.messages")
+    def test_edit_question_response_view(self, mock_message):
         qr = self.test_create_q_response_view()
+        q = Question.objects.first()
 
-        response = self.client.get(f'/posts/questions/{qr.id}/replies/')
+        # request = self.factory.get(f'/posts/questions/{q.id}/responses/{qr.id}/edit/')
+        # request.user = self.user
+        # print(request)
+        # response = EditQuestionResponseView.as_view()(request, response_id=qr.id)
+
+        data = {"id": q.id, "question": q.id, "response": "yezh!", "value": 2}
+        request = self.factory.post(f'/posts/questions/{q.id}/responses/{qr.id}/edit/', data=data)
+        request.user = self.user
+        response = EditQuestionResponseView.as_view()(request, response_id=qr.id, question_id=q.id)
+        eq_(response.status_code, 302)
