@@ -9,7 +9,7 @@ import posts.views
 from posts.views import CreateQuestion, QuestionsView, ChangePostStatusToReviewView, \
                         RejectionView, AcceptReviewView, ReviewView, DeleteQuestionView, \
                         question_by_post, ChangePostToNeedChangesView, AddReviewCommentView, CreateQuestionResponseView, \
-                        EditQuestionResponseView
+                        EditQuestionResponseView, DeleteQuestionResponseView, create_response_for_question
 
 from .test_posts import POST_DATA
 
@@ -70,10 +70,10 @@ class PostsReviewTest(TestCase):
     def test_accept_add_review_comment(self, mock_message):
         self.test_view_send_to_review()
         riviu_aidi = Review.objects.first().id
-        request = self.factory.get(f'/posts/{self.post.id}/review/{riviu_aidi}/add_comment/', {'comment': "hey"})
+        request = self.factory.post(f'/posts/{self.post.id}/review/{riviu_aidi}/add_comment/', {'comment': "hey"})
         request.user = self.user
         response = AddReviewCommentView.as_view()(request, review_id=riviu_aidi)
-        eq_(response.status_code, 200)
+        eq_(response.status_code, 302)
 
     @patch("posts.views.messages")
     def test_review_view(self, mock_message):
@@ -92,6 +92,14 @@ class PostsReviewTest(TestCase):
         request.user = self.user
         response = ChangePostToNeedChangesView.as_view()(request, review_id=riviu_aidi)
         eq_(response.status_code, 302)
+
+    @patch("posts.views.messages")
+    def test_add_comment_to_post_per_user(self, mock_mess):
+        self.test_view_send_to_review()
+        response = self.client.post(f'/posts/post_comment/', {'comment': "hey", "user_id": self.user.id, "post": self.post.id })
+        eq_(response.status_code, 200)
+        response = self.client.get(f'/posts/post_comment/')
+        eq_(response.status_code, 404)
 
 
 class PostsQuestionTest(TestCase):
@@ -151,13 +159,45 @@ class PostsQuestionTest(TestCase):
         qr = self.test_create_q_response_view()
         q = Question.objects.first()
 
-        # request = self.factory.get(f'/posts/questions/{q.id}/responses/{qr.id}/edit/')
-        # request.user = self.user
-        # print(request)
-        # response = EditQuestionResponseView.as_view()(request, response_id=qr.id)
+        request = self.factory.get(f'/posts/questions/{q.id}/responses/{qr.id}/edit/')
+        request.user = self.user
+        response = EditQuestionResponseView.as_view()(request, response_id=qr.id, question_id=q.id)
+        eq_(response.status_code, 200)
 
         data = {"id": q.id, "question": q.id, "response": "yezh!", "value": 2}
         request = self.factory.post(f'/posts/questions/{q.id}/responses/{qr.id}/edit/', data=data)
         request.user = self.user
         response = EditQuestionResponseView.as_view()(request, response_id=qr.id, question_id=q.id)
         eq_(response.status_code, 302)
+
+    @patch("posts.views.messages")
+    def test_delete_qr(self, mock_message):
+        qr = self.test_create_q_response_view()
+        q = Question.objects.first()
+
+        request = self.factory.get(f'/posts/questions/{q.id}/responses/{qr.id}/delete/')
+        request.user = self.user
+        response = DeleteQuestionResponseView.as_view()(request, response_id=qr.id, question_id=q.id)
+        eq_(response.status_code, 200)
+
+        request = self.factory.post(f'/posts/questions/{q.id}/responses/{qr.id}/delete/')
+        request.user = self.user
+        response = DeleteQuestionResponseView.as_view()(request, response_id=qr.id, question_id=q.id)
+        eq_(response.status_code, 302)
+
+class PostsCreateQuestionResponseTest(PostsQuestionTest):
+    databases = "__all__"
+
+    @patch("posts.views.messages")
+    def test_create_response_for_q(self, mock_message):
+        response = self.client.post('/messenger_users/new/', {"messenger_user_id": 1,
+                                                              "last_channel_id": 1,
+                                                              "bot_id": 1,
+                                                              'first_name': "tester",
+                                                              'last_name': "testintong",
+                                                              })
+        self.test_add_question()
+        q = Question.objects.first()
+        data = {"id": q.id, "username": "testertestintong1", "question": q.id, "response": "yeah!", "value": 0}
+        response = self.client.post(f'/posts/questions/{q.id}/response/', data)
+        eq_(response.status_code, 200)

@@ -1327,12 +1327,12 @@ class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'response_id'
     template_name = 'posts/edit-question-response.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = super().get_context_data()
         context['question_id'] = self.kwargs['question_id']
         return context
 
-    def get(self, **kwargs):
+    def get(self, *args, **kwargs):
         question = get_object_or_404(Question, id=self.kwargs['question_id'])
         response = get_object_or_404(question.questionresponse_set.all(), id=self.kwargs['response_id'])
         if not(self.request.user.is_superuser or question.post.user == self.request.user):

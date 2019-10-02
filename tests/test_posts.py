@@ -210,6 +210,27 @@ class PostsViewsTest(TestCase):
         response = Reviews.as_view()(request)
         eq_(response.status_code, 200)
 
+    def test_create_tags(self):
+        response = self.client.post("/posts/tags/create", {"name": "mytag"})
+
+    def test_post_get_tags(self):
+        self.save_post()
+        self.test_create_tags()
+        response = self.client.post("/posts/tags/")
+
+    def test_post_add_tag_to_post(self):
+        self.save_post()
+        self.test_create_tags()
+        self.client.post(f"/posts/{self.post.id}/set_tag", {"name": "mytag"})
+
+    def test_post_get_tags_for_post(self):
+        self.test_post_add_tag_to_post()
+        self.client.post(f"/posts/{self.post.id}/get_tags")
+
+    def test_post_remove_tags_for_post(self):
+        self.test_post_add_tag_to_post()
+        self.client.post(f"/posts/{self.post.id}/remove_tag", {"name": "mytag"})
+
     #
     # def test_details(self):
     #     # Create an instance of a GET request.

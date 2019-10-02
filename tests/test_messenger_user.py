@@ -64,7 +64,7 @@ class PostsViewsTest(TestCase):
 
     def test_get_w_username(self):
         self.make_user()
-        response = self.client.get('/messenger_users/by_username/{}/'.format(self.user.username))
+        response = self.client.post('/messenger_users/by_username/{}/'.format(self.user.username))
         eq_(response.status_code, 200)
 
     def test_set_ref(self):
