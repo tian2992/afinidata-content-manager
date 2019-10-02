@@ -3,6 +3,7 @@
 
 [![Build Status](https://travis-ci.com/afinidata2019/afinidata-content-manager.svg?branch=master)](https://travis-ci.com/afinidata2019/afinidata-content-manager)
 [![Documentation Status](https://readthedocs.org/projects/afinidata-content-manager/badge/?version=latest)](https://afinidata-content-manager.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/afinidata2019/afinidata-content-manager/branch/master/graph/badge.svg)](https://codecov.io/gh/afinidata2019/afinidata-content-manager)
 
 
 ## Overview
