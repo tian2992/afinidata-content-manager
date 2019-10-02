@@ -18,7 +18,7 @@ def check_valid_date(request):
         try:
             date = request.GET['date']
         except Exception as e:
-            logger.error(PostsListViewe)
+            logger.error('invalid date')
             return JsonResponse(dict(status='error', error='param date not defined'))
 
         new_date = parse(date)

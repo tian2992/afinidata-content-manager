@@ -37,11 +37,11 @@ class HomeView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         try:
             params = dict()
-            if self.request.GET['name']:
+            if self.request.GET.get('name'):
                 params['name__contains'] = self.request.GET['name']
-            if self.request.GET['user_id']:
+            if self.request.GET.get('user_id'):
                 params['user_id'] = self.request.GET['user_id']
-            if self.request.GET['status']:
+            if self.request.GET.get('status'):
                 params['status'] = self.request.GET['status']
 
             try:
@@ -74,13 +74,13 @@ class HomeView(LoginRequiredMixin, ListView):
 
         try:
             params = dict()
-            if self.request.GET['name']:
+            if self.request.GET.get('name'):
                 params['name__contains'] = self.request.GET['name']
                 context['name'] = self.request.GET['name']
-            if self.request.GET['user_id']:
+            if self.request.GET.get('user_id'):
                 params['user_id'] = self.request.GET['user_id']
                 context['user_id'] = int(self.request.GET['user_id'])
-            if self.request.GET['status']:
+            if self.request.GET.get('status'):
                 params['status'] = self.request.GET['status']
                 context['status'] = self.request.GET['status']
             posts = Post.objects.filter(**params)
@@ -325,11 +325,17 @@ class EditPostView(LoginRequiredMixin, UpdateView):
             context['role'] = 'reviser'
             context['review'] = review.id
 
-        if post.taxonomy:
+        try:
             tax = post.taxonomy
             ftax = forms.UpdateTaxonomy(instance=tax)
             context['tax'] = ftax
-
+        except Post.taxonomy.RelatedObjectDoesNotExist:
+            logger.exception("no taxonomy object on post, lets set")
+            try:
+                post.taxonomy = forms.UpdateTaxonomy(instance=tax)
+                context['tax'] = post.taxonomy
+            except:
+                logger.exception("no taxonomy available")
         return context
 
 
@@ -351,76 +357,6 @@ def edit_interaction(request, id):
 
     else:
         return JsonResponse(dict(hello="world"))
-
-
-@csrf_exempt
-def set_user_send(request):
-    if request.method == 'POST':
-        user = None
-        post_id = None
-        bot_id = None
-        print(request.POST)
-        try:
-            username = request.POST['username']
-            user = User.objects.get(username=username)
-            print('user: ', user)
-        except:
-            print('not user with username')
-            pass
-
-        if not user:
-            try:
-                channel_id = request.POST['channel_id']
-                user = User.objects.get(last_channel_id=channel_id)
-                print(user)
-            except:
-                print('not user with last channel id')
-                pass
-
-        if not user:
-            try:
-                channel_id = request.POST['channel_id']
-                user = User.objects.get(channel_id=channel_id)
-                print(user)
-            except:
-                print('not user with channel id')
-                pass
-
-        if not user:
-            return JsonResponse(dict(status='error', error='not user defined'))
-
-        try:
-            post_id = request.POST['post_id']
-            selected_post = Post.objects.get(pk=post_id)
-            print(selected_post)
-        except:
-            return JsonResponse(dict(status='error', error='not post with id or id not defined'))
-
-        try:
-            bot_id = request.POST['bot_id']
-        except:
-            bot_id = 1
-
-        new_interaction = Interaction.objects.create(
-            post=selected_post,
-            channel_id=user.last_channel_id,
-            username=user.username,
-            bot_id=bot_id,
-            type='sended',
-            user_id=user.pk
-        )
-        new_interaction.save()
-
-        return JsonResponse(dict(
-            status='created',
-            data=dict(
-                user_id=user.pk,
-                post_id=selected_post.pk,
-                type='sended'
-            )
-        ))
-    else:
-        raise Http404('Not found')
 
 
 @csrf_exempt
@@ -1002,7 +938,7 @@ def get_thumbnail_by_post(request, id):
 
     try:
         post = Post.objects.get(pk=id)
-        logger.info("creating a new post")
+        logger.info("getting thumbnail for post")
         thumbnail = post.thumbnail
     except Exception as e:
         return JsonResponse(dict(status='error', error='Invalid params'))
@@ -1144,7 +1080,7 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
 
         if not post_reviser:
             messages.error(self.request, 'User with role reviser not exist')
-            return redirect('posts:new-review', id=self.kwargs['id'])
+            return redirect('posts:send_to_review', id=self.kwargs['id'])
 
         if reviser_list.count() > 1:
             print('more revisers')
@@ -1180,7 +1116,10 @@ class ChangePostStatusToReviewView(LoginRequiredMixin, CreateView):
             reviser_role.save()
             post.status = 'review'
             post.save()
-            messages.success(self.request, 'Your request for approbation has been created')
+            try:
+                messages.success(self.request, 'Your request for approbation has been created')
+            except messages.api.MessageFailure:
+                logger.error("Request approved yet no messages app installed")
             return redirect('posts:edit-post', id=post.pk)
 
 
@@ -1388,12 +1327,12 @@ class EditQuestionResponseView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'response_id'
     template_name = 'posts/edit-question-response.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = super().get_context_data()
         context['question_id'] = self.kwargs['question_id']
         return context
 
-    def get(self, **kwargs):
+    def get(self, *args, **kwargs):
         question = get_object_or_404(Question, id=self.kwargs['question_id'])
         response = get_object_or_404(question.questionresponse_set.all(), id=self.kwargs['response_id'])
         if not(self.request.user.is_superuser or question.post.user == self.request.user):
