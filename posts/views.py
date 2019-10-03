@@ -835,7 +835,7 @@ class EditQuestion(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         question = form.save()
-        return redirect('posts:review', id=question.post.pk)
+        return redirect('posts:edit-post', id=question.post.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
