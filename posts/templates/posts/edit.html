@@ -47,7 +47,7 @@
                     {% if post.question_set.count > 0 %}
                         <ul class="list">
                             {% for question in post.question_set.all %}
-                                <li><span>{{ question.name }}</span> - <a href="{% url 'posts:question' id=question.pk %}" class="link">View</a> - <a href="{% url 'posts:edit-question' id=question.pk %}" class="link">Edit</a></li>
+                                <li><span>{{ question.name }}</span> - <a href="{% url 'posts:question' id=question.pk %}" class="link">View</a> - <a href="{% url 'posts:edit-question' id=question.pk %}" class="link">Edit</a> -  <a href="{% url 'posts:delete-question' id=question.pk %}" class="link">Delete</a></li>
                             {% endfor %}
                         </ul>
                     {% else %}
