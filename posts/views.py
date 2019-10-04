@@ -859,7 +859,11 @@ class DeleteQuestionView(LoginRequiredMixin, DeleteView):
     redirect_field_name = 'redirect_to'
     pk_url_kwarg = 'id'
     context_object_name = 'question'
-    success_url = reverse_lazy('posts:questions')
+
+    def get_success_url(self):
+        q = self.get_object()
+        post_pk = q.post.pk
+        return redirect('posts:edit-post', id=post_pk).url
 
 
 @csrf_exempt
