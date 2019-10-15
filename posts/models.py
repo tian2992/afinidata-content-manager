@@ -268,9 +268,6 @@ class Taxonomy(models.Model):
     area = models.ForeignKey(Area, on_delete=models.DO_NOTHING)
     subarea = models.ForeignKey(Subarea, on_delete=models.DO_NOTHING)
     component =  models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
-    #area = models.CharField(choices=AREA, max_length=250)
-    #subarea = models.CharField(choices=SUBAREA, max_length=250)
-    #component = models.CharField(choices=COMPONENTS, max_length=250)
 
 
 class Review(models.Model):
