@@ -246,14 +246,17 @@ COMPONENTS = [
 
 class Area(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=AREA)
+    name = models.CharField(max_length=140)
 
 
 class Subarea(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=SUBAREA)
+    name = models.CharField(max_length=140)
 
 
 class Componente(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=COMPONENTS)
+    name = models.CharField(max_length=140)
 
 
 class Taxonomy(models.Model):
@@ -261,9 +264,13 @@ class Taxonomy(models.Model):
                                 on_delete=models.CASCADE,
                                 primary_key=False,
                                 )
-    area = models.CharField(choices=AREA, max_length=250)
-    subarea = models.CharField(choices=SUBAREA, max_length=250)
-    component = models.CharField(choices=COMPONENTS, max_length=250)
+
+    area = models.ForeignKey(Area, on_delete=models.DO_NOTHING)
+    subarea = models.ForeignKey(Subarea, on_delete=models.DO_NOTHING)
+    component =  models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
+    #area = models.CharField(choices=AREA, max_length=250)
+    #subarea = models.CharField(choices=SUBAREA, max_length=250)
+    #component = models.CharField(choices=COMPONENTS, max_length=250)
 
 
 class Review(models.Model):
