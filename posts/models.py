@@ -244,6 +244,18 @@ COMPONENTS = [
 ]
 
 
+class Area(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=AREA)
+
+
+class Subarea(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=SUBAREA)
+
+
+class Componente(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=COMPONENTS)
+
+
 class Taxonomy(models.Model):
     post = models.OneToOneField(Post,
                                 on_delete=models.CASCADE,
