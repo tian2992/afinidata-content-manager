@@ -248,16 +248,24 @@ class Area(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=AREA)
     name = models.CharField(max_length=140)
 
+    def __str__(self):
+        return self.name
+
 
 class Subarea(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=SUBAREA)
     name = models.CharField(max_length=140)
+
+    def __str__(self):
+        return self.name
 
 
 class Componente(models.Model):
     id = models.CharField(max_length=35, primary_key=True, choices=COMPONENTS)
     name = models.CharField(max_length=140)
 
+    def __str__(self):
+        return self.name
 
 class Taxonomy(models.Model):
     post = models.OneToOneField(Post,
@@ -267,7 +275,7 @@ class Taxonomy(models.Model):
 
     area = models.ForeignKey(Area, on_delete=models.DO_NOTHING)
     subarea = models.ForeignKey(Subarea, on_delete=models.DO_NOTHING)
-    component =  models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
+    component = models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
 
 
 class Review(models.Model):
@@ -351,3 +359,6 @@ class MessengerUserCommentPost(models.Model):
 
     def __str__(self):
         return "%s__%s__%s" % (self.pk, self.post_id, self.user_id)
+
+class Tips(models.Model):
+    pass
