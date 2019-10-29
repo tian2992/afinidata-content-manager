@@ -13,6 +13,7 @@ from django.http import JsonResponse, Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
 from django.db import connections
+from django.db.models import Count
 
 
 import logging
@@ -157,6 +158,29 @@ def last_interacted(request, id=None):
                                  messages=[]))
 
     return JsonResponse(dict(status="error"))
+
+
+def get_old_interactions_by_user(request, muid, time_range=30, interaction_type=None):
+    # uname = request.GET.get('username')
+    # if not uname:
+    #     usr = User.objects.get(last_channel_id=muid)
+    # else:
+    #     usr = User.objects.get(username=uname)
+    # type = interaction_type
+    def turn_qset_to_set_vars(qs):
+        d = {}
+        for qk in i:
+            qkz = str(qk['type']) + "_count"
+            coun = qk['id__count']
+            d[qkz] = coun
+        return d
+
+    iob = Interaction.objects.order_by("-created_at").filter(user_id=muid)
+    if interaction_type:
+        iob = iob.filter(type=interaction_type)
+    i = iob.values("type").annotate(Count("id"))
+    ## {"set_attributes": {"interaction_count": [{"type": "b", "id__count": 1}, {"type": "a", "id__count": 1}, {"type": "open", "id__count": 1}]}}
+    return JsonResponse(dict(set_attributes=turn_qset_to_set_vars(i)))
 
 
 @csrf_exempt
