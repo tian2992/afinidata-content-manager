@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.decorators import api_view
 from rest_framework_bulk import (
@@ -5,6 +6,7 @@ from rest_framework_bulk import (
     BulkSerializerMixin,
     ListBulkCreateAPIView,
 )
+from messenger_users.models import User, Child, ChildData, UserData, Referral, UserActivity
 from messenger_users.models import User, Child, ChildData, UserData, Referral, UserActivity
 from posts.models import Interaction
 from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
@@ -161,7 +163,7 @@ def last_interacted(request, id=None):
 
 
 def get_old_interactions_by_user(request, muid, time_range=30, interaction_type=None):
-    iob = Interaction.objects.order_by("-created_at").filter(user_id=muid)
+    iob = Interaction.objects.order_by("-created_at").filter(user_id=muid).filter(created_at__gt=datetime.today()-timedelta(days=time_range))
     if interaction_type:
         iob = iob.filter(type=interaction_type)
     i = iob.values("type").aggregate(Count("id"))
