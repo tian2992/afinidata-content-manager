@@ -161,7 +161,7 @@ def last_interacted(request, id=None):
 
     return JsonResponse(dict(status="error"))
 
-
+@api_view()
 def get_old_interactions_by_user(request, muid, time_range=30, interaction_type=None):
     iob = Interaction.objects.order_by("-created_at").filter(user_id=muid).filter(created_at__gt=datetime.today()-timedelta(days=time_range))
     if interaction_type:
