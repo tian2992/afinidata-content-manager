@@ -30,7 +30,7 @@ class HomeView(LoginRequiredMixin, ListView):
     template_name = 'posts/index.html'
     model = Post
     context_object_name = 'posts'
-    paginate_by = 10
+    paginate_by = 30
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
