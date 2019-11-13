@@ -6,13 +6,10 @@ Afinidata is built using several components, mainly including this, the content 
 
 Here are some important resources:
 
-  * [OpenGovernment for Developers](http://opengovernment.org/pages/developer) tells you where we are,
-  * [Our roadmap](http://opengovernment.org/pages/wish-list) is the 10k foot view of where we're going, and
-  * [Pivotal Tracker](http://pivotaltracker.com/projects/64842) is our day-to-day project management space.
-  * Mailing list: Join our [developer list](http://groups.google.com/group/opengovernment/)
-  * Bugs? [Lighthouse](https://participatorypolitics.lighthouseapp.com/projects/47665-opengovernment/overview) is where to report them
-  * IRC: chat.freenode.net channel [#opengovernment](irc://chat.freenode.net/opengovernment). We're usually there during business hours.
-  
+  * [Afinidata Home Page](http://afinidata.com/) tells you what we are,
+  * [Our Task list](#) Currently our tasks and roadmap are still run privately, we'll update it if it changes.
+  * [Issue / Bug Tracker](https://github.com/afinidata2019/afinidata-content-manager/issues).
+  * [Django Documentation](https://docs.djangoproject.com/en/2.2/)
   
 ## Running in development
 
