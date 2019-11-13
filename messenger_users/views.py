@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.decorators import api_view
 from rest_framework_bulk import (
@@ -6,6 +7,7 @@ from rest_framework_bulk import (
     ListBulkCreateAPIView,
 )
 from messenger_users.models import User, Child, ChildData, UserData, Referral, UserActivity
+from messenger_users.models import User, Child, ChildData, UserData, Referral, UserActivity
 from posts.models import Interaction
 from .serializers import UserDataSerializer, UserSerializer, ChildSerializer, ChildDataSerializer
 from rest_framework import viewsets
@@ -13,6 +15,7 @@ from django.http import JsonResponse, Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaultfilters import slugify
 from django.db import connections
+from django.db.models import Count
 
 
 import logging
@@ -157,6 +160,18 @@ def last_interacted(request, id=None):
                                  messages=[]))
 
     return JsonResponse(dict(status="error"))
+
+@api_view()
+def get_old_interactions_by_user(request, muid, time_range=30, interaction_type=None):
+    time_range = request.GET.get("time_range", time_range)
+    iob = Interaction.objects.order_by("-created_at").filter(user_id=muid)\
+        .filter(created_at__gt=datetime.today()-timedelta(days=time_range))
+    if interaction_type:
+        iob = iob.filter(type=interaction_type)
+    i = iob.values("type").aggregate(Count("id"))
+    it_count = "{}_count".format(interaction_type)
+    d = {it_count: i["id__count"]}
+    return JsonResponse(dict(set_attributes=d))
 
 
 @csrf_exempt
