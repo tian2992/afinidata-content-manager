@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+import django.template.defaultfilters
+from rest_framework import serializers
+
 from messenger_users.models import User as MessengerUser
 
 STATUS_CHOICES = (
@@ -360,5 +363,21 @@ class MessengerUserCommentPost(models.Model):
     def __str__(self):
         return "%s__%s__%s" % (self.pk, self.post_id, self.user_id)
 
-class Tips(models.Model):
-    pass
+
+class Tip(models.Model):
+    title = models.CharField(max_length=140)
+    min_range = models.IntegerField(null=True, default=0)
+    max_range = models.IntegerField(null=True, default=72)
+    topic = models.CharField(max_length=255)
+    tip = models.TextField()
+
+    def slug(self):
+        return django.template.defaultfilters.slugify(self.title)
+
+
+class TipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tip
+        # exclude = ['timestamp']
+
