@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'upload.apps.UploadConfig',
     'django_nose',
     'rest_framework',
+    'random_codes.apps.RandomCodesConfig'
 ]
 
 MIDDLEWARE = [
