@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 from django.shortcuts import redirect
 from django.contrib import messages
 from random_codes import models
@@ -11,6 +11,12 @@ class CodeListView(PermissionRequiredMixin, ListView):
     permission_required = 'random_codes.view_code'
     ordering = ['-pk']
     paginate_by = 10
+
+
+class CodeView(PermissionRequiredMixin, DetailView):
+    model = models.Code
+    pk_url_kwarg = 'code_id'
+    permission_required = 'random_codes.view_code'
 
 
 class GenerateCodesView(PermissionRequiredMixin, TemplateView):
