@@ -15,7 +15,8 @@ class Code(models.Model):
         return super(Code, self).save( *args, **kwargs)
 
     def generate_random_code(self):
-        random_code = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
+        random_code = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(7)])
+        random_code = random_code.lower()
         print(random_code)
         if Code.objects.filter(code=random_code).count() > 0:
             return self.generate_random_code()

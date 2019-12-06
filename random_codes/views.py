@@ -1,6 +1,7 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView, ListView, DetailView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
+from django.http import JsonResponse
 from django.contrib import messages
 from random_codes import models
 from random_codes import forms
