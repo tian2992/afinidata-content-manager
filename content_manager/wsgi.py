@@ -14,6 +14,6 @@ from django.core.wsgi import get_wsgi_application
 env_path = '../.env'
 load_dotenv(dotenv_path=env_path)
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'content_manager.settings.production')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'content_manager.production')
 
 application = get_wsgi_application()
