@@ -7,7 +7,7 @@ class CodesForm(forms.Form):
     qty = forms.IntegerField()
 
 
-class ExchangeForm(forms.Form):
-    user_id = forms.ChoiceField(choices=[user.pk for user in User.objects.all()])
-    code = forms.ChoiceField(choices=[code.code for code in Code.objects.all()])
+class UseCodeForm(forms.Form):
+    user_id = forms.ModelChoiceField(User.objects.all())
+    code = forms.ModelChoiceField(Code.objects.filter(available=True), to_field_name="code")
 

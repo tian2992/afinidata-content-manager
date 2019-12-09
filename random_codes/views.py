@@ -1,7 +1,9 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, View
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.shortcuts import redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib import messages
 from random_codes import models
 from random_codes import forms
@@ -41,3 +43,27 @@ class GenerateCodesView(PermissionRequiredMixin, TemplateView):
         else:
             messages.error(request, "Check your data and try again.")
             return super(GenerateCodesView, self).get(request)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UseCodeView(TemplateView):
+    template_name = 'random_codes/use_code.html'
+
+    def get(self, request, *args, **kwargs):
+        raise Http404
+
+    def post(self, request, *args, **kwargs):
+        form = forms.UseCodeForm(request.POST)
+
+        if form.is_valid():
+            user = form.cleaned_data['user_id']
+            code = form.cleaned_data['code']
+            code.available = False
+            code.user_id = user.pk
+            code.save()
+            user.userdata_set.create(data_key='premium', data_value='true')
+            response = dict(set_attributes=dict(activo_premium1=True, code_error=False), messages=[])
+            return JsonResponse(response)
+
+        response = dict(set_attributes=dict(cod_error=True), messages=[])
+        return JsonResponse(response)

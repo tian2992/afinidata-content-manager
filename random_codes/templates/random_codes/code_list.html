@@ -27,7 +27,7 @@
                                 <td>{{ object.user_id }}</td>
                                 <td>{{ object.created_at }}</td>
                                 <td>
-                                    <a href="#">View</a>
+                                    <a href="{% url 'codes:code' code_id=object.pk %}">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
