@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+import django.template.defaultfilters
+from rest_framework import serializers
+
 from messenger_users.models import User as MessengerUser
 
 STATUS_CHOICES = (
@@ -176,6 +179,8 @@ class Response(models.Model):
     user_id = models.IntegerField()
     username = models.CharField(max_length=255)
     response = models.TextField(null=True)
+    response_text = models.TextField(null=True)
+    response_value = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -244,14 +249,38 @@ COMPONENTS = [
 ]
 
 
+class Area(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=AREA)
+    name = models.CharField(max_length=140)
+
+    def __str__(self):
+        return self.name
+
+
+class Subarea(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=SUBAREA)
+    name = models.CharField(max_length=140)
+
+    def __str__(self):
+        return self.name
+
+
+class Componente(models.Model):
+    id = models.CharField(max_length=35, primary_key=True, choices=COMPONENTS)
+    name = models.CharField(max_length=140)
+
+    def __str__(self):
+        return self.name
+
 class Taxonomy(models.Model):
     post = models.OneToOneField(Post,
                                 on_delete=models.CASCADE,
                                 primary_key=False,
                                 )
-    area = models.CharField(choices=AREA, max_length=250)
-    subarea = models.CharField(choices=SUBAREA, max_length=250)
-    component = models.CharField(choices=COMPONENTS, max_length=250)
+
+    area = models.ForeignKey(Area, on_delete=models.DO_NOTHING)
+    subarea = models.ForeignKey(Subarea, on_delete=models.DO_NOTHING)
+    component = models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
 
 
 class Review(models.Model):
@@ -335,3 +364,22 @@ class MessengerUserCommentPost(models.Model):
 
     def __str__(self):
         return "%s__%s__%s" % (self.pk, self.post_id, self.user_id)
+
+
+class Tip(models.Model):
+    title = models.CharField(max_length=140)
+    min_range = models.IntegerField(null=True, default=0)
+    max_range = models.IntegerField(null=True, default=72)
+    topic = models.CharField(max_length=255)
+    tip = models.TextField()
+
+    def slug(self):
+        return django.template.defaultfilters.slugify(self.title)
+
+
+class TipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tip
+        # exclude = ['timestamp']
+

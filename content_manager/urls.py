@@ -24,5 +24,6 @@ urlpatterns = [
     path('upload/', include('upload.urls', namespace='upload')),
     path('messenger_users/', include("messenger_users.urls", namespace="users")),
     path('utilities/', include("utilities.urls", namespace="utilities")),
-    path('dashboard/', include("dash.urls", namespace="dash"))
+    path('dashboard/', include("dash.urls", namespace="dash")),
+    path('codes/', include("random_codes.urls", namespace="codes"))
 ]

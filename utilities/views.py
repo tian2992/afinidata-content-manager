@@ -1,9 +1,10 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
+from django.views.generic import View
 import re
 from datetime import datetime
 from dateutil.parser import parse
+from dateutil import relativedelta
 from messenger_users.models import User
 import logging
 
@@ -310,3 +311,17 @@ def get_user_id_by_username(request):
         ),
         messages=[]
     ))
+
+
+class GetMonthsView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            date = parse(request.GET['date'])
+            rel = relativedelta.relativedelta(datetime.now(), date)
+            logger.info(rel)
+            child_months = (rel.years * 12) + rel.months
+            return JsonResponse(dict(set_attributes=dict(childMonths=child_months), messages=[]))
+        except:
+            logger.exception("Invalid Date")
+            return JsonResponse(dict(set_attributes=dict(childMonthsError=True), messages=[]))

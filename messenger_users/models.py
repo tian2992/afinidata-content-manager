@@ -21,7 +21,7 @@ class User(models.Model):
     username = models.CharField(max_length=100, null=True, unique=True)
 
     def __str__(self):
-        return "User {} with m_id: {}; username = {}".format(self.pk, self.last_channel_id, self.username)
+        return self.username
 
     class Meta:
         app_label = 'messenger_users'
@@ -178,6 +178,7 @@ def init_state_machine(instance, **kwargs):
     machine.add_transition(UserActivity.SET_PRE_CHURN, UserActivity.WAIT, UserActivity.PRE_CHURN)
     machine.add_transition(UserActivity.GET_POST, UserActivity.PRE_CHURN, UserActivity.DISPATCHED)
     machine.add_transition(UserActivity.OPEN_POST, UserActivity.DISPATCHED, UserActivity.OPENED)
+    machine.add_transition(UserActivity.OPEN_POST, '*', UserActivity.OPENED)
     machine.add_transition(UserActivity.NO_OPEN, UserActivity.DISPATCHED, UserActivity.WAIT)
     machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.OPENED, UserActivity.FOLLOW_UP)
     machine.add_transition(UserActivity.GIVE_FEEDBACK, UserActivity.FOLLOW_UP, UserActivity.FOLLOW_UP)
