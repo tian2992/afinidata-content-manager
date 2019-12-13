@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
+from rest_framework import viewsets
+
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost
+    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
@@ -23,7 +25,6 @@ import logging
 ## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
 logger = logging.getLogger(__name__)
-
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -1031,7 +1032,6 @@ def get_replies_to_question(request, id):
                              block_names=['Validador Feedback Ciclo 1-2'])
             quick_replies.append(new_reply)
 
-    print(quick_replies)
     return JsonResponse(dict(
         messages=[
             {
@@ -1400,3 +1400,10 @@ class AddCommentToPostByUserView(CreateView):
     def form_invalid(self, form):
         return JsonResponse(dict(status='error', error='invalid form'))
 
+
+class TipsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tips to be viewed or edited.
+    """
+    queryset = Tip.objects.all()
+    serializer_class = TipSerializer
