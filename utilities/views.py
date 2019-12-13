@@ -319,9 +319,9 @@ class GetMonthsView(View):
         try:
             date = parse(request.GET['date'])
             rel = relativedelta.relativedelta(datetime.now(), date)
-            print(rel)
+            logger.info(rel)
             child_months = (rel.years * 12) + rel.months
             return JsonResponse(dict(set_attributes=dict(childMonths=child_months), messages=[]))
-        except Exception as e:
-            print(e)
+        except:
+            logger.exception("Invalid Date")
             return JsonResponse(dict(set_attributes=dict(childMonthsError=True), messages=[]))
