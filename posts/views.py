@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
+from rest_framework import viewsets
+
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost
+    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
@@ -25,12 +27,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class HomeView(LoginRequiredMixin, ListView):
     template_name = 'posts/index.html'
     model = Post
     context_object_name = 'posts'
-    paginate_by = 10
+    paginate_by = 30
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
@@ -212,7 +213,7 @@ def fetch_post(request, id):
                               {'post': post, 'session_id': post_session.pk})
             except:
                 return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
-        
+
         return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
 
 
@@ -708,25 +709,25 @@ def get_posts_for_user(request):
     date_limit = today - days
     ## Fetch sent activities to exclude
     interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_limit)
-    
+
     excluded = set()
     for interaction in interactions:
         if interaction.post_id:
             excluded.add(interaction.post_id)
     logger.info("excluding activities seen: {} ".format(excluded))
 
-    if is_premium: 
+    if is_premium:
         posts = Post.objects \
             .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value, 
-                    max_range__gte=months_old_value, 
+            .filter(min_range__lte=months_old_value,
+                    max_range__gte=months_old_value,
                     id__gte=208,
                     status='published')
     else:
         posts = Post.objects \
             .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value, 
-                    max_range__gte=months_old_value, 
+            .filter(min_range__lte=months_old_value,
+                    max_range__gte=months_old_value,
                     status='published')
 
     if posts.count() <= 0:
@@ -735,9 +736,9 @@ def get_posts_for_user(request):
         logger.warning(warning_message+ ": username {}".format(username))
         posts = Post.objects \
             .filter(min_range__lte=months_old_value,
-                    max_range__gte=months_old_value, 
+                    max_range__gte=months_old_value,
                     status='published')
-        
+
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
     if service_post.content_activity:
@@ -1026,7 +1027,6 @@ def get_replies_to_question(request, id):
                              block_names=['Validador Feedback Ciclo 1-2'])
             quick_replies.append(new_reply)
 
-    print(quick_replies)
     return JsonResponse(dict(
         messages=[
             {
@@ -1395,3 +1395,10 @@ class AddCommentToPostByUserView(CreateView):
     def form_invalid(self, form):
         return JsonResponse(dict(status='error', error='invalid form'))
 
+
+class TipsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tips to be viewed or edited.
+    """
+    queryset = Tip.objects.all()
+    serializer_class = TipSerializer
