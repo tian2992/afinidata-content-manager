@@ -717,7 +717,7 @@ def getting_posts_reco(request):
     logger.info(f"fetched for user id {uid} recommends {recoo}")
     recommend_id = list(recoo["post_id"].keys())[0]
 
-    posto = Post.objects.get(pk=recommend_id).first()
+    posto = Post.objects.filter(pk=recommend_id).first()
 
     resp = dict(
             post_id=posto.pk,
