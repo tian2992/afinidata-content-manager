@@ -717,12 +717,14 @@ def getting_posts_reco(request):
     logger.info(f"fetched for user id {uid} recommends {recoo}")
     recommend_id = list(recoo["post_id"].keys())[0]
 
+    posto = Post.objects.first(id=recommend_id)
+
     resp = dict(
-            post_id=recommend_id,
-            post_uri=settings.DOMAIN_URL + '/posts/' + str(recommend_id),
-            post_preview="Post Preview",
-            post_title="Post Title",
-            warn=""
+            post_id=posto.pk,
+            post_uri=settings.DOMAIN_URL + '/posts/' + str(posto.pk),
+            post_preview=posto.preview,
+            post_title=posto.name,
+            warn=None
         )
 
     logging.warning("sent activity: {}".format(resp))
