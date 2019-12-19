@@ -23,9 +23,9 @@ script:
   # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
 
 after_script:
+  - mysql -e 'SHOW ENGINE INNODB STATUS;'
   - mysql -e 'drop database afinidata_test;'
   - mysql -e 'drop database afinidata_users_test;'
-  - mysql -e 'SHOW ENGINE INNODB STATUS;'
 # Push the results back to codecov
 after_success:
   - python -m codecov
