@@ -15,6 +15,9 @@ before_script:
   - mysql -e 'create database afinidata_users_test;'
 script:
   - python manage.py makemigrations
+  - python manage.py makemigrations auth
+  - python manage.py makemigrations posts
+  - python manage.py makemigrations random_codes
   - python manage.py makemigrations messenger_users
   - python manage.py migrate --database=default
   - python manage.py migrate messenger_users --database=messenger_users_db
