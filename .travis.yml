@@ -15,6 +15,7 @@ before_script:
   - mysql -e 'create database afinidata_users_test;'
 script:
   - python manage.py makemigrations
+  - python manage.py makemigrations messenger_users
   - python manage.py migrate --database=default
   - python manage.py migrate messenger_users --database=messenger_users_db
   - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'adminpass')"
