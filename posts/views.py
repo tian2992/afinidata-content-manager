@@ -715,7 +715,7 @@ def getting_posts_reco(request):
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
     logger.info(f"fetched for user id {uid} recommends {recoo}")
-    recommend_id = list(recoo["predictions"].keys())[0]
+    recommend_id = list(recoo["post_id"].keys())[0]
 
     resp = dict(
             post_id=recommend_id,
