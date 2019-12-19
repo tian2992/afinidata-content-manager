@@ -13,7 +13,6 @@ before_script:
   - mysql -e 'set default_storage_engine=INNODB;'
   - mysql -e 'create database afinidata_test;'
   - mysql -e 'create database afinidata_users_test;'
-  - python manage.py syncdb --noinput
 script:
   - python manage.py makemigrations
   - python manage.py makemigrations messenger_users
