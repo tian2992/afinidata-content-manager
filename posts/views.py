@@ -24,6 +24,9 @@ from posts.models import STATUS_CHOICES
 import logging
 ## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
+import celery
+from json import loads as json_loads
+
 logger = logging.getLogger(__name__)
 
 
@@ -678,6 +681,56 @@ class PostsListView(LoginRequiredMixin, TemplateView):
         context['posts'] = posts
 
         return context
+
+
+def getting_posts_reco(request):
+    logger.info("recommend posts for user")
+    months_old_value = 0
+    user = None
+    uid = 0
+    try:
+        months_old_value = int(request.GET['value'])
+        username = request.GET['username']
+        user = User.objects.get(username=username)
+        uid = user.id
+    except:
+        logger.exception("Invalid params on recommend get post")
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    logger.info("Fetching recommended posts for user {} at {} months".format(user, months_old_value))
+
+    broker = "pyamqp://guest@localhost//"
+    app = celery.Celery('tasks', backend='rpc://', broker=broker, broker_pool_limit=None)
+
+    recoo = {}
+
+    try:
+        reco_sign = celery.signature('afinidata_recommender.tasks.tasks.recommend', (uid, months_old_value))
+        reco_obj = reco_sign.delay()
+        reco_res = app.AsyncResult(reco_obj)
+        reco_data = reco_res.get()
+        recoo = json_loads(reco_data)
+    except:
+        logger.exception("Invalid params on recommend get post")
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    logger.info(f"fetched for user id {uid} recommends {recoo}")
+    recommend_id = list(recoo["predictions"].keys())[0]
+
+    resp = dict(
+            post_id=recommend_id,
+            post_uri=settings.DOMAIN_URL + '/posts/' + str(recommend_id),
+            post_preview="Post Preview",
+            post_title="Post Title",
+            warn=""
+        )
+
+    logging.warning("sent activity: {}".format(resp))
+
+    return JsonResponse(dict(
+        set_attributes=resp,
+        messages=[],
+    ))
 
 
 def get_posts_for_user(request):
