@@ -15,7 +15,6 @@ before_script:
   - mysql -e 'create database afinidata_users_test;'
 script:
   - python manage.py makemigrations
-  - python manage.py makemigrations content_manager
   - python manage.py makemigrations auth
   - python manage.py makemigrations posts
   - python manage.py makemigrations random_codes
@@ -27,7 +26,6 @@ script:
   # https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django
 
 after_script:
-  - mysql -e 'SHOW ENGINE INNODB STATUS;'
   - mysql -e 'drop database afinidata_test;'
   - mysql -e 'drop database afinidata_users_test;'
 # Push the results back to codecov
