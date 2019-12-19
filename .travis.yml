@@ -10,6 +10,7 @@ install:
 # command to run tests
 before_script:
   - mysqladmin --user=travis --password="" password "root"
+  - mysql -e 'set default_storage_engine=INNODB'
   - mysql -e 'create database afinidata_test;'
   - mysql -e 'create database afinidata_users_test;'
 script:
