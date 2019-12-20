@@ -1,7 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from posts import views
+from rest_framework import routers
+
 
 app_name = 'posts'
+
+api_router = routers.DefaultRouter()
+api_router.register(r'tip', views.TipsViewSet)
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name="home"),
@@ -45,5 +50,8 @@ urlpatterns = [
     path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies-for-question'),
     path('reviews/', views.Reviews.as_view(), name='reviews'),
     path('getPostForUser', views.get_posts_for_user, name='get-post-for-user'),
-    path('post_comment/', views.AddCommentToPostByUserView.as_view(), name="post_comment")
+    path('getRecommendedPostForUser', views.getting_posts_reco, name='get-reco-post-for-user'),
+    path('post_comment/', views.AddCommentToPostByUserView.as_view(), name="post_comment"),
+    path('api/', include(api_router.urls)),
+
 ]
