@@ -50,6 +50,7 @@ urlpatterns = [
     path('questions/<int:id>/replies/', views.get_replies_to_question, name='replies-for-question'),
     path('reviews/', views.Reviews.as_view(), name='reviews'),
     path('getPostForUser', views.get_posts_for_user, name='get-post-for-user'),
+    path('getRecommendedPostForUser', views.getting_posts_reco, name='get-reco-post-for-user'),
     path('post_comment/', views.AddCommentToPostByUserView.as_view(), name="post_comment"),
     path('api/', include(api_router.urls)),
 
