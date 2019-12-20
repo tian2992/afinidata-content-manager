@@ -62,8 +62,8 @@ class UseCodeView(TemplateView):
             code.user_id = user.pk
             code.save()
             user.userdata_set.create(data_key='premium', data_value='true')
-            response = dict(set_attributes=dict(activo_premium1=True, code_error=False), messages=[])
+            response = dict(set_attributes=dict(activo_premium1='true', code_error='false'), messages=[])
             return JsonResponse(response)
 
-        response = dict(set_attributes=dict(cod_error=True), messages=[])
+        response = dict(set_attributes=dict(code_error='false'), messages=[])
         return JsonResponse(response)
