@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from rest_framework import viewsets
-
+from rest_framework.generics import CreateAPIView
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
     Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer
 from django.utils.decorators import method_decorator
@@ -21,6 +21,7 @@ import random
 import pytz
 import requests
 from posts.models import STATUS_CHOICES
+from posts import serializers
 import logging
 ## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
 
@@ -1462,3 +1463,7 @@ class TipsViewSet(viewsets.ModelViewSet):
     """
     queryset = Tip.objects.all()
     serializer_class = TipSerializer
+
+
+class PostComplexityCreateApiView(CreateAPIView):
+    serializer_class = serializers.PostComplexitySerializer

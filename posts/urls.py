@@ -53,5 +53,5 @@ urlpatterns = [
     path('getRecommendedPostForUser', views.getting_posts_reco, name='get-reco-post-for-user'),
     path('post_comment/', views.AddCommentToPostByUserView.as_view(), name="post_comment"),
     path('api/', include(api_router.urls)),
-
+    path('set_complexity/', views.PostComplexityCreateApiView.as_view(), name="post_complexity")
 ]
