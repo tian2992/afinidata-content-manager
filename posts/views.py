@@ -217,7 +217,7 @@ def fetch_post(request, id):
                               {'post': post, 'session_id': post_session.pk})
             except:
                 return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
-        
+
         return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
 
 
@@ -313,9 +313,10 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         return redirect('posts:edit-post', id=post.pk)
 
     def get_context_data(self, **kwargs):
+        id_post_context = self.kwargs['id']
         context = super().get_context_data()
         user = self.request.user
-        post = get_object_or_404(Post, id=self.kwargs['id'])
+        post = get_object_or_404(Post, id=id_post_context)
         if user.is_superuser:
             context['role'] = 'superuser'
         elif post.user == user:
@@ -323,13 +324,16 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         else:
             last_reviews = Review.objects.filter(post=post, status='pending').order_by('-id')[:1]
             if not last_reviews.count() > 0:
-                post = get_object_or_404(Post, id=self.kwargs['id'], user=user)
+                post = get_object_or_404(Post, id=id_post_context)
 
             last_review = last_reviews.first()
-            review = get_object_or_404(UserReviewRole, review=last_review, user=user)
-            context['role'] = 'reviser'
-            context['review'] = review.id
-
+            try:
+                review = get_object_or_404(UserReviewRole, review=last_review, user=user)
+                context['role'] = 'reviser'
+                context['review'] = review.id
+            except Http404:
+                context['role'] = 'reviser'
+                context['review'] = None
         try:
             tax = post.taxonomy
             ftax = forms.UpdateTaxonomy(instance=tax)
@@ -765,25 +769,25 @@ def get_posts_for_user(request):
     date_limit = today - days
     ## Fetch sent activities to exclude
     interactions = Interaction.objects.filter(user_id=user.pk, type='sended', created_at__gt=date_limit)
-    
+
     excluded = set()
     for interaction in interactions:
         if interaction.post_id:
             excluded.add(interaction.post_id)
     logger.info("excluding activities seen: {} ".format(excluded))
 
-    if is_premium: 
+    if is_premium:
         posts = Post.objects \
             .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value, 
-                    max_range__gte=months_old_value, 
+            .filter(min_range__lte=months_old_value,
+                    max_range__gte=months_old_value,
                     id__gte=208,
                     status='published')
     else:
         posts = Post.objects \
             .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value, 
-                    max_range__gte=months_old_value, 
+            .filter(min_range__lte=months_old_value,
+                    max_range__gte=months_old_value,
                     status='published')
 
     if posts.count() <= 0:
@@ -792,9 +796,9 @@ def get_posts_for_user(request):
         logger.warning(warning_message+ ": username {}".format(username))
         posts = Post.objects \
             .filter(min_range__lte=months_old_value,
-                    max_range__gte=months_old_value, 
+                    max_range__gte=months_old_value,
                     status='published')
-        
+
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
     if service_post.content_activity:
