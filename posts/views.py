@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, UpdateView, CreateView, DeleteView, DetailView, ListView, View
 from rest_framework import viewsets
-
+from rest_framework.generics import CreateAPIView
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
     Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer
 from django.utils.decorators import method_decorator
@@ -21,8 +21,12 @@ import random
 import pytz
 import requests
 from posts.models import STATUS_CHOICES
+from posts import serializers
 import logging
 ## FIXME : lots of issues; simplfy, create validator decorator, auth, duplication, unused vars.
+
+import celery
+from json import loads as json_loads
 
 logger = logging.getLogger(__name__)
 
@@ -309,9 +313,10 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         return redirect('posts:edit-post', id=post.pk)
 
     def get_context_data(self, **kwargs):
+        id_post_context = self.kwargs['id']
         context = super().get_context_data()
         user = self.request.user
-        post = get_object_or_404(Post, id=self.kwargs['id'])
+        post = get_object_or_404(Post, id=id_post_context)
         if user.is_superuser:
             context['role'] = 'superuser'
         elif post.user == user:
@@ -319,13 +324,16 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         else:
             last_reviews = Review.objects.filter(post=post, status='pending').order_by('-id')[:1]
             if not last_reviews.count() > 0:
-                post = get_object_or_404(Post, id=self.kwargs['id'], user=user)
+                post = get_object_or_404(Post, id=id_post_context)
 
             last_review = last_reviews.first()
-            review = get_object_or_404(UserReviewRole, review=last_review, user=user)
-            context['role'] = 'reviser'
-            context['review'] = review.id
-
+            try:
+                review = get_object_or_404(UserReviewRole, review=last_review, user=user)
+                context['role'] = 'reviser'
+                context['review'] = review.id
+            except Http404:
+                context['role'] = 'reviser'
+                context['review'] = None
         try:
             tax = post.taxonomy
             ftax = forms.UpdateTaxonomy(instance=tax)
@@ -678,6 +686,58 @@ class PostsListView(LoginRequiredMixin, TemplateView):
         context['posts'] = posts
 
         return context
+
+
+def getting_posts_reco(request):
+    logger.info("recommend posts for user")
+    months_old_value = 0
+    user = None
+    uid = 0
+    try:
+        months_old_value = int(request.GET['value'])
+        username = request.GET['username']
+        user = User.objects.get(username=username)
+        uid = user.id
+    except:
+        logger.exception("Invalid params on recommend get post")
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    logger.info("Fetching recommended posts for user {} at {} months".format(user, months_old_value))
+
+    broker = "pyamqp://guest@localhost//"
+    app = celery.Celery('tasks', backend='rpc://', broker=broker, broker_pool_limit=None)
+
+    recoo = {}
+
+    try:
+        reco_sign = celery.signature('afinidata_recommender.tasks.tasks.recommend', (uid, months_old_value))
+        reco_obj = reco_sign.delay()
+        reco_res = app.AsyncResult(reco_obj)
+        reco_data = reco_res.get()
+        recoo = json_loads(reco_data)
+    except:
+        logger.exception("Invalid params on recommend get post")
+        return JsonResponse(dict(status='error', error='Invalid params.'))
+
+    logger.info(f"fetched for user id {uid} recommends {recoo}")
+    recommend_id = list(recoo["post_id"].values())[0]
+
+    posto = Post.objects.filter(pk=recommend_id).first()
+
+    resp = dict(
+            post_id=posto.pk,
+            post_uri=settings.DOMAIN_URL + '/posts/' + str(posto.pk),
+            post_preview=posto.preview,
+            post_title=posto.name,
+            warn=None
+        )
+
+    logging.warning("sent activity: {}".format(resp))
+
+    return JsonResponse(dict(
+        set_attributes=resp,
+        messages=[],
+    ))
 
 
 def get_posts_for_user(request):
@@ -1407,3 +1467,7 @@ class TipsViewSet(viewsets.ModelViewSet):
     """
     queryset = Tip.objects.all()
     serializer_class = TipSerializer
+
+
+class PostComplexityCreateApiView(CreateAPIView):
+    serializer_class = serializers.PostComplexitySerializer
