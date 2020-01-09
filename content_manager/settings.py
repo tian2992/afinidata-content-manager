@@ -149,7 +149,8 @@ if os.getenv('CM_DATABASE_HOST'):
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4'
             }
         },
         'messenger_users_db': {
@@ -160,7 +161,8 @@ if os.getenv('CM_DATABASE_HOST'):
             'HOST': os.getenv('CM_DATABASE_HOST'),
             'PORT': os.getenv('CM_DATABASE_PORT'),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4'
             }
         }
     }
