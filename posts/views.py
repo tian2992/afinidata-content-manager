@@ -699,9 +699,7 @@ def getting_posts_reco(request):
     uid = 0
     try:
         months_old_value = int(request.GET['value'])
-        username = request.GET['username']
-        user = User.objects.get(username=username)
-        uid = user.id
+        uid = int(request.GET['user_id'])
     except:
         logger.exception("Invalid params on recommend get post")
         return JsonResponse(dict(status='error', error='Invalid params.'))
