@@ -689,6 +689,10 @@ class PostsListView(LoginRequiredMixin, TemplateView):
 
 
 def getting_posts_reco(request):
+    from django.conf import settings
+
+    BROKER = getattr(settings, "CELERY_BROKER")
+
     logger.info("recommend posts for user")
     months_old_value = 0
     user = None
@@ -704,7 +708,7 @@ def getting_posts_reco(request):
 
     logger.info("Fetching recommended posts for user {} at {} months".format(user, months_old_value))
 
-    broker = "pyamqp://guest@localhost//"
+    broker = BROKER if BROKER else "pyamqp://guest@localhost/"
     app = celery.Celery('tasks', backend='rpc://', broker=broker, broker_pool_limit=None)
 
     recoo = {}
