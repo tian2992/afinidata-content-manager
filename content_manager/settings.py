@@ -111,6 +111,9 @@ LOGGING = {
     },
 }
 
+# Celery broker:
+CELERY_BROKER = os.getenv('CELERY_BROKER', "pyamqp://guest@localhost/")
+
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases

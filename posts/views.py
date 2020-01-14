@@ -706,7 +706,7 @@ def getting_posts_reco(request):
 
     logger.info("Fetching recommended posts for user {} at {} months".format(user, months_old_value))
 
-    broker = BROKER if BROKER else "pyamqp://guest@localhost/"
+    broker = BROKER
     app = celery.Celery('tasks', backend='rpc://', broker=broker, broker_pool_limit=None)
 
     recoo = {}
