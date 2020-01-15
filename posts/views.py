@@ -726,6 +726,9 @@ def getting_posts_reco(request):
 
     posto = Post.objects.filter(pk=recommend_id).first()
 
+    post_dispatch = Interaction(post=posto, user_id=user.id, type='dispatched', value=1)
+    post_dispatch.save()
+
     resp = dict(
             post_id=posto.pk,
             post_uri=settings.DOMAIN_URL + '/posts/' + str(posto.pk),
