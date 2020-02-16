@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'reply_repo.apps.ReplyRepoConfig',
     'posts.apps.PostsConfig',
     'static.apps.StaticConfig',
     'messenger_users.apps.MessengerUsersConfig',

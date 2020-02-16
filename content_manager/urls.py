@@ -25,5 +25,6 @@ urlpatterns = [
     path('messenger_users/', include("messenger_users.urls", namespace="users")),
     path('utilities/', include("utilities.urls", namespace="utilities")),
     path('dashboard/', include("dash.urls", namespace="dash")),
-    path('codes/', include("random_codes.urls", namespace="codes"))
+    path('codes/', include("random_codes.urls", namespace="codes")),
+    path('reply/', include("reply_repo.urls", namespace="codes"))
 ]
