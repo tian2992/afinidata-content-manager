@@ -10,4 +10,4 @@ class Message(models.Model):
     content = models.TextField()
 
     def __str__(self):
-        return self.block_id
+        return "%s - %s - %s" %(self.block_id, self.language, self.full_locale)
