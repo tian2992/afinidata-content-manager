@@ -9,13 +9,33 @@ import json
 
 @csrf_exempt
 def index(request):
+    def _prepare_message(message):
+        message = message[0]
+        extra_items = None
+        try:
+            extra_items = json.loads(message.extra_items)
+        except:
+            extra_items = {}
+        r2 = dict(text=message.content)
+        r2.update(extra_items)
+        result = dict(messages=[r2])
+        return result
     '''{
      "messages": [
-       {"text": "Welcome to the Chatfuel Rockets!"},
-       {"text": "What are you up to?"}
+       {"text": "Welcome to the Example!"},
+       {"text": "What are you up to?",
+       "quick_replies": [
+        {
+          "title":"Loved it!",
+          "block_names": ["Block 1", "Block 2"]
+        },
+        {
+          "title":"Not really...",
+          "url": "https://google.com",
+          "type":"json_plugin_url"
+        },
      ]
     }'''
-    print (request.body)
     data = json.loads(request.body)
     if not data['locale']:
         raise Http404
@@ -33,8 +53,8 @@ def index(request):
         )
     message = list(message)
     if len(message) > 0:
-        message = message[0]
-        return JsonResponse(dict(messages=[dict(text=message.content)]))
+        result = _prepare_message(message)
+        return JsonResponse(result)
     if not message:
         message = models.Message.objects.filter(
                 block_id = data['block_id']
@@ -43,16 +63,16 @@ def index(request):
             )
     message = list(message)
     if len(message) > 0:
-        message = message[0]
-        return JsonResponse(dict(messages=[dict(text=message.content)]))
+        result = _prepare_message(message)
+        return JsonResponse(result)
     if not message:
         message = models.Message.objects.filter(
                 block_id = data['block_id']
             )
     message = list(message)
     if len(message) > 0:
-        message = message[0]
-        return JsonResponse(dict(messages=[dict(text=message.content)]))
+        result = _prepare_message(message)
+        return JsonResponse(result)
     if not message:
         message = 'Error - No block found for block_id %s and locale %s.' % (data['block_id'],
                                                                              data['locale'])
