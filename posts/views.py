@@ -695,7 +695,6 @@ def getting_posts_reco(request):
 
     logger.info("recommend posts for user")
     months_old_value = 0
-    user = None
     uid = 0
     try:
         months_old_value = int(request.GET['value'])
@@ -704,7 +703,7 @@ def getting_posts_reco(request):
         logger.exception("Invalid params on recommend get post")
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    logger.info("Fetching recommended posts for user {} at {} months".format(user, months_old_value))
+    logger.info("Fetching recommended posts for user {} at {} months".format(uid, months_old_value))
 
     broker = BROKER
     app = celery.Celery('tasks', backend='rpc://', broker=broker, broker_pool_limit=None)
@@ -721,12 +720,12 @@ def getting_posts_reco(request):
         logger.exception("Invalid params on recommend get post")
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
-    logger.info(f"fetched for user id {uid} recommends {recoo}")
+    logger.warning(f"fetched for user id {uid} recommends {recoo}")
     recommend_id = list(recoo["post_id"].values())[0]
 
     posto = Post.objects.filter(pk=recommend_id).first()
 
-    post_dispatch = Interaction(post=posto, user_id=user.id, type='dispatched', value=1)
+    post_dispatch = Interaction(post=posto, user_id=uid, type='dispatched', value=1)
     post_dispatch.save()
 
     resp = dict(
