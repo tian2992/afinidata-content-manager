@@ -769,7 +769,9 @@ def get_posts_for_user(request):
     #TODO: DO LOCALE!!!
     if locale:
         service_post = None
-        if months_old_value >= 4 and months_old_value <= 6:
+        if months_old_value >= 0 and months_old_value <= 3:
+            service_post = Post.objects.filter(id = 473)[0]
+        elif months_old_value >= 4 and months_old_value <= 6:
             service_post = Post.objects.filter(id = 474)[0]
         elif months_old_value >= 7 and months_old_value <= 9:
             service_post = Post.objects.filter(id = 475)[0]
@@ -779,7 +781,7 @@ def get_posts_for_user(request):
             service_post = Post.objects.filter(id = 477)[0]
         elif months_old_value >= 19 and months_old_value <= 24:
             service_post = Post.objects.filter(id = 478)[0]
-        elif months_old_value >= 25 and months_old_value <= 36:
+        elif months_old_value >= 25:
             service_post = Post.objects.filter(id = 479)[0]
         else:
             service_post = Post.objects.filter(id = 473)[0]
