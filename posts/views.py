@@ -754,8 +754,9 @@ def get_posts_for_user(request):
     user = None
     warning_message = None
     is_premium = False
-
+    locale = None
     try:
+        locale = request.GET.get('locale')
         months_old_value = int(request.GET['value'])
         username = request.GET['username']
         user = User.objects.get(username=username)
@@ -765,6 +766,34 @@ def get_posts_for_user(request):
         logger.error(e)
         logger.error(request.POST)
         return JsonResponse(dict(status='error', error='Invalid params.'))
+    #TODO: DO LOCALE!!!
+    if locale:
+        service_post = None
+        if months_old_value >= 4 and months_old_value <= 6:
+            service_post = Post.objects.filter(id = 474)[0]
+        elif months_old_value >= 7 and months_old_value <= 9:
+            service_post = Post.objects.filter(id = 475)[0]
+        elif months_old_value >= 10 and months_old_value <= 12:
+            service_post = Post.objects.filter(id = 476)[0]
+        elif months_old_value >= 13 and months_old_value <= 18:
+            service_post = Post.objects.filter(id = 477)[0]
+        elif months_old_value >= 19 and months_old_value <= 24:
+            service_post = Post.objects.filter(id = 478)[0]
+        elif months_old_value >= 25 and months_old_value <= 36:
+            service_post = Post.objects.filter(id = 479)[0]
+        else:
+            service_post = Post.objects.filter(id = 473)[0]
+        resp = dict(
+                post_id=service_post.pk,
+                post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
+                post_preview=service_post.preview,
+                post_title=service_post.name,
+                warn=warning_message
+            )
+        return JsonResponse(dict(
+            set_attributes=resp,
+            messages=[],
+        ))
 
     logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
 
