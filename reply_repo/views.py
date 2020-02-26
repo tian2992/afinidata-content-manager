@@ -46,12 +46,14 @@ def index(request):
         raise Http404
     language = d[0]
     region = d[1]
+    #First try with locale
     message = models.Message.objects.filter(
             block_id = data['block_id']
         ).filter(
             full_locale = data['locale']
         )
     message = list(message)
+    #Else try with language
     if len(message) > 0:
         result = _prepare_message(message)
         return JsonResponse(result)
@@ -62,18 +64,21 @@ def index(request):
                 language = language
             )
     message = list(message)
+    #Else default to english
     if len(message) > 0:
         result = _prepare_message(message)
         return JsonResponse(result)
     if not message:
         message = models.Message.objects.filter(
                 block_id = data['block_id']
+            ).filter(
+                language = 'en'
             )
     message = list(message)
     if len(message) > 0:
         result = _prepare_message(message)
         return JsonResponse(result)
     if not message:
-        message = 'Error - No block found for block_id %s and locale %s.' % (data['block_id'],
-                                                                             data['locale'])
+        message = 'Error - No block found in english for block_id %s and locale %s.' % (data['block_id'],
+        data['locale'])
     return JsonResponse(dict(messages=[dict(text=message)]))
