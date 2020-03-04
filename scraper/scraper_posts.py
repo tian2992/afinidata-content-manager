@@ -21,8 +21,8 @@ class PostsSpider(scrapy.Spider):
 
     def parse(self, response):
         b = response.css('.templateContainer')
-        page = response.url.split("/")[-2]
-        filename = 'posto-%s.html' % page
+        page = response.url.split("/")[-1]
+        filename = 'scraper/posto-%s.html' % page
         with open(filename, 'wb') as f:
             f.write(sanitize(b.get()).encode())
         self.log('Saved file %s' % filename)    
