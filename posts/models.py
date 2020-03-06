@@ -64,6 +64,17 @@ class Post(models.Model):
         return f"{self.pk} - {self.name} - {self.content_activity[:20]}"
 
 
+class PostLocale(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    lang = models.CharField(max_length=10, default="es")
+    locale = models.CharField(max_length=10, default="es-gt")
+
+    rich_post_content = models.TextField()
+    plain_post_content_= models.TextField()
+    link_post = models.CharField(max_length=144)
+
+
 class Interaction(models.Model):
     """
     Interaction
@@ -272,6 +283,7 @@ class Componente(models.Model):
     def __str__(self):
         return self.name
 
+
 class Taxonomy(models.Model):
     post = models.OneToOneField(Post,
                                 on_delete=models.CASCADE,
@@ -281,6 +293,9 @@ class Taxonomy(models.Model):
     area = models.ForeignKey(Area, on_delete=models.DO_NOTHING)
     subarea = models.ForeignKey(Subarea, on_delete=models.DO_NOTHING)
     component = models.ForeignKey(Componente, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return f"taxonomy for post {self.post_id}: {self.area.id} - {self.subarea.id} - {self.component.id}"
 
 
 class Review(models.Model):
