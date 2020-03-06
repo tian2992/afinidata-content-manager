@@ -788,7 +788,8 @@ def get_posts_for_user(request):
                 .exclude(id__in=excluded) \
                 .filter(min_range__lte=months_old_value,
                         max_range__gte=months_old_value,
-                        id__gte=473)
+                        id__gte=473,
+                        status='need_changes')
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
@@ -802,7 +803,8 @@ def get_posts_for_user(request):
                 .exclude(id__in=excluded) \
                 .filter(min_range__lte=months_old_value,
                         max_range__gte=months_old_value,
-                        id__gte=473)
+                        id__gte=473,
+                        status='need_changes')
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
@@ -818,7 +820,8 @@ def get_posts_for_user(request):
             posts = Post.objects \
                 .filter(min_range__lte=months_old_value,
                         max_range__gte=months_old_value,
-                        id__gte=473)
+                        id__gte=473,
+                        status='need_changes')
         else:
             posts = Post.objects \
                 .filter(min_range__lte=months_old_value,
