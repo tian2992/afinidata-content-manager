@@ -317,10 +317,12 @@ class GetMonthsView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            date = parse(request.GET['date'])
+            date = parse(request.GET['date'], dayfirst=True)
             rel = relativedelta.relativedelta(datetime.now(), date)
             logger.info(rel)
             child_months = (rel.years * 12) + rel.months
+            if child_months < 0:
+                logger.warning("Child months calculated below 0")
             return JsonResponse(dict(set_attributes=dict(childMonths=child_months), messages=[]))
         except:
             logger.exception("Invalid Date")
