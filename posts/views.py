@@ -767,35 +767,6 @@ def get_posts_for_user(request):
         logger.error(request.POST)
         return JsonResponse(dict(status='error', error='Invalid params.'))
     #TODO: DO LOCALE!!!
-    if locale:
-        service_post = None
-        if months_old_value >= 0 and months_old_value <= 3:
-            service_post = Post.objects.filter(id = 473)[0]
-        elif months_old_value >= 4 and months_old_value <= 6:
-            service_post = Post.objects.filter(id = 474)[0]
-        elif months_old_value >= 7 and months_old_value <= 9:
-            service_post = Post.objects.filter(id = 475)[0]
-        elif months_old_value >= 10 and months_old_value <= 12:
-            service_post = Post.objects.filter(id = 476)[0]
-        elif months_old_value >= 13 and months_old_value <= 18:
-            service_post = Post.objects.filter(id = 477)[0]
-        elif months_old_value >= 19 and months_old_value <= 24:
-            service_post = Post.objects.filter(id = 478)[0]
-        elif months_old_value >= 25:
-            service_post = Post.objects.filter(id = 479)[0]
-        else:
-            service_post = Post.objects.filter(id = 473)[0]
-        resp = dict(
-                post_id=service_post.pk,
-                post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
-                post_preview=service_post.preview,
-                post_title=service_post.name,
-                warn=warning_message
-            )
-        return JsonResponse(dict(
-            set_attributes=resp,
-            messages=[],
-        ))
 
     logger.info("Fetching posts for user {} at {} months".format(user, months_old_value))
 
@@ -812,27 +783,50 @@ def get_posts_for_user(request):
     logger.info("excluding activities seen: {} ".format(excluded))
 
     if is_premium:
-        posts = Post.objects \
-            .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value,
-                    max_range__gte=months_old_value,
-                    id__gte=208,
-                    status='published')
+        if locale:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        id__gte=473,
+                        status='need changes')
+        else:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        id__gte=208,
+                        status='published')
     else:
-        posts = Post.objects \
-            .exclude(id__in=excluded) \
-            .filter(min_range__lte=months_old_value,
-                    max_range__gte=months_old_value,
-                    status='published')
+        if locale:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        id__gte=473,
+                        status='need changes')
+        else:
+            posts = Post.objects \
+                .exclude(id__in=excluded) \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        status='published')
 
     if posts.count() <= 0:
         # Repeat; report error that has been seen.
         warning_message = 'no values without sended available'
         logger.warning(warning_message+ ": username {}".format(username))
-        posts = Post.objects \
-            .filter(min_range__lte=months_old_value,
-                    max_range__gte=months_old_value,
-                    status='published')
+        if locale:
+            posts = Post.objects \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        id__gte=473,
+                        status='need changes')
+        else:
+            posts = Post.objects \
+                .filter(min_range__lte=months_old_value,
+                        max_range__gte=months_old_value,
+                        status='published')
 
     rand_limit = random.randrange(0, posts.count())
     service_post = posts[rand_limit]
