@@ -74,6 +74,7 @@ class PostLocale(models.Model):
 
     rich_post_content = models.TextField()
     plain_post_content = models.TextField()
+    summary_content = models.TextField()
     link_post = models.CharField(max_length=144)
 
 
