@@ -71,7 +71,7 @@ class PostLocale(models.Model):
     locale = models.CharField(max_length=10, default="es-gt")
 
     rich_post_content = models.TextField()
-    plain_post_content_= models.TextField()
+    plain_post_content = models.TextField()
     link_post = models.CharField(max_length=144)
 
 
