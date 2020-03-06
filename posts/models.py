@@ -168,6 +168,7 @@ class Question(models.Model):
         created_at, updated_at: (Uso general, fecha de creación, fecha de última actualización).
     """
     name = models.CharField(max_length=255, unique=True)
+    lang = models.CharField(max_length=16, default="es")
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     replies = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
