@@ -158,14 +158,25 @@ def fetch_post(request, id):
     if request.method == 'GET':
         post = Post.objects.get(id=id)
         user = None
+        locale = None
+        language = None
+        post_locale = None
         try:
+            locale = request.GET.get('locale')
+            if locale:
+                language = 'en'
+                d = data['locale'].split('_')
+                if len(d) == 2:
+                    language = d[0]
             username = request.GET['username']
             user = User.objects.get(username=username)
             logger.info('fetching post for user : ', user)
         except:
             logger.warning('not user with username')
             pass
-
+        if locale:
+            post_locale = PostLocale.objects.get(lang = language,
+                                                 post__id=id)
         if not user:
             try:
                 channel_id = request.GET['channel_id']
@@ -212,13 +223,21 @@ def fetch_post(request, id):
                     ua.save()
                 except Exception:
                     logger.exception("fail on setting opened User Activity")
-
-                return render(request, 'posts/post.html',
-                              {'post': post, 'session_id': post_session.pk})
+                if post_locale:
+                    return render(request, 'posts/postlocale.html', {'postlocale': post_locale, 'session_id': post_session.pk})
+                else:
+                    return render(request, 'posts/post.html',
+                                  {'post': post, 'session_id': post_session.pk})
             except:
-                return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
+                if post_locale:
+                    return render(request, 'posts/postlocale.html', {'postlocale': post_locale, 'session_id': 'null'})
+                else:
+                    return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
 
-        return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
+        if post_locale:
+            return render(request, 'posts/postlocale.html', {'postlocale': post_locale, 'session_id': 'null'})
+        else:
+            return render(request, 'posts/post.html', {'post': post, 'session_id': 'null'})
 
 
 class StatisticsView(TemplateView):
@@ -787,22 +806,15 @@ def get_posts_for_user(request):
         if interaction.post_id:
             excluded.add(interaction.post_id)
     logger.info("excluding activities seen: {} ".format(excluded))
-
+    post_locale = None
     if is_premium:
         if locale:
-            posts = PostLocale.objects.exclude(post__id__in=excluded) \
+            post_locale = PostLocale.objects.exclude(post__id__in=excluded) \
                                       .filter(lang = language,
                                               post__id__gte=208,
                                               post__status='published',
-                                              post__max_range__lte=months_old_value,
+                                              post__max_range__gte=months_old_value,
                                               post__min_range__lte=months_old_value)
-            if posts.count() <= 0:
-                posts = Post.objects \
-                    .exclude(id__in=excluded) \
-                    .filter(min_range__lte=months_old_value,
-                            max_range__gte=months_old_value,
-                            id__gte=473,
-                            status='need_changes')
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
@@ -812,45 +824,54 @@ def get_posts_for_user(request):
                         status='published')
     else:
         if locale:
-            posts = Post.objects \
-                .exclude(id__in=excluded) \
-                .filter(min_range__lte=months_old_value,
-                        max_range__gte=months_old_value,
-                        id__gte=473,
-                        status='need_changes')
+            posts = PostLocale.objects.exclude(post__id__in=excluded) \
+                                      .filter(lang = language,
+                                              post__status='published',
+                                              post__max_range__gte=months_old_value,
+                                              post__min_range__lte=months_old_value)
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
                 .filter(min_range__lte=months_old_value,
                         max_range__gte=months_old_value,
                         status='published')
-
-    if posts.count() <= 0:
+    if locale and posts.count() <= 0:
         # Repeat; report error that has been seen.
         warning_message = 'no values without sended available'
         logger.warning(warning_message+ ": username {}".format(username))
-        if locale:
-            posts = Post.objects \
-                .filter(min_range__lte=months_old_value,
-                        max_range__gte=months_old_value,
-                        id__gte=473,
-                        status='need_changes')
-        else:
-            posts = Post.objects \
-                .filter(min_range__lte=months_old_value,
-                        max_range__gte=months_old_value,
-                        status='published')
+        posts = PostLocale.objects \
+            .filter(lang = language,
+                    post__min_range__lte=months_old_value,
+                    post__max_range__gte=months_old_value,
+                    post__status='published')
+    elif posts.count() <= 0:
+        # Repeat; report error that has been seen.
+        warning_message = 'no values without sended available'
+        logger.warning(warning_message+ ": username {}".format(username))
+        posts = Post.objects \
+            .filter(min_range__lte=months_old_value,
+                    max_range__gte=months_old_value,
+                    status='published')
 
     rand_limit = random.randrange(0, posts.count())
-    service_post = posts[rand_limit]
-    if service_post.content_activity:
+    r = posts[rand_limit]
+    if locale:
+        content_activity = r.plain_post_content
+        post_id = r.post.pk
+        post_uri = settings.DOMAIN_URL + '/posts/' + str(r.pk) + str('?locale=%s'%(locale))
+        post_preview = r.summary_content
+        post_title = r.title
+    else:
+        content_activity = r.content_activity
+        post_id = r.pk
+        post_uri = settings.DOMAIN_URL + '/posts/' + str(r.pk)
+        post_preview = r.preview
+        post_title = r.name
+    if content_activity:
         activity = " -- ".join(service_post.content_activity.split('|'))
         logging.info("activity selected: {}".format(activity))
-    elif service_post.content_activity.post:
-        activity = " -- ".join(service_post.post.content_activity.split('|'))
-        logging.info("activity selected: {}".format(activity))
 
-    post_dispatch = Interaction(post=service_post, user_id=user.id, type='dispatched', value=1)
+    post_dispatch = Interaction(post=post_id, user_id=user.id, type='dispatched', value=1)
     post_dispatch.save()
 
     try:
@@ -861,10 +882,10 @@ def get_posts_for_user(request):
         logger.exception("fail on setting User Activity")
 
     resp = dict(
-            post_id=service_post.pk,
-            post_uri=settings.DOMAIN_URL + '/posts/' + str(service_post.pk),
-            post_preview=service_post.preview,
-            post_title=service_post.name,
+            post_id=post_id,
+            post_uri=post_uri,
+            post_preview=post_preview,
+            post_title=post_title,
             warn=warning_message
         )
 
