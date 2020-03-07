@@ -165,7 +165,7 @@ def fetch_post(request, id):
             locale = request.GET.get('locale')
             if locale:
                 language = 'en'
-                d = data['locale'].split('_')
+                d = locale.split('_')
                 if len(d) == 2:
                     language = d[0]
             username = request.GET['username']
@@ -779,7 +779,7 @@ def get_posts_for_user(request):
         locale = request.GET.get('locale')
         if locale:
             language = 'en'
-            d = data['locale'].split('_')
+            d = locale.split('_')
             if len(d) == 2:
                 language = d[0]
         months_old_value = int(request.GET['value'])
@@ -1001,7 +1001,7 @@ def question_by_post(request, id):
     language = 'es'
     if locale:
         language = 'en'
-        d = data['locale'].split('_')
+        d = locale.split('_')
         if len(d) == 2:
             language = d[0]
     questions = Question.objects.filter(post_id=id, lang = language)
