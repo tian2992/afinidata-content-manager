@@ -858,13 +858,13 @@ def get_posts_for_user(request):
     r = posts[rand_limit]
     if locale:
         content_activity = r.plain_post_content
-        post_id = r.post.pk
+        post_id = r.post
         post_uri = settings.DOMAIN_URL + '/posts/' + str(r.pk) + str('?locale=%s'%(locale))
         post_preview = r.summary_content
         post_title = r.title
     else:
         content_activity = r.content_activity
-        post_id = r.pk
+        post_id = r
         post_uri = settings.DOMAIN_URL + '/posts/' + str(r.pk)
         post_preview = r.preview
         post_title = r.name
@@ -883,7 +883,7 @@ def get_posts_for_user(request):
         logger.exception("fail on setting User Activity")
 
     resp = dict(
-            post_id=post_id,
+            post_id=post_id.pk,
             post_uri=post_uri,
             post_preview=post_preview,
             post_title=post_title,
