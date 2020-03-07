@@ -869,7 +869,7 @@ def get_posts_for_user(request):
         post_preview = r.preview
         post_title = r.name
     if content_activity:
-        activity = " -- ".join(service_post.content_activity.split('|'))
+        activity = " -- ".join(content_activity.split('|'))
         logging.info("activity selected: {}".format(activity))
 
     post_dispatch = Interaction(post=post_id, user_id=user.id, type='dispatched', value=1)
