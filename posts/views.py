@@ -755,8 +755,14 @@ def get_posts_for_user(request):
     warning_message = None
     is_premium = False
     locale = None
+    language = 'es'
     try:
         locale = request.GET.get('locale')
+        if locale:
+            language = 'en'
+            d = data['locale'].split('_')
+            if len(d) == 2:
+                language = d[0]
         months_old_value = int(request.GET['value'])
         username = request.GET['username']
         user = User.objects.get(username=username)
@@ -784,12 +790,19 @@ def get_posts_for_user(request):
 
     if is_premium:
         if locale:
-            posts = Post.objects \
-                .exclude(id__in=excluded) \
-                .filter(min_range__lte=months_old_value,
-                        max_range__gte=months_old_value,
-                        id__gte=473,
-                        status='need_changes')
+            posts = PostLocale.objects.exclude(post__id__in=excluded) \
+                                      .filter(lang = language,
+                                              post__id__gte=208,
+                                              post__status='published',
+                                              post__max_range__lte=months_old_value,
+                                              post__min_range__lte=months_old_value)
+            if posts.count() <= 0:
+                posts = Post.objects \
+                    .exclude(id__in=excluded) \
+                    .filter(min_range__lte=months_old_value,
+                            max_range__gte=months_old_value,
+                            id__gte=473,
+                            status='need_changes')
         else:
             posts = Post.objects \
                 .exclude(id__in=excluded) \
@@ -832,6 +845,9 @@ def get_posts_for_user(request):
     service_post = posts[rand_limit]
     if service_post.content_activity:
         activity = " -- ".join(service_post.content_activity.split('|'))
+        logging.info("activity selected: {}".format(activity))
+    elif service_post.content_activity.post:
+        activity = " -- ".join(service_post.post.content_activity.split('|'))
         logging.info("activity selected: {}".format(activity))
 
     post_dispatch = Interaction(post=service_post, user_id=user.id, type='dispatched', value=1)
@@ -960,10 +976,21 @@ class DeleteQuestionView(LoginRequiredMixin, DeleteView):
 def question_by_post(request, id):
     if request.method == 'POST':
         return JsonResponse(dict(status='error', error='Invalid method.'))
+    locale = request.GET.get('locale')
+    language = 'es'
+    if locale:
+        language = 'en'
+        d = data['locale'].split('_')
+        if len(d) == 2:
+            language = d[0]
+    questions = Question.objects.filter(post_id=id, lang = language)
 
-    questions = Question.objects.filter(post_id=id)
 
-    if questions.count() <= 0:
+    if questions.count() <= 0 and locale:
+        questions = Question.objects.filter(post_id=id, lang = 'en')
+        if questions.count() <= 0:
+            return JsonResponse(dict(status='error', error='No questions for this post'))
+    elif questions.count() <= 0:
         return JsonResponse(dict(status='error', error='No questions for this post'))
 
     random_limit = random.randrange(0, questions.count())
