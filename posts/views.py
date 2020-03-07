@@ -807,9 +807,10 @@ def get_posts_for_user(request):
             excluded.add(interaction.post_id)
     logger.info("excluding activities seen: {} ".format(excluded))
     post_locale = None
+    posts = None
     if is_premium:
         if locale:
-            post_locale = PostLocale.objects.exclude(post__id__in=excluded) \
+            posts = PostLocale.objects.exclude(post__id__in=excluded) \
                                       .filter(lang = language,
                                               post__id__gte=208,
                                               post__status='published',
