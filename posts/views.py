@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, UpdateView, CreateView, DeleteVie
 from rest_framework import viewsets
 from rest_framework.generics import CreateAPIView
 from posts.models import Post, Interaction, Feedback, Label, Question, Response, Review, UserReviewRole, Approbation, \
-    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer
+    Rejection, ReviewComment, QuestionResponse, MessengerUserCommentPost, Tip, TipSerializer, PostLocale
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
