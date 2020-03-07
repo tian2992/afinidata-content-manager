@@ -90,7 +90,7 @@ def diff_post_dataframe(post: Post, df):
     # print(f"max- {max_r} === {max_d_val}")
     return (min_r - min_d_val, max_r-max_d_val)
 
-s = Spread("https://docs.google.com/spreadsheets/d/1EfS2W11kRg2C1H6KD2vVjR_Htvy6j7C4SSGHPA8Bvpc/edit?ts=5d22a555",
+s = Spread("",
            sheet="Base de Datos")
 df = s.sheet_to_df()
 
