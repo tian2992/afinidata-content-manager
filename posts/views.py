@@ -175,8 +175,8 @@ def fetch_post(request, id):
             logger.warning('not user with username')
             pass
         if locale:
-            post_locale = PostLocale.objects.get(lang = language,
-                                                 post__id=id)
+            post_locale = PostLocale.objects.filter(lang = language,
+                                                 post__id=id).first()
         if not user:
             try:
                 channel_id = request.GET['channel_id']
@@ -913,8 +913,8 @@ def post_activity(request, id):
             if len(d) == 2:
                 language = d[0]
         if locale:
-            post_locale = PostLocale.objects.get(lang = language,
-                                                 post__id=id)
+            post_locale = PostLocale.objects.filter(lang = language,
+                                                 post__id=id).first()
         search_post = Post.objects.get(id=id)
         post_count = int(request.GET['post_count'])
     except Exception as e:
