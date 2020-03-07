@@ -859,7 +859,7 @@ def get_posts_for_user(request):
     if locale:
         content_activity = r.plain_post_content
         post_id = r.post
-        post_uri = settings.DOMAIN_URL + '/posts/' + str(r.pk) + str('?locale=%s'%(locale))
+        post_uri = settings.DOMAIN_URL + '/posts/' + str(r.post.pk) + str('?locale=%s'%(locale))
         post_preview = r.summary_content
         post_title = r.title
     else:
