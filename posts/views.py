@@ -159,7 +159,7 @@ def fetch_post(request, id):
         post = Post.objects.get(id=id)
         user = None
         locale = None
-        language = None
+        language = 'es'
         post_locale = None
         try:
             locale = request.GET.get('locale')
@@ -902,16 +902,29 @@ def post_activity(request, id):
     if request.method == 'POST':
         return JsonResponse(dict(status='error', error='Invalid params.'))
 
+    language = 'es'
+    post_locale = None
+    locale = None
     try:
+        locale = request.GET.get('locale')
+        if locale:
+            language = 'en'
+            d = locale.split('_')
+            if len(d) == 2:
+                language = d[0]
+        if locale:
+            post_locale = PostLocale.objects.get(lang = language,
+                                                 post__id=id)
         search_post = Post.objects.get(id=id)
         post_count = int(request.GET['post_count'])
     except Exception as e:
         return JsonResponse(dict(status='error', error=str(e)))
-
     if not search_post.content_activity:
         return JsonResponse(dict(status='error', error='Post has not activity'))
-
-    activity_array = search_post.content_activity.split('|')
+    if post_locale:
+        activity_array = post_locale.plain_post_content.split('|')
+    else:
+        activity_array = search_post.content_activity.split('|')
     print(len(activity_array))
     if post_count > len(activity_array) - 1:
         return JsonResponse(dict(status='error', error='Invalid params.'))
