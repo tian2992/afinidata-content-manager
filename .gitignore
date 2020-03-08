@@ -25,3 +25,4 @@ default
 messengeruser
 
 .coverage
+scraper/*.html
