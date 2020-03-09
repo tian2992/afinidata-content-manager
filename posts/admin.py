@@ -12,7 +12,7 @@ admin.site.register(models.Question, QuestionModel)
 
 
 class QuestionResponseModel(admin.ModelAdmin):
-    search_fields = ['question', 'response']
+    search_fields = ['question__name', 'response']
 
 
 admin.site.register(models.QuestionResponse, QuestionResponseModel)

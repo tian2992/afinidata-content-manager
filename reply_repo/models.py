@@ -202,4 +202,4 @@ class Message(models.Model):
     extra_items = models.TextField(default='')
 
     def __str__(self):
-        return f"{self.block_id} -  {self.content[:20]} -  :{self.language} {self.full_locale}"
+        return f"{self.block_id} - {self.content[:150]} :{ self.language} {self.full_locale}"

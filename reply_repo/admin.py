@@ -7,4 +7,4 @@ class MessageModel(admin.ModelAdmin):
     search_fields = ['block_id', 'content']
 
 
-admin.site.register(models.Message, model=MessageModel)
+admin.site.register(models.Message, MessageModel)
