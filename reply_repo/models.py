@@ -1,5 +1,5 @@
 from django.db import models
-
+import re
 
 LANGS = [
     ('en', 'English'),
@@ -193,6 +193,9 @@ LOCALES = (
     (u'es_LA', u'es_LA')
 )
 
+def safe_print(st):
+    #FIXME for a safer unicode aware repr
+    return re.sub(r'[^\x00-\x7f]', r'', st)
 
 class Message(models.Model):
     block_id = models.CharField(max_length=255, null=False, unique=False, default='')
@@ -202,4 +205,4 @@ class Message(models.Model):
     extra_items = models.TextField(default='')
 
     def __str__(self):
-        return f"{self.block_id} - {self.content[:150]} :{ self.language} {self.full_locale}"
+        return f"{self.block_id} - {safe_print(self.content)[:150]} :{ self.language} {self.full_locale}"
