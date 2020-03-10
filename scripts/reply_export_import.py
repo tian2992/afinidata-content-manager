@@ -9,7 +9,7 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'content_manager.production')
 
 import django
-django.setup()
+# django.setup()
 
 def get_replies():
     from reply_repo.models import Message
