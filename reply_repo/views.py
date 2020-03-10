@@ -48,9 +48,9 @@ def index(request):
     region = d[1]
     #First try with locale
     message = models.Message.objects.filter(
-            block_id = data['block_id']
-        ).filter(
-            full_locale = data['locale']
+            block_id = data['block_id'],
+            full_locale = data['locale'],
+            state = 'Published'
         )
     message = list(message)
     #Else try with language
@@ -59,9 +59,9 @@ def index(request):
         return JsonResponse(result)
     if not message:
         message = models.Message.objects.filter(
-                block_id = data['block_id']
-            ).filter(
-                language = language
+                block_id = data['block_id'],
+                language = language,
+                state = 'Published'
             )
     message = list(message)
     #Else default to english
@@ -70,9 +70,9 @@ def index(request):
         return JsonResponse(result)
     if not message:
         message = models.Message.objects.filter(
-                block_id = data['block_id']
-            ).filter(
-                language = 'en'
+                block_id = data['block_id'],
+                language = 'en',
+                state = 'Published'
             )
     message = list(message)
     if len(message) > 0:
