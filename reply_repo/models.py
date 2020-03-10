@@ -193,6 +193,12 @@ LOCALES = (
     (u'es_LA', u'es_LA')
 )
 
+STATES = (
+    (u'Draft', u'Draft'),
+    (u'AutoTranslated', u'AutoTranslated'),
+    (u'Published', u'Published')
+)
+
 def safe_print(st):
     #FIXME for a safer unicode aware repr
     return re.sub(r'[^\x00-\x7f]', r'', st)
@@ -201,6 +207,7 @@ class Message(models.Model):
     block_id = models.CharField(max_length=255, null=False, unique=False, default='')
     language = models.CharField(max_length=2, null=False, choices=LANGS, default=LANGS[0][0])
     full_locale = models.CharField(max_length=5, null=False, choices=LOCALES, default=LOCALES[0][0])
+    state = models.CharField(max_length=255, null=False, choices=STATES, default=STATES[0][0])
     content = models.TextField()
     extra_items = models.TextField(default='')
 
