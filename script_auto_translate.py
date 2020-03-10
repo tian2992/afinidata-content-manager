@@ -4,7 +4,7 @@ Copy paste this script in a django shell:
     1. Activate venv (source venv/bin/activate)
     2. Install boto3 (pip install -r requirements.txt)
     3. Save the following https://nextcloud.afinidata.com/index.php/apps/files/?dir=/Credenciales&fileid=241# file to ~/.aws/credentials
-    4. Copy Paste script
+    4. Start the shell & python manage.py Copy Paste script
     5. See result
 '''
 from reply_repo.models import Message
@@ -31,6 +31,7 @@ def translate_reply_repo(language_origin = 'es', language_destination = 'en', de
                                         SourceLanguageCode=language_origin,
                                         TargetLanguageCode=language_destination)
       msg_to_save = Message(block_id = message.block_id,
+                            state = 'AutoTranslated',
                             language = language_destination,
                             full_locale = destination_locale,
                             content = result.get('TranslatedText'),
@@ -60,3 +61,13 @@ def translate_questions(language_origin = 'es', language_destination = 'en', des
       q.save()
 
     print ('Translated %s questions. ' % (len(questions_to_translate)))
+
+def change_state(language = 'en', desired_state = 'Published'):
+    messages_updated = Message.objects \
+      .exclude(
+        state = desired_state
+      ) \
+      .filter(
+        language = language
+      ).update(state=desired_state)
+    print ('Updated %s messages. ' % messages_updated)
