@@ -199,8 +199,8 @@ def safe_print(st):
 
 class Message(models.Model):
     block_id = models.CharField(max_length=255, null=False, unique=False, default='')
-    language = models.CharField(max_length=2, null=False, choices=LANGS, default=LANGS[0][0])
-    full_locale = models.CharField(max_length=5, null=False, choices=LOCALES, default=LOCALES[0][0])
+    language = models.CharField(max_length=2, null=False, choices=LANGS, default=LANGS[1][0])
+    full_locale = models.CharField(max_length=5, null=False, choices=LOCALES, default=LOCALES[1][0])
     content = models.TextField()
     extra_items = models.TextField(default='')
 
