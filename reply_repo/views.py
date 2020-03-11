@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+
 from reply_repo import models
 import json
 #from posts.models import Post, Interaction
@@ -82,3 +84,19 @@ def index(request):
         message = 'Error - No block found in english for block_id %s and locale %s.' % (data['block_id'],
         data['locale'])
     return JsonResponse(dict(messages=[dict(text=message)]))
+
+
+def fix_messages_view():
+    return render("upload_form.html")
+
+
+@api_view
+def download_messages(mess_ur):
+    from scripts.reply_export_import import run_dump
+    return JsonResponse(run_dump(mess_ur))
+
+
+@api_view
+def upload_messages(mess_ur):
+
+    return JsonResponse()

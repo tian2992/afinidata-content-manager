@@ -27,12 +27,13 @@ def df_from_replies(reps_m):
 def dump_replies(sp_url, l_df):
     spread = Spread(sp_url)
     spread.df_to_sheet(l_df, index=True, sheet=f"Dump {datetime.now()}")
+    return spread
 
 
 def run_dump(sheet_url):
     rps = get_replies()
     df = df_from_replies(rps)
-    dump_replies(sheet_url, df)
+    return dump_replies(sheet_url, df)
 
 
 def parse_sheet(sheet_url):
@@ -42,6 +43,6 @@ def parse_sheet(sheet_url):
     df = s.sheet_to_df()
     return df
 
-def load_replies(reply_it):
+def amek_replies(reply_it):
     '''Adds replies to DB'''
     pass
