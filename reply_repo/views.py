@@ -87,16 +87,16 @@ def index(request):
 
 
 def fix_messages_view(request):
-    return render("upload_form.html")
+    return render(request, "reply_repo/upload_form.html")
 
 
-@api_view
+@api_view(["POST"])
 def download_messages(mess_ur):
     from scripts.reply_export_import import run_dump
     return JsonResponse(run_dump(mess_ur))
 
 
-@api_view
+@api_view(["POST"])
 def upload_messages(mess_ur):
 
     return JsonResponse()
