@@ -87,7 +87,7 @@ def index(request):
 
 
 def fix_messages_view(request):
-    return render(request, template_name="upload_form.html")
+    return render("upload_form.html")
 
 
 @api_view
