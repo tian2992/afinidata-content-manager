@@ -6,7 +6,7 @@ app_name = 'dash'
 
 urlpatterns = [
     path('', index, name="index"),
-    path('fix_core', fix_messages_view, name='fixer'),
+    path('fix_messages', fix_messages_view, name='fixer'),
     path('download', download_messages, name="down"),
     path('upload', upload_messages, name="up")
 ]
