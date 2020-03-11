@@ -86,8 +86,8 @@ def index(request):
     return JsonResponse(dict(messages=[dict(text=message)]))
 
 
-def fix_messages_view():
-    return render("upload_form.html")
+def fix_messages_view(request):
+    return render(request, template_name="upload_form.html")
 
 
 @api_view
