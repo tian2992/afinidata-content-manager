@@ -51,7 +51,7 @@ def index(request):
     #First try with locale
     message = models.Message.objects.filter(
             block_id = data['block_id'],
-            full_locale = data['locale'],
+            language = language, #  = data['locale'],
             state = 'Published'
         )
     message = list(message)
