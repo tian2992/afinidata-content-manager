@@ -87,7 +87,12 @@ def index(request):
 
 
 def fix_messages_view(request):
-    return render(request, "reply_repo/upload_form.html")
+    return """<form action="download" method="post">
+    <input type="text" name="url" />
+
+    <button type="submit" formaction="download">Download</button>
+    <button type="submit" formaction="upload">Upload</button>
+</form>"""
 
 
 @api_view(["POST"])
