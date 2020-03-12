@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -87,12 +87,12 @@ def index(request):
 
 
 def fix_messages_view(request):
-    return """<form action="download" method="post">
+    return HttpResponse("""<form action="download" method="post">
     <input type="text" name="url" />
 
     <button type="submit" formaction="download">Download</button>
     <button type="submit" formaction="upload">Upload</button>
-</form>"""
+</form>""")
 
 
 @api_view(["POST"])
