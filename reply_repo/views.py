@@ -96,13 +96,13 @@ def fix_messages_view(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
-def download_messages(request, mess_ur):
+def download_messages(request):
+    mess_ur = request.POST.get("url")
     from scripts.reply_export_import import run_dump
     return JsonResponse(run_dump(mess_ur))
 
+
 @csrf_exempt
-@api_view(["POST"])
-def upload_messages(request, mess_ur):
+def upload_messages(request):
 
     return JsonResponse()
