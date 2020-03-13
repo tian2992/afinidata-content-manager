@@ -36,6 +36,11 @@ def run_dump(sheet_url):
     return dump_replies(sheet_url, df)
 
 
+def run_up(sheet_url):
+    sh = parse_sheet(sheet_url)
+    return amek_replies(sh)
+
+
 def parse_sheet(sheet_url):
     '''from a gsheet return a pandas df'''
     s = Spread(sheet_url,
@@ -43,6 +48,34 @@ def parse_sheet(sheet_url):
     df = s.sheet_to_df()
     return df
 
-def amek_replies(reply_it):
+
+def amek_replies(reply_df):
     '''Adds replies to DB'''
-    pass
+    import json
+    from reply_repo.models import Message
+    added = 0
+    edited = 0
+
+    for i, row in reply_df.iterrows():
+        if row.id:
+            print(f"updating row {i}")
+            r = dict(row)
+            del r["id"]
+            m, cre = Message.objects.update_or_create(block_id=row.block_id, language=row.language, defaults=dict(row))
+            if cre:
+                added += 1
+            else:
+                edited += 1
+        else:
+            print(f"new row {i}")
+            extra_items = row.extra_items
+            try:
+                json.loads(extra_items)
+            except:
+                print("error on extra items")
+                extra_items = "{}"
+            m = Message(block_id=row.block_id, language=row.language, full_locale=row.full_locale,
+                                state=row.state, content=row.content, extra_items=extra_items)
+            m.save()
+            added += 1
+    return {"added": added, "edited": edited}

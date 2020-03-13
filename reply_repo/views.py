@@ -1,13 +1,8 @@
-from django.shortcuts import render
 from django.http import JsonResponse, Http404, HttpResponse
-from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
 
 from reply_repo import models
 import json
-#from posts.models import Post, Interaction
-#from messenger_users.models import User, UserData
 
 @csrf_exempt
 def index(request):
@@ -99,10 +94,11 @@ def fix_messages_view(request):
 def download_messages(request):
     mess_ur = request.POST.get("url")
     from scripts.reply_export_import import run_dump
-    return JsonResponse(run_dump(mess_ur))
+    return JsonResponse(repr(run_dump(mess_ur)))
 
 
 @csrf_exempt
 def upload_messages(request):
-
-    return JsonResponse()
+    sheet_url = request.POST.get("url")
+    from scripts.reply_export_import import run_up
+    return JsonResponse(run_up(sheet_url))
