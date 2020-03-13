@@ -61,11 +61,14 @@ def amek_replies(reply_df):
             print(f"updating row {i}")
             r = dict(row)
             del r["id"]
-            m, cre = Message.objects.update_or_create(block_id=row.block_id, language=row.language, defaults=dict(row))
-            if cre:
-                added += 1
-            else:
-                edited += 1
+            try:
+                m, cre = Message.objects.update_or_create(block_id=row.block_id, language=row.language, defaults=dict(r))
+                if cre:
+                    added += 1
+                else:
+                    edited += 1
+            except Message.MultipleObjectsReturned:
+                print("error, as object {row}")
         else:
             print(f"new row {i}")
             extra_items = row.extra_items
