@@ -1,9 +1,3 @@
-#!/bin/python
-from celery import Celery
-from dotenv import load_dotenv
-import django
-
-load_dotenv('.env')
 '''
 Copy paste this script in a django shell:
     1. Activate venv (source venv/bin/activate)
@@ -17,9 +11,6 @@ from posts.models import Question
 
 import boto3
 
-app = Celery('tasks', broker=CELERY_BROKER)
-
-@app.task
 def translate_reply_repo(language_origin = 'es', language_destination = 'en', destination_locale = 'en_US'):
     translate = boto3.client(service_name='translate', region_name='us-east-2', use_ssl=True)
 
@@ -46,9 +37,8 @@ def translate_reply_repo(language_origin = 'es', language_destination = 'en', de
                             extra_items = message.extra_items)
       msg_to_save.save()
 
-    print ('Translated %s messages. ' % (len(messages_to_translate)))
+    return dict(translated = len(messages_to_translate))
 
-@app.task
 def translate_questions(language_origin = 'es', language_destination = 'en', destination_locale = 'en_US'):
     translate = boto3.client(service_name ='translate', region_name = 'us-east-2', use_ssl = True)
 
@@ -67,10 +57,8 @@ def translate_questions(language_origin = 'es', language_destination = 'en', des
                    post = question.post,
                    replies = replies_result.get('TranslatedText'))
       q.save()
+    return dict(translated_questions = len(questions_to_translate))
 
-    print ('Translated %s questions. ' % (len(questions_to_translate)))
-
-@app.task
 def change_state(language = 'en', desired_state = 'Published'):
     messages_updated = Message.objects \
       .exclude(
@@ -79,4 +67,4 @@ def change_state(language = 'en', desired_state = 'Published'):
       .filter(
         language = language
       ).update(state=desired_state)
-    print ('Updated %s messages. ' % messages_updated)
+    return dict(updated_messages = len(messages_updated))

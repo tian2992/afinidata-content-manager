@@ -80,6 +80,33 @@ def index(request):
         data['locale'])
     return JsonResponse(dict(messages=[dict(text=message)]))
 
+def translate(request):
+    return HttpResponse(
+    '''
+    <form action="do_translate" method="post">
+        <label for="language_origin">
+            Language Origin
+            <input type="text" name="language_origin" />
+        </label>
+        <label for="language_destination">
+            Language Destination
+            <input type="text" name="language_destination" />
+        </label>
+        <label for="destination_locale">
+            Destination Locale
+            <input type="text" name="destination_locale" />
+        </label>
+        <button type="submit" formaction="do">Start</button>
+    </form>
+    ''')
+
+@csrf_exempt
+def do_translate(request):
+    from scripts.auto_translate import translate_reply_repo
+
+    return JsonResponse(translate_reply_repo(language_origin = request.POST.get("language_origin"),
+                                             language_destination = request.POST.get("language_destination"),
+                                             destination_locale = request.POST.get("destination_locale")))
 
 def fix_messages_view(request):
     return HttpResponse("""<form action="download" method="post">
