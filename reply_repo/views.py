@@ -124,7 +124,7 @@ def done(request):
         result = 'Pending - <pre>%s</pre>' % (r)
     state = task.state
     script = ''
-    if state != 'SUCCESS':
+    if state == 'PENDING':
         script = '<script>setTimeout(location.reload.bind(location), 5000);</script>'
     return HttpResponse('''
                         <div>
