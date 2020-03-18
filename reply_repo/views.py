@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 
 from reply_repo import models
 import json
+import traceback
 
 @csrf_exempt
 def index(request):
@@ -115,19 +116,21 @@ def done(request):
     from celery.result import AsyncResult
     task = AsyncResult(request.GET.get("id"))
     result = 'Pending'
+    r = ''
     try:
         result = task.get(1)
     except:
-        result = 'Pending'
+        r = traceback.format_exc()
+        result = 'Pending - %s' % (r)
     state = task.state
     return HttpResponse('''
-                        <pre>
+                        <div>
                             <ul>
                                 <li><b>ID:</b> - %s<li>
                                 <li><b>State:</b> - %s<li>
                                 <li><b>Result:</b> - %s<li>
                             </ul>
-                        </pre>
+                        </div>
                         ''' % (task.id, state, result))
 
 def fix_messages_view(request):
