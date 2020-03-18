@@ -121,7 +121,7 @@ def done(request):
         result = task.get(1)
     except:
         r = traceback.format_exc()
-        result = 'Pending - %s' % (r)
+        result = 'Pending - <pre>%s</pre>' % (r)
     state = task.state
     return HttpResponse('''
                         <div>
