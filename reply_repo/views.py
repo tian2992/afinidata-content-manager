@@ -123,6 +123,9 @@ def done(request):
         r = traceback.format_exc()
         result = 'Pending - <pre>%s</pre>' % (r)
     state = task.state
+    script = ''
+    if state != 'SUCCESS':
+        script = '<script>setTimeout(location.reload.bind(location), 5000);</script>'
     return HttpResponse('''
                         <div>
                             <ul>
@@ -131,7 +134,8 @@ def done(request):
                                 <li><b>Result:</b> - %s<li>
                             </ul>
                         </div>
-                        ''' % (task.id, state, result))
+                        %s
+                        ''' % (task.id, state, result, script))
 
 def fix_messages_view(request):
     return HttpResponse("""<form action="download" method="post">
