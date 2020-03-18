@@ -8,9 +8,14 @@ Copy paste this script in a django shell:
 '''
 from reply_repo.models import Message
 from posts.models import Question
-
+from celery import shared_task
 import boto3
 
+@shared_task
+def add(x, y):
+    return x + y
+
+@shared_task
 def translate_reply_repo(language_origin = 'es', language_destination = 'en', destination_locale = 'en_US'):
     translate = boto3.client(service_name='translate', region_name='us-east-2', use_ssl=True)
 
