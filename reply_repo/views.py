@@ -102,11 +102,34 @@ def translate(request):
 
 @csrf_exempt
 def do_translate(request):
-    from scripts.auto_translate import translate_reply_repo
+    from reply_repo.tasks import translate_reply_repo
 
-    return JsonResponse(translate_reply_repo(language_origin = request.POST.get("language_origin"),
-                                             language_destination = request.POST.get("language_destination"),
-                                             destination_locale = request.POST.get("destination_locale")))
+    task = translate_reply_repo.delay(language_origin = request.POST.get("language_origin"),
+                                      language_destination = request.POST.get("language_destination"),
+                                      destination_locale = request.POST.get("destination_locale"))
+    return JsonResponse(dict(id = task.id,
+                             state = task.state,
+                             is_done='https://contentmanager.afinidata.com/reply_repo/done?id=%s' % (task.id)))
+
+@csrf_exempt
+def done(request):
+    from celery.result import AsyncResult
+    task = AsyncResult(request.GET.get("id"))
+    result = 'Pending'
+    try:
+        result = task.get(1)
+    except:
+        result = 'Pending'
+    state = task.state
+    return HttpResponse('''
+                        <pre>
+                            <ul>
+                                <li><b>ID:</b> - %s<li>
+                                <li><b>State:</b> - %s<li>
+                                <li><b>Result:</b> - %s<li>
+                            </ul>
+                        </pre>
+                        ''' % (task.id, state, result))
 
 def fix_messages_view(request):
     return HttpResponse("""<form action="download" method="post">
