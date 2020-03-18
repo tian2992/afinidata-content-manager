@@ -1,5 +1,6 @@
 from django.http import JsonResponse, Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
 
 from reply_repo import models
 import json
@@ -107,9 +108,7 @@ def do_translate(request):
     task = translate_reply_repo.delay(language_origin = request.POST.get("language_origin"),
                                       language_destination = request.POST.get("language_destination"),
                                       destination_locale = request.POST.get("destination_locale"))
-    return JsonResponse(dict(id = task.id,
-                             state = task.state,
-                             is_done='https://contentmanager.afinidata.com/reply_repo/done?id=%s' % (task.id)))
+    return redirect('/reply/done?id=%s' % (task.id))
 
 @csrf_exempt
 def done(request):
