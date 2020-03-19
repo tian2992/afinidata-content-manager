@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path
 from reply_repo.views import index, download_messages, upload_messages, fix_messages_view, translate, do_translate, done
-
 app_name = 'reply_repo'
 
 urlpatterns = [

@@ -137,6 +137,7 @@ def done(request):
                         %s
                         ''' % (task.id, state, result, script))
 
+
 def fix_messages_view(request):
     return HttpResponse("""<form action="download" method="post">
     <input type="text" name="url" />
