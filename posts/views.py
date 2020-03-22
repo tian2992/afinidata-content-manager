@@ -845,6 +845,14 @@ def get_posts_for_user(request):
                     post__min_range__lte=months_old_value,
                     post__max_range__gte=months_old_value,
                     post__status='published')
+        if posts.count() <= 0:
+            warning_message = 'no values without sended available, defaulting to english'
+            logger.warning(warning_message+ ": username {}".format(username))
+            posts = PostLocale.objects \
+                .filter(lang = 'en',
+                        post__min_range__lte=months_old_value,
+                        post__max_range__gte=months_old_value,
+                        post__status='published')
     elif posts.count() <= 0:
         # Repeat; report error that has been seen.
         warning_message = 'no values without sended available'
