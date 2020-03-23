@@ -35,7 +35,10 @@ def index(request):
         },
      ]
     }'''
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except:
+        raise Exception(request.body)
     if not data['locale']:
         raise Http404
     if not data['block_id']:
