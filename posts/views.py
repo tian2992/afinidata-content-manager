@@ -177,6 +177,10 @@ def fetch_post(request, id):
         if locale:
             post_locale = PostLocale.objects.filter(lang = language,
                                                  post__id=id).first()
+            if not post_locale and language != 'en':
+                language = 'en'
+                post_locale = PostLocale.objects.filter(lang = language,
+                                                     post__id=id).first()
         if not user:
             try:
                 channel_id = request.GET['channel_id']
